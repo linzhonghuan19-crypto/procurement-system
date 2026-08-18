@@ -6,7 +6,7 @@ from typing import Optional, List
 from database import get_db, Product, User, AuditLog, ProductStatus
 from auth import get_current_user, require_editor, require_admin
 from datetime import datetime, timezone
-import zipfile, xml.etree.ElementTree as ET, io, math
+import zipfile, xml.etree.ElementTree as  ET, io, math
 
 router = APIRouter(prefix="/api/products", tags=["产品"])
 
