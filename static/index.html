@@ -579,7 +579,7 @@ function showApp() {
 async function loadData() {
   try {
     document.getElementById('lastSync').textContent = '同步中...';
-    const data = await api(`/api/products?page_size=5000`);
+    const data = await api(`/api/products?page_size=200`);
     products = data.items;
     document.getElementById('rowCount').textContent = products.length;
     renderGrid();
