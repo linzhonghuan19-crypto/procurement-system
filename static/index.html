@@ -491,23 +491,36 @@ let editingCell = null;
 let colWidths = {};
 let sortState = {};
 
-// Column definitions matching the spreadsheet
-const COLUMNS = [
-  { key: 'row_num', label: '#', width: 50, editable: false },
-  { key: 'sku', label: 'SKU', width: 130, editable: true },
-  { key: 'product_name', label: '标题', width: 200, editable: true },
-  { key: 'category', label: '组别', width: 80, editable: true },
-  { key: 'supplier', label: '供应商', width: 140, editable: true },
-  { key: 'price_1688', label: '采购价RMB', width: 110, editable: true, type: 'number' },
-  { key: 'price_amazon', label: '亚马逊价', width: 110, editable: true, type: 'number' },
-  { key: 'price_selling', label: '售价', width: 90, editable: true, type: 'number' },
-  { key: 'stock_quantity', label: '库存', width: 70, editable: true, type: 'number' },
-  { key: 'moq', label: '采购数量', width: 80, editable: true, type: 'number' },
-  { key: 'status', label: '采购状态', width: 100, editable: true },
-  { key: 'purchase_link', label: '采购链接', width: 200, editable: true },
-  { key: 'image_url', label: '图片', width: 80, editable: true },
-  { key: 'remarks', label: '备注', width: 180, editable: true },
-];
+// Column definitions matching the uploaded Excel headers
+	const COLUMNS = [
+	  { key: 'row_num', label: '#', width: 50, editable: false },
+	  { key: 'date', label: '日期', width: 80, editable: true },
+	  { key: 'attribute', label: '属性', width: 70, editable: true },
+	  { key: 'category', label: '组别', width: 80, editable: true },
+	  { key: 'store', label: '店铺', width: 80, editable: true },
+	  { key: 'mercadolibre_link', label: '美客多产品链接', width: 180, editable: true, type: 'link' },
+	  { key: 'purchase_link', label: '原采购链接', width: 180, editable: true, type: 'link' },
+	  { key: 'sku', label: 'SKU', width: 140, editable: true },
+	  { key: 'product_name', label: '标题', width: 220, editable: true },
+	  { key: 'product_attributes', label: '产品属性', width: 120, editable: true },
+	  { key: 'purchase_remarks', label: '采购备注', width: 120, editable: true },
+	  { key: 'purchase_quantity', label: '采购数量', width: 80, editable: true, type: 'number' },
+	  { key: 'warehouse_remarks', label: '仓库备注', width: 120, editable: true },
+	  { key: 'order_number', label: '订单号', width: 160, editable: true },
+	  { key: 'purchase_price', label: '采购价RMB', width: 100, editable: true, type: 'number' },
+	  { key: 'new_purchase_price', label: '新采购价RMB', width: 100, editable: true, type: 'number' },
+	  { key: 'new_purchase_link', label: '新采购链接', width: 180, editable: true, type: 'link' },
+	  { key: 'supplier', label: '供应商', width: 140, editable: true },
+	  { key: 'image_url', label: '图片', width: 70, editable: true, type: 'image' },
+	  { key: 'stock_quantity', label: '库存', width: 70, editable: true, type: 'number' },
+	  { key: 'remark1', label: '备注1', width: 120, editable: true },
+	  { key: 'remark2', label: '备注2', width: 120, editable: true },
+	  { key: 'remark3', label: '备注3', width: 120, editable: true },
+	  { key: 'remark4', label: '备注4', width: 120, editable: true },
+	  { key: 'length', label: '长', width: 70, editable: true, type: 'number' },
+	  { key: 'width', label: '宽', width: 70, editable: true, type: 'number' },
+	  { key: 'height', label: '高', width: 70, editable: true, type: 'number' },
+	];
 
 // ========== AUTH ==========
 function doLogin() {
@@ -583,6 +596,16 @@ async function api(url, method='GET', body=null) {
   const opts = {method, headers: authHeaders()};
   if (body) opts.body = JSON.stringify(body);
   const resp = await fetch(url, opts);
+  if (resp.status === 401) {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    TOKEN = ''; USER = {};
+    if (document.getElementById('app').classList.contains('active')) {
+      document.getElementById('app').classList.remove('active');
+      document.getElementById('loginPage').style.display = 'flex';
+    }
+    throw new Error('请先登录');
+  }
   const data = await resp.json();
   if (!resp.ok) throw new Error(data.detail || '请求失败');
   return data;
@@ -624,18 +647,23 @@ function renderGrid() {
       let content = '';
 
       if (val === null || val === undefined || val === '') {
-        content = '';
-      } else if (col.key === 'status') {
-        const statusMap = {'待采购':'pending','已下单':'ordered','在途':'transit','已入库':'warehoused','停售':'discontinued'};
-        const sc = statusMap[val] || 'pending';
-        content = `<span class="status-dot" style="background:${sc==='pending'?'#f59e0b':sc==='ordered'?'#3b82f6':sc==='transit'?'#8b5cf6':sc==='warehoused'?'#22c55e':'#9ca3af'}"></span><span class="status-${sc}">${escHtml(val)}</span>`;
-      } else if (col.key === 'image_url') {
-        content = val ? `<img src="${escHtml(val)}" class="img-thumb" onerror="this.style.display='none'">` : '';
-      } else if (col.key === 'purchase_link' && val) {
-        content = `<a href="${escHtml(val)}" target="_blank" class="cell-link">${val.length > 25 ? val.slice(0,25)+'...' : val}</a>`;
-      } else if (col.type === 'number') {
-        content = `<span class="cell-content num">${Number(val).toFixed(2)}</span>`;
-      } else {
+	        content = '';
+	      } else if (col.key === 'status') {
+	        const statusMap = {'待采购':'pending','已下单':'ordered','在途':'transit','已入库':'warehoused','停售':'discontinued'};
+	        const sc = statusMap[val] || 'pending';
+	        content = `<span class="status-dot" style="background:${sc==='pending'?'#f59e0b':sc==='ordered'?'#3b82f6':sc==='transit'?'#8b5cf6':sc==='warehoused'?'#22c55e':'#9ca3af'}"></span><span class="status-${sc}">${escHtml(val)}</span>`;
+	      } else if (col.key === 'image_url') {
+	        content = val ? `<img src="${escHtml(val)}" class="img-thumb" onerror="this.style.display='none'">` : '';
+	      } else if (col.type === 'link' && val) {
+	        content = `<a href="${escHtml(val)}" target="_blank" class="cell-link">${val.length > 30 ? val.slice(0,30)+'...' : val}</a>`;
+	      } else if (col.type === 'number') {
+	        const num = Number(val);
+	        if (Number.isInteger(num) && Math.abs(num) < 100000) {
+	          content = `<span class="cell-content num">${num}</span>`;
+	        } else {
+	          content = `<span class="cell-content num">${num.toFixed(2)}</span>`;
+	        }
+	      } else {
         content = escHtml(String(val));
       }
 
@@ -787,51 +815,91 @@ function switchView(view) {
 
 // ========== PRODUCT CRUD ==========
 function showCreateProduct() {
-  document.getElementById('modalTitle').textContent = '新增产品';
-  document.getElementById('modalBody').innerHTML = `
-    <div class="form-row">
-      <div class="form-group"><label>SKU *</label><input id="f_sku" placeholder="必填，唯一标识"></div>
-      <div class="form-group"><label>产品名称 *</label><input id="f_name" placeholder="必填"></div>
-    </div>
-    <div class="form-row">
-      <div class="form-group"><label>组别</label><input id="f_category" placeholder="如：美一组"></div>
-      <div class="form-group"><label>供应商</label><input id="f_supplier" placeholder="供应商名称"></div>
-    </div>
-    <div class="form-row">
-      <div class="form-group"><label>采购价</label><input id="f_p1688" type="number" step="0.01" value="0"></div>
-      <div class="form-group"><label>库存</label><input id="f_stock" type="number" value="0"></div>
-    </div>
-    <div class="form-group"><label>采购链接</label><input id="f_link" placeholder="https://detail.1688.com/..."></div>
-    <div class="form-group"><label>图片URL</label><input id="f_img" placeholder="https://..."></div>
-    <div class="form-group"><label>备注</label><textarea id="f_remarks" rows="2" style="width:100%"></textarea></div>
-  `;
-  document.getElementById('modalFooter').innerHTML = `
-    <button class="btn btn-outline" onclick="closeModal()">取消</button>
-    <button class="btn btn-primary" onclick="submitCreateProduct()">创建</button>
-  `;
-  document.getElementById('modalOverlay').classList.add('active');
-}
+	  document.getElementById('modalTitle').textContent = '新增产品';
+	  document.getElementById('modalBody').innerHTML = `
+	    <div class="form-row">
+	      <div class="form-group"><label>SKU *</label><input id="f_sku" placeholder="必填，唯一标识"></div>
+	      <div class="form-group"><label>标题 *</label><input id="f_name" placeholder="必填"></div>
+	    </div>
+	    <div class="form-row-3">
+	      <div class="form-group"><label>日期</label><input id="f_date" placeholder="如：46093"></div>
+	      <div class="form-group"><label>属性</label><input id="f_attribute" placeholder="如：补货"></div>
+	      <div class="form-group"><label>组别</label><input id="f_category" placeholder="如：美一组"></div>
+	    </div>
+	    <div class="form-row-3">
+	      <div class="form-group"><label>店铺</label><input id="f_store" placeholder="如：B7店"></div>
+	      <div class="form-group"><label>产品属性</label><input id="f_product_attr" placeholder="如：笔记本15.6寸"></div>
+	      <div class="form-group"><label>供应商</label><input id="f_supplier" placeholder="供应商名称"></div>
+	    </div>
+	    <div class="form-row-3">
+	      <div class="form-group"><label>采购价RMB</label><input id="f_purchase_price" type="number" step="0.01" value="0"></div>
+	      <div class="form-group"><label>新采购价RMB</label><input id="f_new_price" type="number" step="0.01" value="0"></div>
+	      <div class="form-group"><label>采购数量</label><input id="f_purchase_qty" type="number" value="0"></div>
+	    </div>
+	    <div class="form-row-3">
+	      <div class="form-group"><label>库存</label><input id="f_stock" type="number" value="0"></div>
+	      <div class="form-group"><label>订单号</label><input id="f_order" placeholder="采购订单号"></div>
+	      <div class="form-group"><label>长/宽/高</label><div style="display:flex;gap:4px;"><input id="f_length" type="number" step="0.1" placeholder="长" style="flex:1"><input id="f_width" type="number" step="0.1" placeholder="宽" style="flex:1"><input id="f_height" type="number" step="0.1" placeholder="高" style="flex:1"></div></div>
+	    </div>
+	    <div class="form-group"><label>美客多产品链接</label><input id="f_mercadolibre" placeholder="https://..."></div>
+	    <div class="form-group"><label>原采购链接</label><input id="f_link" placeholder="https://detail.1688.com/..."></div>
+	    <div class="form-group"><label>新采购链接</label><input id="f_new_link" placeholder="https://..."></div>
+	    <div class="form-group"><label>图片URL</label><input id="f_img" placeholder="https://..."></div>
+	    <div class="form-row">
+	      <div class="form-group"><label>采购备注</label><textarea id="f_purchase_remarks" rows="2" style="width:100%"></textarea></div>
+	      <div class="form-group"><label>仓库备注</label><textarea id="f_warehouse_remarks" rows="2" style="width:100%"></textarea></div>
+	    </div>
+	    <div class="form-row-3">
+	      <div class="form-group"><label>备注1</label><input id="f_remark1"></div>
+	      <div class="form-group"><label>备注2</label><input id="f_remark2"></div>
+	      <div class="form-group"><label>备注3</label><input id="f_remark3"></div>
+	    </div>
+	    <div class="form-group"><label>备注4</label><input id="f_remark4"></div>
+	  `;
+	  document.getElementById('modalFooter').innerHTML = `
+	    <button class="btn btn-outline" onclick="closeModal()">取消</button>
+	    <button class="btn btn-primary" onclick="submitCreateProduct()">创建</button>
+	  `;
+	  document.getElementById('modalOverlay').classList.add('active');
+	}
 
 async function submitCreateProduct() {
-  const d = {
-    sku: document.getElementById('f_sku').value,
-    product_name: document.getElementById('f_name').value,
-    category: document.getElementById('f_category').value,
-    supplier: document.getElementById('f_supplier').value,
-    price_1688: parseFloat(document.getElementById('f_p1688').value) || 0,
-    stock_quantity: parseInt(document.getElementById('f_stock').value) || 0,
-    purchase_link: document.getElementById('f_link').value,
-    image_url: document.getElementById('f_img').value,
-    remarks: document.getElementById('f_remarks').value,
-  };
-  if (!d.sku || !d.product_name) { toast('SKU和名称为必填', 'error'); return; }
-  try {
-    await api('/api/products', 'POST', d);
-    toast('创建成功', 'success');
-    closeModal();
-    loadData();
-  } catch(e) { toast(e.message, 'error'); }
-}
+	  const d = {
+	    sku: document.getElementById('f_sku').value,
+	    product_name: document.getElementById('f_name').value,
+	    date: document.getElementById('f_date').value,
+	    attribute: document.getElementById('f_attribute').value,
+	    category: document.getElementById('f_category').value,
+	    store: document.getElementById('f_store').value,
+	    product_attributes: document.getElementById('f_product_attr').value,
+	    supplier: document.getElementById('f_supplier').value,
+	    purchase_price: parseFloat(document.getElementById('f_purchase_price').value) || 0,
+	    new_purchase_price: parseFloat(document.getElementById('f_new_price').value) || 0,
+	    purchase_quantity: parseInt(document.getElementById('f_purchase_qty').value) || 0,
+	    stock_quantity: parseInt(document.getElementById('f_stock').value) || 0,
+	    order_number: document.getElementById('f_order').value,
+	    length: parseFloat(document.getElementById('f_length').value) || 0,
+	    width: parseFloat(document.getElementById('f_width').value) || 0,
+	    height: parseFloat(document.getElementById('f_height').value) || 0,
+	    mercadolibre_link: document.getElementById('f_mercadolibre').value,
+	    purchase_link: document.getElementById('f_link').value,
+	    new_purchase_link: document.getElementById('f_new_link').value,
+	    image_url: document.getElementById('f_img').value,
+	    purchase_remarks: document.getElementById('f_purchase_remarks').value,
+	    warehouse_remarks: document.getElementById('f_warehouse_remarks').value,
+	    remark1: document.getElementById('f_remark1').value,
+	    remark2: document.getElementById('f_remark2').value,
+	    remark3: document.getElementById('f_remark3').value,
+	    remark4: document.getElementById('f_remark4').value,
+	  };
+	  if (!d.sku || !d.product_name) { toast('SKU和标题为必填', 'error'); return; }
+	  try {
+	    await api('/api/products', 'POST', d);
+	    toast('创建成功', 'success');
+	    closeModal();
+	    loadData();
+	  } catch(e) { toast(e.message, 'error'); }
+	}
 
 // ========== ORDERS ==========
 async function loadOrders() {
@@ -945,17 +1013,43 @@ async function aiSuggestOrder() {
 
 // ========== IMPORT ==========
 function showImport() {
-  document.getElementById('modalTitle').textContent = '📥 导入数据';
+  document.getElementById('modalTitle').textContent = '导入数据';
   document.getElementById('modalBody').innerHTML = `
-    <p style="font-size:13px;color:var(--gray-500);margin-bottom:12px;">将从企业微信表格导出的JSON数据粘贴到下方：</p>
-    <textarea id="importData" rows="10" style="width:100%;font-family:monospace;font-size:12px;padding:8px;border:1px solid var(--gray-200);border-radius:6px;" placeholder='[{"sku":"...","product_name":"...",...}]'></textarea>
-    <div style="margin-top:8px;font-size:12px;color:var(--gray-400);">格式: [{"sku":"SKU001","product_name":"产品名称","category":"美一组","price_1688":15.5,"stock_quantity":100,...}]</div>
+    <div style="margin-bottom:16px;">
+      <p style="font-size:13px;color:var(--gray-500);margin-bottom:8px;">方式一：上传Excel文件（.xlsx，表头自动匹配）</p>
+      <input type="file" id="excelFileInput" accept=".xlsx" style="font-size:13px;">
+      <button class="btn btn-primary btn-sm" onclick="uploadExcel()" style="margin-top:8px;">上传并导入</button>
+    </div>
+    <div style="border-top:1px solid var(--gray-200);padding-top:16px;">
+      <p style="font-size:13px;color:var(--gray-500);margin-bottom:8px;">方式二：粘贴JSON数据</p>
+      <textarea id="importData" rows="8" style="width:100%;font-family:monospace;font-size:12px;padding:8px;border:1px solid var(--gray-200);border-radius:6px;" placeholder='[{"sku":"...","product_name":"...","date":"46093","attribute":"补货","category":"美一组","purchase_price":15.5,...}]'></textarea>
+      <div style="margin-top:8px;font-size:12px;color:var(--gray-400);">支持字段: date, attribute, category, store, mercadolibre_link, purchase_link, sku, product_name, product_attributes, purchase_remarks, purchase_quantity, warehouse_remarks, order_number, purchase_price, new_purchase_price, new_purchase_link, supplier, image_url, stock_quantity, remark1-4, length, width, height</div>
+    </div>
   `;
   document.getElementById('modalFooter').innerHTML = `
     <button class="btn btn-outline" onclick="closeModal()">取消</button>
-    <button class="btn btn-primary" onclick="submitImport()">导入</button>
+    <button class="btn btn-primary" onclick="submitImport()">导入JSON</button>
   `;
   document.getElementById('modalOverlay').classList.add('active');
+}
+
+async function uploadExcel() {
+  const fileInput = document.getElementById('excelFileInput');
+  if (!fileInput.files.length) { toast('请选择Excel文件', 'error'); return; }
+  const formData = new FormData();
+  formData.append('file', fileInput.files[0]);
+  try {
+    const resp = await fetch('/api/products/upload-excel', {
+      method: 'POST',
+      headers: {'Authorization': `Bearer ${TOKEN}`},
+      body: formData,
+    });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.detail || '上传失败');
+    toast(data.message, 'success');
+    closeModal();
+    loadData();
+  } catch(e) { toast('上传失败: '+e.message, 'error'); }
 }
 
 async function submitImport() {
@@ -1053,11 +1147,8 @@ function renameDoc(name) {
 }
 
 // ========== INIT ==========
-if (TOKEN && USER.username) {
-  showApp();
-} else {
-  document.getElementById('loginPage').style.display = 'flex';
-}
+// Always show login page first
+document.getElementById('loginPage').style.display = 'flex';
 loadSettings();
 </script>
 </body>
