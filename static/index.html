@@ -3,192 +3,302 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>海外仓采购管理系统</title>
+<title>海外仓总采购表</title>
 <style>
 :root {
-  --primary: #4f46e5; --primary-hover: #4338ca; --primary-light: #eef2ff;
-  --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --info: #3b82f6;
-  --gray-50: #f9fafb; --gray-100: #f3f4f6; --gray-200: #e5e7eb;
-  --gray-300: #d1d5db; --gray-400: #9ca3af; --gray-500: #6b7280;
-  --gray-600: #4b5563; --gray-700: #374151; --gray-800: #1f2937; --gray-900: #111827;
-  --radius: 8px; --radius-lg: 12px; --shadow: 0 1px 3px rgba(0,0,0,0.1);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.1); --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
-  --sidebar-w: 220px;
+  --primary: #4a6cf7;
+  --primary-hover: #3b5de7;
+  --primary-light: #eef1ff;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --gray-50: #f8f9fa;
+  --gray-100: #f0f1f3;
+  --gray-150: #e8eaed;
+  --gray-200: #dadce0;
+  --gray-300: #bdc1c6;
+  --gray-400: #9aa0a6;
+  --gray-500: #80868b;
+  --gray-600: #5f6368;
+  --gray-700: #3c4043;
+  --gray-800: #202124;
+  --header-bg: #f0f1f3;
+  --selected-bg: #e8f0fe;
+  --selected-border: #1a73e8;
+  --gridline: #e0e0e0;
+  --header-h: 32px;
+  --row-h: 28px;
+  --toolbar-h: 48px;
+  --formula-h: 36px;
+  --status-h: 28px;
+  --col-w: 120px;
+  --row-num-w: 50px;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans SC", sans-serif; background: var(--gray-50); color: var(--gray-800); font-size: 14px; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", "Helvetica Neue", Arial, sans-serif; font-size: 13px; color: var(--gray-800); background: #fff; overflow: hidden; height: 100vh; user-select: none; }
+input, textarea, select { font-family: inherit; font-size: 13px; }
 a { color: var(--primary); text-decoration: none; }
-button { cursor: pointer; font-family: inherit; font-size: 13px; border: none; outline: none; }
-input, select, textarea { font-family: inherit; font-size: 13px; outline: none; border: 1px solid var(--gray-300); border-radius: var(--radius); padding: 6px 10px; }
-input:focus, select:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79,70,229,0.1); }
-table { width: 100%; border-collapse: collapse; }
-th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--gray-200); }
-th { background: var(--gray-50); font-weight: 600; font-size: 12px; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.5px; position: sticky; top: 0; z-index: 1; }
-tr:hover { background: var(--gray-50); }
 
-/* Login */
-.login-page { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-.login-card { background: #fff; border-radius: var(--radius-lg); padding: 40px; width: 380px; box-shadow: var(--shadow-lg); }
-.login-card h1 { font-size: 22px; text-align: center; margin-bottom: 8px; }
-.login-card p { text-align: center; color: var(--gray-500); margin-bottom: 24px; font-size: 13px; }
+/* ===== LOGIN ===== */
+.login-page { display: flex; align-items: center; justify-content: center; height: 100vh; background: #f0f2f5; }
+.login-card { background: #fff; border-radius: 12px; padding: 36px; width: 380px; box-shadow: 0 2px 16px rgba(0,0,0,0.08); }
+.login-card h1 { font-size: 20px; text-align: center; margin-bottom: 4px; color: var(--gray-800); }
+.login-card .subtitle { text-align: center; color: var(--gray-500); font-size: 13px; margin-bottom: 24px; }
 .form-group { margin-bottom: 16px; }
-.form-group label { display: block; font-size: 12px; font-weight: 600; color: var(--gray-700); margin-bottom: 4px; }
-.form-group input { width: 100%; padding: 10px 12px; font-size: 14px; }
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 16px; border-radius: var(--radius); font-weight: 500; transition: all 0.15s; }
+.form-group label { display: block; font-size: 12px; font-weight: 500; color: var(--gray-600); margin-bottom: 4px; }
+.form-group input { width: 100%; padding: 10px 12px; border: 1px solid var(--gray-200); border-radius: 8px; font-size: 14px; }
+.form-group input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(74,108,247,0.1); }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 18px; border-radius: 6px; font-weight: 500; font-size: 13px; border: none; cursor: pointer; transition: all 0.15s; }
 .btn-primary { background: var(--primary); color: #fff; }
 .btn-primary:hover { background: var(--primary-hover); }
+.btn-outline { background: transparent; border: 1px solid var(--gray-200); color: var(--gray-600); }
+.btn-outline:hover { background: var(--gray-50); border-color: var(--gray-300); }
 .btn-sm { padding: 4px 10px; font-size: 12px; }
-.btn-outline { background: transparent; border: 1px solid var(--gray-300); color: var(--gray-700); }
-.btn-outline:hover { background: var(--gray-50); }
-.btn-danger { background: var(--danger); color: #fff; }
-.btn-danger:hover { background: #dc2626; }
-.btn-success { background: var(--success); color: #fff; }
-.btn-success:hover { background: #059669; }
-.btn-block { width: 100%; padding: 10px; font-size: 14px; }
-.btn-ghost { background: transparent; color: var(--gray-600); }
-.btn-ghost:hover { background: var(--gray-100); }
+.btn-block { width: 100%; padding: 10px; }
+.btn-link { background: none; border: none; color: var(--primary); cursor: pointer; font-size: 12px; padding: 0; }
+.btn-link:hover { text-decoration: underline; }
+.btn-icon { background: none; border: none; padding: 4px 6px; border-radius: 4px; cursor: pointer; color: var(--gray-500); font-size: 16px; line-height: 1; }
+.btn-icon:hover { background: var(--gray-100); color: var(--gray-700); }
+.hidden { display: none !important; }
 
-/* Layout */
-.app-layout { display: none; height: 100vh; overflow: hidden; }
-.app-layout.active { display: flex; }
-.sidebar { width: var(--sidebar-w); background: #fff; border-right: 1px solid var(--gray-200); display: flex; flex-direction: column; flex-shrink: 0; }
-.sidebar-header { padding: 16px; border-bottom: 1px solid var(--gray-200); }
-.sidebar-header h2 { font-size: 15px; display: flex; align-items: center; gap: 8px; }
-.sidebar-header h2 span { color: var(--primary); }
-.sidebar-nav { flex: 1; padding: 8px; overflow-y: auto; }
-.nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: var(--radius); color: var(--gray-600); cursor: pointer; transition: all 0.1s; margin-bottom: 2px; font-size: 13px; }
-.nav-item:hover { background: var(--gray-50); color: var(--gray-800); }
-.nav-item.active { background: var(--primary-light); color: var(--primary); font-weight: 600; }
-.nav-item .badge { margin-left: auto; background: var(--gray-200); padding: 1px 8px; border-radius: 10px; font-size: 11px; }
-.sidebar-footer { padding: 12px 16px; border-top: 1px solid var(--gray-200); display: flex; align-items: center; gap: 8px; }
-.sidebar-footer .avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; }
-.sidebar-footer .user-info { flex: 1; }
-.sidebar-footer .user-name { font-size: 13px; font-weight: 500; }
-.sidebar-footer .user-role { font-size: 11px; color: var(--gray-500); }
+/* ===== SPREADSHEET LAYOUT ===== */
+.spreadsheet-app { display: none; height: 100vh; flex-direction: column; }
+.spreadsheet-app.active { display: flex; }
 
-/* Main */
-.main-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-.topbar { display: flex; align-items: center; justify-content: space-between; padding: 12px 24px; background: #fff; border-bottom: 1px solid var(--gray-200); }
-.topbar h1 { font-size: 16px; font-weight: 600; }
-.topbar-actions { display: flex; gap: 8px; align-items: center; }
-.content { flex: 1; overflow: auto; padding: 20px 24px; }
+/* ===== TOOLBAR ===== */
+.toolbar { display: flex; align-items: center; height: var(--toolbar-h); padding: 0 12px; border-bottom: 1px solid var(--gray-200); background: #fff; gap: 4px; flex-shrink: 0; }
+.toolbar .doc-title { font-size: 15px; font-weight: 500; color: var(--gray-800); padding: 4px 8px; border-radius: 4px; cursor: default; }
+.toolbar .doc-title:hover { background: var(--gray-100); }
+.toolbar .doc-title input { display: none; border: none; font-size: 15px; font-weight: 500; outline: none; background: var(--gray-100); padding: 2px 4px; border-radius: 2px; }
+.toolbar .doc-title.editing input { display: inline; }
+.toolbar .doc-title.editing span { display: none; }
+.toolbar .star { color: var(--gray-300); cursor: pointer; font-size: 16px; padding: 4px; }
+.toolbar .star:hover { color: var(--warning); }
+.toolbar-sep { width: 1px; height: 24px; background: var(--gray-200); margin: 0 4px; }
+.toolbar-group { display: flex; align-items: center; gap: 2px; }
+.toolbar-btn { padding: 4px 8px; border-radius: 4px; cursor: pointer; color: var(--gray-600); font-size: 13px; border: none; background: none; display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+.toolbar-btn:hover { background: var(--gray-100); }
+.toolbar-btn b { font-weight: 600; }
+.toolbar-right { margin-left: auto; display: flex; align-items: center; gap: 4px; }
+.user-avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 12px; cursor: pointer; }
+.user-avatar:hover { opacity: 0.8; }
 
-/* Page */
-.page { display: none; }
-.page.active { display: block; }
+/* ===== FORMULA BAR ===== */
+.formula-bar { display: flex; align-items: center; height: var(--formula-h); border-bottom: 1px solid var(--gray-200); background: #fff; flex-shrink: 0; }
+.formula-bar .cell-ref { width: 60px; text-align: center; font-size: 12px; font-weight: 600; color: var(--gray-600); border-right: 1px solid var(--gray-200); height: 100%; display: flex; align-items: center; justify-content: center; background: var(--gray-50); }
+.formula-bar .fx { padding: 0 8px; color: var(--gray-400); font-size: 12px; font-style: italic; }
+.formula-bar .formula-input { flex: 1; height: 100%; border: none; outline: none; padding: 0 8px; font-size: 13px; }
 
-/* Stats */
-.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 20px; }
-.stat-card { background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius-lg); padding: 16px; }
-.stat-card .stat-label { font-size: 12px; color: var(--gray-500); margin-bottom: 4px; }
-.stat-card .stat-value { font-size: 24px; font-weight: 700; }
-.stat-card .stat-sub { font-size: 11px; color: var(--gray-400); margin-top: 2px; }
+/* ===== GRID ===== */
+.grid-container { flex: 1; overflow: auto; position: relative; }
+.grid-scroll { min-width: 100%; }
+.grid-table { border-collapse: collapse; width: max-content; }
 
-/* Table */
-.table-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
-.table-toolbar .left { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-.table-toolbar .right { display: flex; gap: 8px; }
-.search-box { position: relative; }
-.search-box input { padding-left: 32px; width: 220px; }
-.search-box .icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--gray-400); }
-.table-container { background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius-lg); overflow: auto; max-height: calc(100vh - 280px); }
-.table-container table { min-width: 1400px; }
-.table-container th { background: var(--gray-50); }
-.table-container td { font-size: 13px; }
-.status-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 500; }
-.status-pending { background: #fef3c7; color: #92400e; }
-.status-ordered { background: #dbeafe; color: #1e40af; }
-.status-transit { background: #e0e7ff; color: #3730a3; }
-.status-warehoused { background: #d1fae5; color: #065f46; }
-.status-discontinued { background: #f3f4f6; color: #6b7280; }
-.inline-edit { border: none; background: transparent; padding: 2px 4px; cursor: text; min-width: 60px; width: 100%; }
-.inline-edit:focus { background: #fff; border: 1px solid var(--primary); box-shadow: 0 0 0 2px rgba(79,70,229,0.1); }
-.inline-edit:hover { background: var(--gray-50); }
-.cell-img { width: 40px; height: 40px; object-fit: cover; border-radius: 4px; }
-.cell-link { color: var(--primary); font-size: 12px; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block; }
-.text-right { text-align: right; }
-.text-center { text-align: center; }
+/* Header row (column letters) */
+.grid-table th.col-header { 
+  background: var(--header-bg); 
+  border-right: 1px solid var(--gridline); 
+  border-bottom: 1px solid var(--gray-300); 
+  height: var(--header-h); 
+  padding: 0; 
+  text-align: center; 
+  font-size: 11px; 
+  font-weight: 500; 
+  color: var(--gray-500); 
+  position: sticky; 
+  top: 0; 
+  z-index: 3; 
+  min-width: var(--col-w);
+  max-width: var(--col-w);
+  width: var(--col-w);
+}
+.grid-table th.col-header:first-child { 
+  min-width: var(--row-num-w); 
+  max-width: var(--row-num-w); 
+  width: var(--row-num-w); 
+  z-index: 4; 
+  left: 0; 
+  position: sticky;
+}
+.grid-table th.col-header .resize-handle { 
+  position: absolute; right: 0; top: 0; bottom: 0; width: 4px; cursor: col-resize; 
+}
+.grid-table th.col-header .resize-handle:hover { background: var(--selected-border); }
+.grid-table th.col-header .filter-icon { 
+  font-size: 10px; margin-left: 2px; opacity: 0.4; cursor: pointer; 
+  display: inline-block; vertical-align: middle;
+}
+.grid-table th.col-header .filter-icon:hover { opacity: 1; }
 
-/* Pagination */
-.pagination { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; gap: 12px; }
-.pagination .info { font-size: 12px; color: var(--gray-500); }
-.pagination .btns { display: flex; gap: 4px; }
-.pagination .btns button { padding: 4px 10px; border: 1px solid var(--gray-300); background: #fff; border-radius: var(--radius); font-size: 12px; }
-.pagination .btns button:hover { background: var(--gray-50); }
-.pagination .btns button.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+/* Row number column */
+.grid-table td.row-num { 
+  background: var(--header-bg); 
+  border-right: 1px solid var(--gray-300); 
+  border-bottom: 1px solid var(--gridline); 
+  text-align: center; 
+  font-size: 11px; 
+  color: var(--gray-500); 
+  padding: 0; 
+  min-width: var(--row-num-w); 
+  max-width: var(--row-num-w); 
+  width: var(--row-num-w); 
+  height: var(--row-h);
+  position: sticky;
+  left: 0;
+  z-index: 2;
+}
+.grid-table td.row-num.selected-row { background: var(--selected-bg); color: var(--selected-border); font-weight: 600; }
 
-/* Modal */
-.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 1000; align-items: center; justify-content: center; }
+/* Data cells */
+.grid-table td.cell { 
+  border-right: 1px solid var(--gridline); 
+  border-bottom: 1px solid var(--gridline); 
+  padding: 0; 
+  height: var(--row-h); 
+  min-width: var(--col-w);
+  max-width: var(--col-w);
+  width: var(--col-w);
+  position: relative;
+  cursor: cell;
+}
+.grid-table td.cell .cell-content { 
+  padding: 0 6px; 
+  line-height: var(--row-h); 
+  overflow: hidden; 
+  text-overflow: ellipsis; 
+  white-space: nowrap;
+  font-size: 13px;
+  height: 100%;
+}
+.grid-table td.cell.selected { 
+  outline: 2px solid var(--selected-border); 
+  outline-offset: -1px;
+  z-index: 1;
+}
+.grid-table td.cell .cell-content.editing { display: none; }
+.grid-table td.cell .cell-edit { 
+  display: none; 
+  position: absolute; 
+  inset: 0; 
+  border: none; 
+  outline: none; 
+  padding: 0 6px; 
+  font-size: 13px;
+  font-family: inherit;
+  z-index: 5;
+}
+.grid-table td.cell .cell-edit.active { display: block; }
+.grid-table td.cell .cell-content.num { text-align: right; }
+.grid-table td.cell .cell-content.link { color: var(--primary); cursor: pointer; }
+.grid-table td.cell .cell-content.link:hover { text-decoration: underline; }
+.grid-table td.cell .cell-content.status { font-size: 12px; font-weight: 500; }
+.grid-table td.cell .cell-content .status-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 4px; vertical-align: middle; }
+.grid-table td.cell .cell-content .img-thumb { width: 24px; height: 24px; object-fit: cover; border-radius: 2px; vertical-align: middle; cursor: pointer; }
+.grid-table td.cell .cell-content .img-thumb:hover { transform: scale(1.2); }
+
+/* Status colors */
+.status-pending { color: #b45309; }
+.status-ordered { color: #1e40af; }
+.status-transit { color: #6d28d9; }
+.status-warehoused { color: #065f46; }
+.status-discontinued { color: var(--gray-400); }
+
+/* Zebra */
+.grid-table tr:nth-child(even) td.cell { background: #fafafa; }
+.grid-table tr:nth-child(even) td.row-num { background: var(--header-bg); }
+.grid-table tr:hover td.cell { background: #f5f8ff; }
+.grid-table tr:hover td.row-num { background: #e8ecf4; }
+
+/* ===== BOTTOM BAR ===== */
+.status-bar { 
+  display: flex; 
+  align-items: center; 
+  height: var(--status-h); 
+  border-top: 1px solid var(--gray-200); 
+  background: #fff; 
+  padding: 0 12px; 
+  font-size: 11px; 
+  color: var(--gray-500); 
+  gap: 16px;
+  flex-shrink: 0;
+}
+.status-bar .sheet-tabs { display: flex; align-items: center; gap: 0; margin-left: -12px; }
+.status-bar .sheet-tab { 
+  padding: 2px 16px; 
+  border-right: 1px solid var(--gray-200); 
+  cursor: pointer; 
+  font-size: 12px; 
+  color: var(--gray-500); 
+  height: var(--status-h); 
+  display: flex; 
+  align-items: center;
+}
+.status-bar .sheet-tab.active { 
+  border-bottom: 2px solid var(--primary); 
+  color: var(--primary); 
+  font-weight: 500; 
+}
+.status-bar .sheet-tab:hover { background: var(--gray-50); }
+.status-bar .status-right { margin-left: auto; display: flex; gap: 16px; }
+
+/* ===== TOAST ===== */
+.toast { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%) translateY(20px); z-index: 9999; padding: 10px 20px; border-radius: 8px; color: #fff; font-size: 13px; font-weight: 500; box-shadow: 0 4px 16px rgba(0,0,0,0.15); opacity: 0; transition: all 0.3s; pointer-events: none; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast.success { background: var(--success); }
+.toast.error { background: var(--danger); }
+.toast.info { background: var(--primary); }
+
+/* ===== MODAL ===== */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 1000; align-items: center; justify-content: center; }
 .modal-overlay.active { display: flex; }
-.modal { background: #fff; border-radius: var(--radius-lg); width: 90%; max-width: 600px; max-height: 85vh; overflow: auto; box-shadow: var(--shadow-lg); }
+.modal { background: #fff; border-radius: 12px; width: 90%; max-width: 700px; max-height: 85vh; overflow: auto; box-shadow: 0 8px 32px rgba(0,0,0,0.12); }
 .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--gray-200); }
-.modal-header h3 { font-size: 15px; }
-.modal-close { background: none; border: none; font-size: 20px; color: var(--gray-400); padding: 4px; }
+.modal-header h3 { font-size: 15px; font-weight: 600; }
+.modal-close { background: none; border: none; font-size: 20px; color: var(--gray-400); padding: 4px; cursor: pointer; }
 .modal-close:hover { color: var(--gray-600); }
 .modal-body { padding: 20px; }
 .modal-footer { padding: 12px 20px; border-top: 1px solid var(--gray-200); display: flex; justify-content: flex-end; gap: 8px; }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
 
-/* AI Panel */
-.ai-panel { background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 20px; }
-.ai-panel-header { padding: 14px 20px; border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; justify-content: space-between; }
-.ai-panel-header h3 { font-size: 14px; display: flex; align-items: center; gap: 6px; }
-.ai-panel-body { padding: 20px; }
-.ai-input-row { display: flex; gap: 8px; }
-.ai-input-row input { flex: 1; }
-.ai-response { margin-top: 12px; padding: 16px; background: var(--gray-50); border-radius: var(--radius); white-space: pre-wrap; font-size: 13px; line-height: 1.6; min-height: 60px; }
+/* ===== DROPDOWN ===== */
+.dropdown { position: relative; display: inline-block; }
+.dropdown-menu { display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid var(--gray-200); border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.1); z-index: 100; min-width: 180px; padding: 4px; }
+.dropdown-menu.show { display: block; }
+.dropdown-item { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 13px; color: var(--gray-700); }
+.dropdown-item:hover { background: var(--gray-50); }
+.dropdown-sep { height: 1px; background: var(--gray-200); margin: 4px 0; }
 
-/* Orders */
-.orders-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
-.order-card { background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius-lg); padding: 16px; }
-.order-card .order-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
-.order-card .order-number { font-weight: 600; font-size: 14px; }
-.order-card .order-status { font-size: 12px; }
-.order-card .order-detail { font-size: 12px; color: var(--gray-500); }
-.order-card .order-items { margin-top: 8px; font-size: 12px; }
-.order-card .order-items li { padding: 2px 0; }
+/* ===== FILTER DROPDOWN ===== */
+.filter-dropdown { position: absolute; top: 100%; left: 0; background: #fff; border: 1px solid var(--gray-200); border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.1); z-index: 100; padding: 12px; min-width: 200px; }
+.filter-dropdown h4 { font-size: 12px; color: var(--gray-500); margin-bottom: 8px; font-weight: 500; }
+.filter-dropdown label { display: flex; align-items: center; gap: 6px; padding: 4px 0; font-size: 12px; cursor: pointer; }
+.filter-dropdown label input { cursor: pointer; }
+.filter-dropdown .filter-actions { display: flex; gap: 8px; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--gray-200); }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .sidebar { display: none; }
-  .sidebar.mobile-show { display: flex; position: fixed; left: 0; top: 0; bottom: 0; z-index: 100; box-shadow: var(--shadow-lg); }
-  .content { padding: 12px; }
-  .topbar { padding: 10px 12px; }
-  .form-row { grid-template-columns: 1fr; }
-  .stats-grid { grid-template-columns: 1fr 1fr; }
-  .table-toolbar .left { width: 100%; }
-  .search-box input { width: 100%; }
-}
-
-/* Toast */
-.toast { position: fixed; top: 20px; right: 20px; z-index: 9999; padding: 12px 20px; border-radius: var(--radius); color: #fff; font-size: 13px; font-weight: 500; box-shadow: var(--shadow-lg); transform: translateX(120%); transition: transform 0.3s; }
-.toast.show { transform: translateX(0); }
-.toast.success { background: var(--success); }
-.toast.error { background: var(--danger); }
-.toast.info { background: var(--info); }
-
-/* Empty state */
-.empty-state { text-align: center; padding: 60px 20px; color: var(--gray-400); }
-.empty-state .icon { font-size: 48px; margin-bottom: 12px; }
-.empty-state h3 { font-size: 16px; color: var(--gray-600); margin-bottom: 4px; }
-.empty-state p { font-size: 13px; }
-
-/* Loading */
-.loading { display: inline-block; width: 16px; height: 16px; border: 2px solid var(--gray-200); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.6s linear infinite; }
+/* ===== LOADING ===== */
+.loading { display: inline-block; width: 14px; height: 14px; border: 2px solid var(--gray-200); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.6s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* Drag handle */
-.drag-handle { cursor: grab; color: var(--gray-300); }
-.drag-handle:active { cursor: grabbing; }
+/* ===== SETTINGS PANEL ===== */
+.settings-panel { display: none; position: fixed; right: 0; top: 0; bottom: 0; width: 360px; background: #fff; box-shadow: -4px 0 24px rgba(0,0,0,0.1); z-index: 200; flex-direction: column; }
+.settings-panel.active { display: flex; }
+.settings-panel .panel-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--gray-200); }
+.settings-panel .panel-header h3 { font-size: 15px; }
+.settings-panel .panel-body { flex: 1; overflow: auto; padding: 20px; }
+.settings-panel .panel-body .form-group { margin-bottom: 20px; }
+.settings-panel .panel-body .form-group label { font-size: 12px; font-weight: 600; color: var(--gray-600); margin-bottom: 6px; display: block; }
+.settings-panel .panel-body .form-group input, .settings-panel .panel-body .form-group textarea { width: 100%; padding: 8px 10px; border: 1px solid var(--gray-200); border-radius: 6px; font-size: 13px; }
+.settings-panel .panel-body .form-group textarea { font-family: monospace; }
 </style>
 </head>
 <body>
 
-<!-- Login Page -->
+<!-- ===== LOGIN ===== -->
 <div class="login-page" id="loginPage">
   <div class="login-card">
-    <h1>📦 采购管理系统</h1>
-    <p>海外仓总采购表 · 企业版</p>
+    <h1>📊 海外仓总采购表</h1>
+    <p class="subtitle">企业级采购管理 · 在线协作表格</p>
     <div id="loginForm">
       <div class="form-group">
         <label>用户名</label>
@@ -199,8 +309,8 @@ tr:hover { background: var(--gray-50); }
         <input type="password" id="loginPassword" placeholder="输入密码" value="admin123">
       </div>
       <button class="btn btn-primary btn-block" onclick="doLogin()">登录</button>
-      <p style="margin-top: 12px; text-align: center; font-size: 12px;">
-        新用户？<a href="#" onclick="showRegister()">注册账号</a>
+      <p style="margin-top:12px;text-align:center;font-size:12px;color:var(--gray-500);">
+        没有账号？<a href="#" onclick="showRegister()" style="color:var(--primary)">注册</a>
       </p>
     </div>
     <div id="registerForm" style="display:none">
@@ -217,192 +327,110 @@ tr:hover { background: var(--gray-50); }
         <input type="password" id="regPassword" placeholder="设置密码">
       </div>
       <button class="btn btn-primary btn-block" onclick="doRegister()">注册</button>
-      <p style="margin-top: 12px; text-align: center; font-size: 12px;">
-        已有账号？<a href="#" onclick="showLogin()">返回登录</a>
+      <p style="margin-top:12px;text-align:center;font-size:12px;color:var(--gray-500);">
+        已有账号？<a href="#" onclick="showLogin()" style="color:var(--primary)">返回登录</a>
       </p>
     </div>
   </div>
 </div>
 
-<!-- App Layout -->
-<div class="app-layout" id="appLayout">
-  <!-- Sidebar -->
-  <div class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-      <h2>📦 <span>采购系统</span></h2>
+<!-- ===== SPREADSHEET ===== -->
+<div class="spreadsheet-app" id="app">
+  
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <div class="doc-title" id="docTitle">
+      <span>📊 海外仓总采购表</span>
+      <input type="text" value="海外仓总采购表" onblur="renameDoc(this.value)">
     </div>
-    <div class="sidebar-nav">
-      <div class="nav-item active" onclick="switchPage('products', this)">
-        📋 产品列表 <span class="badge" id="productCount">0</span>
-      </div>
-      <div class="nav-item" onclick="switchPage('orders', this)">
-        📄 采购单 <span class="badge" id="orderCount">0</span>
-      </div>
-      <div class="nav-item" onclick="switchPage('ai', this)">
-        🤖 AI 智能分析
-      </div>
-      <div class="nav-item" onclick="switchPage('settings', this)">
-        ⚙️ 集成设置
-      </div>
-      <div class="nav-item" onclick="switchPage('import', this)">
-        📥 数据导入
-      </div>
+    <span class="star" title="标记星标">☆</span>
+    <div class="toolbar-sep"></div>
+    <div class="toolbar-group">
+      <button class="toolbar-btn" onclick="switchView('products')" title="产品列表"><b>📋</b> 产品</button>
+      <button class="toolbar-btn" onclick="switchView('orders')" title="采购单"><b>📄</b> 采购单</button>
+      <button class="toolbar-btn" onclick="switchView('ai')" title="AI分析"><b>🤖</b> AI</button>
     </div>
-    <div class="sidebar-footer">
-      <div class="avatar" id="userAvatar">管</div>
-      <div class="user-info">
-        <div class="user-name" id="userName">管理员</div>
-        <div class="user-role" id="userRole">admin</div>
+    <div class="toolbar-sep"></div>
+    <div class="toolbar-group">
+      <button class="toolbar-btn" onclick="showCreateProduct()" title="新增产品"><b>+</b> 新增</button>
+      <button class="toolbar-btn" onclick="showImport()" title="导入"><b>↑</b> 导入</button>
+      <button class="toolbar-btn" onclick="refreshData()" title="刷新"><b>🔄</b></button>
+    </div>
+    <div class="toolbar-right">
+      <div class="toolbar-group">
+        <button class="toolbar-btn" onclick="openSettings()" style="color:var(--gray-400)">⚙️</button>
       </div>
-      <button class="btn btn-ghost btn-sm" onclick="doLogout()" title="退出">🚪</button>
+      <div class="user-avatar" id="userAvatar" onclick="toggleUserMenu()" title="用户菜单">管</div>
     </div>
   </div>
 
-  <!-- Main Area -->
-  <div class="main-area">
-    <div class="topbar">
-      <h1 id="pageTitle">产品列表</h1>
-      <div class="topbar-actions">
-        <button class="btn btn-outline btn-sm" onclick="toggleSidebar()" style="display:none">☰</button>
-        <span style="font-size:12px;color:var(--gray-400)" id="lastSync"></span>
+  <!-- Formula Bar -->
+  <div class="formula-bar" id="formulaBar">
+    <div class="cell-ref" id="cellRef">A1</div>
+    <span class="fx">fx</span>
+    <input class="formula-input" id="formulaInput" placeholder="输入值或公式..." readonly>
+  </div>
+
+  <!-- View Switcher (hidden by default, shows non-table views) -->
+  <div id="viewContainer" style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
+    <!-- Grid View (default) -->
+    <div id="gridView" style="flex:1;display:flex;flex-direction:column;">
+      <div class="grid-container" id="gridContainer">
+        <div class="grid-scroll" id="gridScroll">
+          <table class="grid-table" id="gridTable">
+            <thead id="gridHeader"></thead>
+            <tbody id="gridBody"></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
-    <div class="content">
-
-      <!-- Products Page -->
-      <div class="page active" id="pageProducts">
-        <div class="stats-grid" id="statsGrid"></div>
-        <div class="table-toolbar">
-          <div class="left">
-            <div class="search-box">
-              <span class="icon">🔍</span>
-              <input type="text" placeholder="搜索SKU、产品名称、供应商..." oninput="searchProducts()" id="searchInput">
-            </div>
-            <select onchange="filterProducts()" id="statusFilter">
-              <option value="">全部状态</option>
-              <option value="待采购">待采购</option>
-              <option value="已下单">已下单</option>
-              <option value="在途">在途</option>
-              <option value="已入库">已入库</option>
-              <option value="停售">停售</option>
-            </select>
-          </div>
-          <div class="right">
-            <button class="btn btn-primary btn-sm" onclick="openAddProduct()">+ 新增产品</button>
-            <button class="btn btn-outline btn-sm" onclick="refreshProducts()">🔄</button>
-          </div>
-        </div>
-        <div class="table-container" id="productsTableContainer">
-          <div class="empty-state"><div class="icon">📋</div><h3>加载中...</h3></div>
-        </div>
-        <div class="pagination" id="productsPagination"></div>
+    <!-- Orders View (hidden) -->
+    <div id="ordersView" style="display:none;flex:1;overflow:auto;padding:20px;">
+      <div style="margin-bottom:12px;display:flex;align-items:center;gap:8px;">
+        <select onchange="loadOrders()" id="orderFilter" style="padding:4px 8px;border:1px solid var(--gray-200);border-radius:4px;">
+          <option value="">全部状态</option>
+          <option value="待审核">待审核</option>
+          <option value="已批准">已批准</option>
+          <option value="已下单">已下单</option>
+          <option value="已收货">已收货</option>
+          <option value="已取消">已取消</option>
+        </select>
+        <button class="btn btn-primary btn-sm" onclick="showCreateOrder()">+ 新建采购单</button>
       </div>
+      <div id="ordersList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;"></div>
+    </div>
 
-      <!-- Orders Page -->
-      <div class="page" id="pageOrders">
-        <div class="table-toolbar">
-          <div class="left">
-            <select onchange="filterOrders()" id="orderStatusFilter">
-              <option value="">全部状态</option>
-              <option value="待审核">待审核</option>
-              <option value="已批准">已批准</option>
-              <option value="已下单">已下单</option>
-              <option value="已收货">已收货</option>
-              <option value="已取消">已取消</option>
-            </select>
-          </div>
-          <div class="right">
-            <button class="btn btn-primary btn-sm" onclick="openCreateOrder()">+ 新建采购单</button>
-          </div>
+    <!-- AI View (hidden) -->
+    <div id="aiView" style="display:none;flex:1;overflow:auto;padding:20px;">
+      <div style="background:#fff;border:1px solid var(--gray-200);border-radius:8px;padding:20px;">
+        <h3 style="font-size:15px;margin-bottom:12px;">🤖 AI 智能分析</h3>
+        <div style="display:flex;gap:8px;margin-bottom:12px;">
+          <input type="text" id="aiQuery" placeholder="输入问题，如：分析低库存商品、建议采购优先级..." style="flex:1;padding:8px 12px;border:1px solid var(--gray-200);border-radius:6px;" onkeydown="if(event.key==='Enter') aiAnalyze()">
+          <button class="btn btn-primary" onclick="aiAnalyze()">分析</button>
+          <button class="btn btn-outline" onclick="aiSuggestOrder()">建议采购单</button>
         </div>
-        <div class="orders-grid" id="ordersGrid">
-          <div class="empty-state"><div class="icon">📄</div><h3>暂无采购单</h3></div>
-        </div>
+        <div id="aiResponse" style="padding:16px;background:var(--gray-50);border-radius:6px;font-size:13px;line-height:1.6;white-space:pre-wrap;min-height:60px;">💡 输入问题开始分析，或点击"建议采购单"自动生成补货建议</div>
       </div>
+    </div>
+  </div>
 
-      <!-- AI Page -->
-      <div class="page" id="pageAI">
-        <div class="ai-panel">
-          <div class="ai-panel-header"><h3>🤖 AI 智能分析</h3><span style="font-size:12px;color:var(--gray-400)">可配置OpenAI API Key使用高级AI</span></div>
-          <div class="ai-panel-body">
-            <div class="ai-input-row">
-              <input type="text" id="aiQuery" placeholder="输入问题，如：分析低库存商品、建议采购优先级、利润分析..." onkeydown="if(event.key==='Enter') aiAnalyze()">
-              <button class="btn btn-primary" onclick="aiAnalyze()">分析</button>
-              <button class="btn btn-outline" onclick="aiSuggestOrder()">建议采购单</button>
-            </div>
-            <div class="ai-response" id="aiResponse">💡 输入问题开始分析，或点击"建议采购单"自动生成补货建议</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Settings Page -->
-      <div class="page" id="pageSettings">
-        <div class="ai-panel">
-          <div class="ai-panel-header"><h3>⚙️ 集成设置</h3></div>
-          <div class="ai-panel-body">
-            <div class="form-group">
-              <label>OpenAI API Key</label>
-              <input type="password" id="settingApiKey" placeholder="sk-..." style="width:100%">
-              <div style="font-size:11px;color:var(--gray-400);margin-top:4px;">配置后启用AI高级分析功能。支持兼容OpenAI的API（可更换API Base）</div>
-            </div>
-            <div class="form-group">
-              <label>API Base（可选）</label>
-              <input type="text" id="settingApiBase" placeholder="https://api.openai.com/v1" value="https://api.openai.com/v1" style="width:100%">
-            </div>
-            <div class="form-group">
-              <label>企业微信群机器人 Webhook URL</label>
-              <input type="url" id="settingWebhook" placeholder="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=..." style="width:100%">
-              <div style="font-size:11px;color:var(--gray-400);margin-top:4px;">配置后支持低库存预警、采购单状态通知</div>
-            </div>
-            <button class="btn btn-primary" onclick="saveSettings()">保存设置</button>
-          </div>
-        </div>
-        <div class="ai-panel">
-          <div class="ai-panel-header"><h3>🔌 API 接口文档</h3></div>
-          <div class="ai-panel-body">
-            <p style="font-size:13px;color:var(--gray-600);margin-bottom:12px;">系统提供完整REST API，可对接其他办公系统：</p>
-            <div style="background:var(--gray-50);padding:12px;border-radius:var(--radius);font-size:12px;font-family:monospace;line-height:1.8;">
-              GET  /api/products          - 获取产品列表<br>
-              POST /api/products          - 创建产品<br>
-              PUT  /api/products/{id}     - 更新产品<br>
-              DELETE /api/products/{id}   - 删除产品<br>
-              GET  /api/orders            - 采购单列表<br>
-              POST /api/orders            - 创建采购单<br>
-              POST /api/ai/analyze        - AI分析<br>
-              POST /api/wecom/send        - 发送企微消息<br>
-              POST /api/wecom/notify/low-stock - 低库存预警<br>
-              <br>
-              <span style="color:var(--gray-400)">所有API需在Header中添加: Authorization: Bearer {token}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Import Page -->
-      <div class="page" id="pageImport">
-        <div class="ai-panel">
-          <div class="ai-panel-header"><h3>📥 从企业微信表格导入数据</h3></div>
-          <div class="ai-panel-body">
-            <p style="font-size:13px;color:var(--gray-600);margin-bottom:12px;">将从旧企业微信表格导出的数据（支持JSON格式）导入到新系统。</p>
-            <div class="form-group">
-              <label>粘贴JSON数据</label>
-              <textarea id="importData" rows="10" style="width:100%;font-family:monospace;font-size:12px;" placeholder='[{"sku":"...","product_name":"...",...}]'></textarea>
-            </div>
-            <button class="btn btn-primary" onclick="doImport()">导入数据</button>
-            <button class="btn btn-outline" onclick="showImportFormat()" style="margin-left:8px;">查看格式示例</button>
-          </div>
-        </div>
-      </div>
-
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <div class="sheet-tabs">
+      <span class="sheet-tab active">总表</span>
+      <span class="sheet-tab" onclick="switchView('orders')">采购单</span>
+      <span class="sheet-tab" onclick="switchView('ai')">AI分析</span>
+    </div>
+    <div>行数: <span id="rowCount">0</span></div>
+    <div class="status-right">
+      <span id="lastSync">同步中...</span>
+      <span id="userStatus">管理员</span>
     </div>
   </div>
 </div>
 
-<!-- Toast -->
-<div class="toast" id="toast"></div>
-
-<!-- Modal -->
+<!-- ===== MODAL ===== -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal">
     <div class="modal-header">
@@ -414,79 +442,108 @@ tr:hover { background: var(--gray-50); }
   </div>
 </div>
 
+<!-- ===== SETTINGS PANEL ===== -->
+<div class="settings-panel" id="settingsPanel">
+  <div class="panel-header">
+    <h3>⚙️ 设置</h3>
+    <button class="modal-close" onclick="closeSettings()">×</button>
+  </div>
+  <div class="panel-body">
+    <div class="form-group">
+      <label>OpenAI API Key</label>
+      <input type="password" id="settingApiKey" placeholder="sk-...">
+      <div style="font-size:11px;color:var(--gray-400);margin-top:4px;">配置后启用AI高级分析</div>
+    </div>
+    <div class="form-group">
+      <label>API Base 地址</label>
+      <input type="text" id="settingApiBase" placeholder="https://api.openai.com/v1" value="https://api.openai.com/v1">
+    </div>
+    <div class="form-group">
+      <label>企业微信 Webhook</label>
+      <input type="text" id="settingWebhook" placeholder="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=...">
+    </div>
+    <button class="btn btn-primary btn-block" onclick="saveSettings()">保存设置</button>
+    <hr style="margin:20px 0;border:none;border-top:1px solid var(--gray-200);">
+    <div class="form-group">
+      <label>当前用户</label>
+      <div style="display:flex;align-items:center;gap:8px;padding:8px 0;">
+        <span class="user-avatar" id="settingsAvatar">管</span>
+        <span id="settingsUserName">管理员</span>
+        <span style="font-size:11px;color:var(--gray-400);" id="settingsUserRole">admin</span>
+      </div>
+    </div>
+    <button class="btn btn-outline btn-block" onclick="doLogout()">退出登录</button>
+  </div>
+</div>
+
+<!-- ===== TOAST ===== -->
+<div class="toast" id="toast"></div>
+
 <script>
 // ========== STATE ==========
 let TOKEN = localStorage.getItem('token') || '';
 let USER = JSON.parse(localStorage.getItem('user') || '{}');
 let products = [];
 let orders = [];
-let currentPage = 1;
-let currentSearch = '';
-let currentStatus = '';
-let totalPages = 1;
+let currentView = 'products';
+let selectedCell = null;
+let editingCell = null;
+let colWidths = {};
+let sortState = {};
+
+// Column definitions matching the spreadsheet
+const COLUMNS = [
+  { key: 'row_num', label: '#', width: 50, editable: false },
+  { key: 'sku', label: 'SKU', width: 130, editable: true },
+  { key: 'product_name', label: '标题', width: 200, editable: true },
+  { key: 'category', label: '组别', width: 80, editable: true },
+  { key: 'supplier', label: '供应商', width: 140, editable: true },
+  { key: 'price_1688', label: '采购价RMB', width: 110, editable: true, type: 'number' },
+  { key: 'price_amazon', label: '亚马逊价', width: 110, editable: true, type: 'number' },
+  { key: 'price_selling', label: '售价', width: 90, editable: true, type: 'number' },
+  { key: 'stock_quantity', label: '库存', width: 70, editable: true, type: 'number' },
+  { key: 'moq', label: '采购数量', width: 80, editable: true, type: 'number' },
+  { key: 'status', label: '采购状态', width: 100, editable: true },
+  { key: 'purchase_link', label: '采购链接', width: 200, editable: true },
+  { key: 'image_url', label: '图片', width: 80, editable: true },
+  { key: 'remarks', label: '备注', width: 180, editable: true },
+];
 
 // ========== AUTH ==========
 function doLogin() {
-  const username = document.getElementById('loginUsername').value;
-  const password = document.getElementById('loginPassword').value;
-  fetch('/api/auth/login', {
-    method: 'POST', headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({username, password})
-  })
-  .then(r => r.json())
-  .then(data => {
-    if (data.token) {
-      TOKEN = data.token;
-      USER = data.user;
-      localStorage.setItem('token', TOKEN);
-      localStorage.setItem('user', JSON.stringify(USER));
+  const u = document.getElementById('loginUsername').value;
+  const p = document.getElementById('loginPassword').value;
+  fetch('/api/auth/login', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:u, password:p})})
+  .then(r=>r.json()).then(d=>{
+    if (d.token) {
+      TOKEN = d.token; USER = d.user;
+      localStorage.setItem('token', TOKEN); localStorage.setItem('user', JSON.stringify(USER));
       showApp();
-    } else {
-      toast(data.detail || '登录失败', 'error');
-    }
-  })
-  .catch(() => toast('网络错误', 'error'));
+    } else toast(d.detail||'登录失败', 'error');
+  }).catch(()=>toast('网络错误', 'error'));
 }
 
 function doRegister() {
-  const username = document.getElementById('regUsername').value;
-  const password = document.getElementById('regPassword').value;
-  const displayName = document.getElementById('regDisplayName').value || username;
-  fetch('/api/auth/register', {
-    method: 'POST', headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({username, password, display_name: displayName})
-  })
-  .then(r => r.json())
-  .then(data => {
-    if (data.token) {
-      TOKEN = data.token;
-      USER = data.user;
-      localStorage.setItem('token', TOKEN);
-      localStorage.setItem('user', JSON.stringify(USER));
-      showApp();
-    } else {
-      toast(data.detail || '注册失败', 'error');
-    }
+  const u = document.getElementById('regUsername').value;
+  const p = document.getElementById('regPassword').value;
+  const n = document.getElementById('regDisplayName').value || u;
+  fetch('/api/auth/register', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:u, password:p, display_name:n})})
+  .then(r=>r.json()).then(d=>{
+    if (d.token) { TOKEN = d.token; USER = d.user; localStorage.setItem('token', TOKEN); localStorage.setItem('user', JSON.stringify(USER)); showApp(); }
+    else toast(d.detail||'注册失败', 'error');
   });
 }
 
 function doLogout() {
-  localStorage.removeItem('token');
-  localStorage.removeItem('user');
-  TOKEN = '';
-  USER = {};
-  document.getElementById('appLayout').classList.remove('active');
+  localStorage.removeItem('token'); localStorage.removeItem('user');
+  TOKEN = ''; USER = {};
+  document.getElementById('app').classList.remove('active');
   document.getElementById('loginPage').style.display = 'flex';
+  closeSettings();
 }
 
-function showRegister() {
-  document.getElementById('loginForm').style.display = 'none';
-  document.getElementById('registerForm').style.display = 'block';
-}
-function showLogin() {
-  document.getElementById('loginForm').style.display = 'block';
-  document.getElementById('registerForm').style.display = 'none';
-}
+function showRegister() { document.getElementById('loginForm').style.display='none'; document.getElementById('registerForm').style.display='block'; }
+function showLogin() { document.getElementById('loginForm').style.display='block'; document.getElementById('registerForm').style.display='none'; }
 
 function authHeaders() {
   return TOKEN ? {'Authorization': `Bearer ${TOKEN}`, 'Content-Type': 'application/json'} : {'Content-Type': 'application/json'};
@@ -495,32 +552,33 @@ function authHeaders() {
 // ========== APP ==========
 function showApp() {
   document.getElementById('loginPage').style.display = 'none';
-  document.getElementById('appLayout').classList.add('active');
-  document.getElementById('userName').textContent = USER.display_name || USER.username;
-  document.getElementById('userRole').textContent = USER.role;
-  document.getElementById('userAvatar').textContent = (USER.display_name || USER.username)[0];
-  loadProducts();
-  loadOrders();
-  loadStats();
+  document.getElementById('app').classList.add('active');
+  const n = USER.display_name || USER.username;
+  document.getElementById('userAvatar').textContent = n[0];
+  document.getElementById('settingsAvatar').textContent = n[0];
+  document.getElementById('settingsUserName').textContent = n;
+  document.getElementById('settingsUserRole').textContent = USER.role;
+  document.getElementById('userStatus').textContent = n;
+  loadData();
 }
 
-function switchPage(name, el) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById(`page${name.charAt(0).toUpperCase()+name.slice(1)}`).classList.add('active');
-  if (el) el.classList.add('active');
-  const titles = {products:'产品列表', orders:'采购单', ai:'AI 智能分析', settings:'集成设置', import:'数据导入'};
-  document.getElementById('pageTitle').textContent = titles[name] || name;
-  document.getElementById('sidebar').classList.remove('mobile-show');
-  if (name === 'products') { loadProducts(); loadStats(); }
-  if (name === 'orders') loadOrders();
+// ========== DATA ==========
+async function loadData() {
+  try {
+    document.getElementById('lastSync').textContent = '同步中...';
+    const data = await api(`/api/products?page_size=5000`);
+    products = data.items;
+    document.getElementById('rowCount').textContent = products.length;
+    renderGrid();
+    document.getElementById('lastSync').textContent = `最后更新: ${new Date().toLocaleTimeString()}`;
+  } catch(e) {
+    toast('加载失败: '+e.message, 'error');
+    document.getElementById('lastSync').textContent = '同步失败';
+  }
 }
 
-function toggleSidebar() {
-  document.getElementById('sidebar').classList.toggle('mobile-show');
-}
+function refreshData() { loadData(); }
 
-// ========== API HELPER ==========
 async function api(url, method='GET', body=null) {
   const opts = {method, headers: authHeaders()};
   if (body) opts.body = JSON.stringify(body);
@@ -530,121 +588,205 @@ async function api(url, method='GET', body=null) {
   return data;
 }
 
-function toast(msg, type='info') {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.className = `toast ${type}`;
-  el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 3000);
-}
+// ========== GRID ==========
+function renderGrid() {
+  const header = document.getElementById('gridHeader');
+  const body = document.getElementById('gridBody');
 
-// ========== STATS ==========
-async function loadStats() {
-  try {
-    const data = await api('/api/products?page_size=1');
-    const total = data.total;
-    // Get counts from full list
-    const all = await api('/api/products?page_size=200');
-    const items = all.items;
-    const pending = items.filter(p => p.status === '待采购').length;
-    const lowStock = items.filter(p => p.stock_quantity < 10 && p.status !== '停售').length;
-    const warehoused = items.filter(p => p.status === '已入库').length;
-    document.getElementById('statsGrid').innerHTML = `
-      <div class="stat-card"><div class="stat-label">📦 总产品数</div><div class="stat-value">${total}</div></div>
-      <div class="stat-card"><div class="stat-label">📋 待采购</div><div class="stat-value" style="color:var(--warning)">${pending}</div></div>
-      <div class="stat-card"><div class="stat-label">⚠️ 低库存</div><div class="stat-value" style="color:var(--danger)">${lowStock}</div></div>
-      <div class="stat-card"><div class="stat-label">✅ 已入库</div><div class="stat-value" style="color:var(--success)">${warehoused}</div></div>
-    `;
-    document.getElementById('productCount').textContent = total;
-  } catch(e) { /* ignore */ }
-}
+  // Build header
+  let hHtml = '<tr>';
+  COLUMNS.forEach((col, i) => {
+    hHtml += `<th class="col-header" style="min-width:${col.width}px;max-width:${col.width}px;width:${col.width}px;position:relative;">
+      ${col.label}
+      <span class="filter-icon" onclick="showFilter(${i})" title="筛选">▼</span>
+      <span class="resize-handle" onmousedown="startResize(event, ${i})"></span>
+    </th>`;
+  });
+  hHtml += '</tr>';
+  header.innerHTML = hHtml;
 
-// ========== PRODUCTS ==========
-async function loadProducts() {
-  try {
-    const search = document.getElementById('searchInput').value;
-    const status = document.getElementById('statusFilter').value;
-    const data = await api(`/api/products?page=${currentPage}&page_size=50&search=${encodeURIComponent(search)}&status=${encodeURIComponent(status)}`);
-    products = data.items;
-    totalPages = Math.ceil(data.total / 50);
-    renderTable();
-    renderPagination();
-  } catch(e) {
-    document.getElementById('productsTableContainer').innerHTML = `<div class="empty-state"><h3>加载失败: ${e.message}</h3></div>`;
-  }
-}
-
-function renderTable() {
+  // Build body
   if (!products.length) {
-    document.getElementById('productsTableContainer').innerHTML = `<div class="empty-state"><div class="icon">📋</div><h3>暂无数据</h3><p>点击"新增产品"开始添加</p></div>`;
+    body.innerHTML = `<tr><td colspan="${COLUMNS.length}" style="text-align:center;padding:40px;color:var(--gray-400);">暂无数据，点击工具栏"新增"添加产品</td></tr>`;
     return;
   }
-  let html = `<table><thead><tr>
-    <th style="width:30px">#</th>
-    <th style="width:100px">SKU</th>
-    <th style="min-width:150px">产品名称</th>
-    <th style="width:80px">类目</th>
-    <th style="width:60px">图片</th>
-    <th style="width:90px">1688价</th>
-    <th style="width:90px">亚马逊价</th>
-    <th style="width:90px">售价</th>
-    <th style="width:120px">供应商</th>
-    <th style="width:60px">库存</th>
-    <th style="width:80px">状态</th>
-    <th style="width:200px">采购链接</th>
-    <th style="width:60px">操作</th>
-  </tr></thead><tbody>`;
-  products.forEach((p, i) => {
-    const statusClass = `status-${p.status.replace('待采购','pending').replace('已下单','ordered').replace('在途','transit').replace('已入库','warehoused').replace('停售','discontinued')}`;
-    html += `<tr>
-      <td>${(currentPage-1)*50 + i + 1}</td>
-      <td><strong>${p.sku}</strong></td>
-      <td><input class="inline-edit" value="${escHtml(p.product_name)}" onchange="quickEdit(${p.id},'product_name',this.value)" title="点击编辑"></td>
-      <td>${p.category}</td>
-      <td>${p.image_url ? `<img src="${escHtml(p.image_url)}" class="cell-img" onerror="this.style.display='none'">` : '-'}</td>
-      <td class="text-right"><input class="inline-edit text-right" type="number" step="0.01" value="${p.price_1688}" onchange="quickEdit(${p.id},'price_1688',this.value)" style="width:80px"></td>
-      <td class="text-right"><input class="inline-edit text-right" type="number" step="0.01" value="${p.price_amazon}" onchange="quickEdit(${p.id},'price_amazon',this.value)" style="width:80px"></td>
-      <td class="text-right"><input class="inline-edit text-right" type="number" step="0.01" value="${p.price_selling}" onchange="quickEdit(${p.id},'price_selling',this.value)" style="width:80px"></td>
-      <td>${p.supplier}</td>
-      <td class="text-right" style="color:${p.stock_quantity < 10 ? 'var(--danger)' : 'inherit'};font-weight:${p.stock_quantity < 10 ? '600' : 'normal'}">
-        <input class="inline-edit text-right" type="number" value="${p.stock_quantity}" onchange="quickEdit(${p.id},'stock_quantity',this.value)" style="width:50px;font-weight:inherit">
-      </td>
-      <td><select class="inline-edit" onchange="quickEdit(${p.id},'status',this.value)" style="width:90px">
-        ${['待采购','已下单','在途','已入库','停售'].map(s => `<option value="${s}" ${p.status===s?'selected':''}>${s}</option>`).join('')}
-      </select></td>
-      <td>${p.purchase_link ? `<a href="${escHtml(p.purchase_link)}" target="_blank" class="cell-link">${p.purchase_link.slice(0,30)}...</a>` : '-'}</td>
-      <td><button class="btn btn-danger btn-sm" onclick="deleteProduct(${p.id})" title="删除">🗑</button></td>
-    </tr>`;
+
+  let bHtml = '';
+  products.forEach((p, rowIdx) => {
+    bHtml += '<tr>';
+    COLUMNS.forEach((col, colIdx) => {
+      if (col.key === 'row_num') {
+        bHtml += `<td class="row-num">${rowIdx + 1}</td>`;
+        return;
+      }
+      let val = p[col.key];
+      let cls = 'cell';
+      let content = '';
+
+      if (val === null || val === undefined || val === '') {
+        content = '';
+      } else if (col.key === 'status') {
+        const statusMap = {'待采购':'pending','已下单':'ordered','在途':'transit','已入库':'warehoused','停售':'discontinued'};
+        const sc = statusMap[val] || 'pending';
+        content = `<span class="status-dot" style="background:${sc==='pending'?'#f59e0b':sc==='ordered'?'#3b82f6':sc==='transit'?'#8b5cf6':sc==='warehoused'?'#22c55e':'#9ca3af'}"></span><span class="status-${sc}">${escHtml(val)}</span>`;
+      } else if (col.key === 'image_url') {
+        content = val ? `<img src="${escHtml(val)}" class="img-thumb" onerror="this.style.display='none'">` : '';
+      } else if (col.key === 'purchase_link' && val) {
+        content = `<a href="${escHtml(val)}" target="_blank" class="cell-link">${val.length > 25 ? val.slice(0,25)+'...' : val}</a>`;
+      } else if (col.type === 'number') {
+        content = `<span class="cell-content num">${Number(val).toFixed(2)}</span>`;
+      } else {
+        content = escHtml(String(val));
+      }
+
+      bHtml += `<td class="${cls}" data-row="${rowIdx}" data-col="${colIdx}" data-key="${col.key}" data-id="${p.id}" onclick="selectCell(this)">
+        <div class="cell-content${col.type==='number'?' num':''}">${content}</div>
+        <input class="cell-edit" onblur="finishEdit(this)" onkeydown="if(event.key==='Enter')this.blur();if(event.key==='Escape'){this.value=this.dataset.old;this.blur()}">
+      </td>`;
+    });
+    bHtml += '</tr>';
   });
-  html += '</tbody></table>';
-  document.getElementById('productsTableContainer').innerHTML = html;
+  body.innerHTML = bHtml;
+}
+
+function selectCell(el) {
+  if (selectedCell) selectedCell.classList.remove('selected');
+  selectedCell = el;
+  el.classList.add('selected');
+  const row = parseInt(el.dataset.row) + 1;
+  const col = String.fromCharCode(65 + parseInt(el.dataset.col));
+  document.getElementById('cellRef').textContent = `${col}${row}`;
+  const content = el.querySelector('.cell-content');
+  document.getElementById('formulaInput').value = content ? content.textContent.trim() : '';
+}
+
+function startEdit(el) {
+  if (editingCell) finishEdit(editingCell.querySelector('.cell-edit'));
+  const editInput = el.querySelector('.cell-edit');
+  const content = el.querySelector('.cell-content');
+  const key = el.dataset.key;
+  if (!editInput || !key || !COLUMNS.find(c=>c.key===key)?.editable) return;
+  
+  editInput.value = content.textContent.trim();
+  editInput.dataset.old = editInput.value;
+  content.classList.add('editing');
+  editInput.classList.add('active');
+  editInput.focus();
+  editInput.select();
+  editingCell = el;
+  document.getElementById('formulaInput').value = editInput.value;
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && selectedCell && !editingCell) {
+    e.preventDefault();
+    startEdit(selectedCell);
+  }
+  if (e.key === 'Tab' && selectedCell) {
+    e.preventDefault();
+    const col = parseInt(selectedCell.dataset.col);
+    const row = parseInt(selectedCell.dataset.row);
+    const next = document.querySelector(`td[data-row="${row}"][data-col="${col+1}"]`);
+    if (next) { selectCell(next); if (editingCell) startEdit(next); }
+  }
+  if (e.key === 'ArrowDown' && selectedCell) {
+    e.preventDefault();
+    const col = parseInt(selectedCell.dataset.col);
+    const row = parseInt(selectedCell.dataset.row);
+    const next = document.querySelector(`td[data-row="${row+1}"][data-col="${col}"]`);
+    if (next) selectCell(next);
+  }
+  if (e.key === 'ArrowUp' && selectedCell) {
+    e.preventDefault();
+    const col = parseInt(selectedCell.dataset.col);
+    const row = parseInt(selectedCell.dataset.row);
+    const next = document.querySelector(`td[data-row="${row-1}"][data-col="${col}"]`);
+    if (next) selectCell(next);
+  }
+});
+
+function finishEdit(input) {
+  if (!editingCell) return;
+  const content = editingCell.querySelector('.cell-content');
+  const newVal = input.value;
+  input.classList.remove('active');
+  content.classList.remove('editing');
+  editingCell = null;
+  
+  if (newVal !== input.dataset.old) {
+    const id = parseInt(editingCell.dataset.id);
+    const key = editingCell.dataset.key;
+    const field = key;
+    let val = newVal;
+    const col = COLUMNS.find(c => c.key === key);
+    if (col && col.type === 'number') val = parseFloat(val) || 0;
+    if (key === 'status') {
+      quickEdit(id, field, val);
+      content.innerHTML = `<span class="status-dot" style="background:${val==='待采购'?'#f59e0b':val==='已下单'?'#3b82f6':val==='在途'?'#8b5cf6':val==='已入库'?'#22c55e':'#9ca3af'}"></span>${val}`;
+    } else {
+      quickEdit(id, field, val);
+      content.textContent = val;
+    }
+  }
 }
 
 async function quickEdit(id, field, value) {
   try {
-    const body = {[field]: field.includes('price') || field === 'stock_quantity' ? parseFloat(value) || 0 : value};
-    await api(`/api/products/${id}`, 'PUT', body);
-  } catch(e) { toast('更新失败: ' + e.message, 'error'); }
-}
-
-function searchProducts() { currentPage = 1; loadProducts(); }
-function filterProducts() { currentPage = 1; loadProducts(); }
-function refreshProducts() { loadProducts(); loadStats(); }
-
-function renderPagination() {
-  if (totalPages <= 1) { document.getElementById('productsPagination').innerHTML = ''; return; }
-  let html = `<div class="pagination"><div class="info">共 ${products.length} 条</div><div class="btns">`;
-  for (let i = 1; i <= totalPages; i++) {
-    html += `<button class="${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
+    await api(`/api/products/${id}`, 'PUT', {[field]: value});
+    document.getElementById('lastSync').textContent = `已保存 ${new Date().toLocaleTimeString()}`;
+  } catch(e) {
+    toast('保存失败: '+e.message, 'error');
   }
-  html += '</div></div>';
-  document.getElementById('productsPagination').innerHTML = html;
 }
 
-function goPage(p) { currentPage = p; loadProducts(); }
+// ========== COLUMN RESIZE ==========
+let resizeCol = null;
+function startResize(e, colIdx) {
+  resizeCol = colIdx;
+  document.addEventListener('mousemove', doResize);
+  document.addEventListener('mouseup', stopResize);
+  e.preventDefault();
+}
+function doResize(e) {
+  if (resizeCol === null) return;
+  const ths = document.querySelectorAll('.col-header');
+  const th = ths[resizeCol];
+  if (!th) return;
+  const rect = th.getBoundingClientRect();
+  const newW = Math.max(50, e.clientX - rect.left);
+  th.style.width = newW + 'px';
+  th.style.minWidth = newW + 'px';
+  th.style.maxWidth = newW + 'px';
+  COLUMNS[resizeCol].width = newW;
+  // Update all cells in this column
+  document.querySelectorAll(`td[data-col="${resizeCol}"]`).forEach(td => {
+    td.style.minWidth = newW + 'px';
+    td.style.maxWidth = newW + 'px';
+    td.style.width = newW + 'px';
+  });
+}
+function stopResize() {
+  resizeCol = null;
+  document.removeEventListener('mousemove', doResize);
+  document.removeEventListener('mouseup', stopResize);
+}
 
-// ========== ADD PRODUCT ==========
-function openAddProduct() {
+// ========== VIEW SWITCH ==========
+function switchView(view) {
+  currentView = view;
+  document.getElementById('gridView').style.display = view === 'products' ? 'flex' : 'none';
+  document.getElementById('ordersView').style.display = view === 'orders' ? 'block' : 'none';
+  document.getElementById('aiView').style.display = view === 'ai' ? 'block' : 'none';
+  document.querySelectorAll('.sheet-tab').forEach(t => t.classList.remove('active'));
+  const tabs = document.querySelectorAll('.sheet-tab');
+  if (view === 'products') tabs[0].classList.add('active');
+  else if (view === 'orders') tabs[1].classList.add('active');
+  else if (view === 'ai') tabs[2].classList.add('active');
+  if (view === 'orders') loadOrders();
+}
+
+// ========== PRODUCT CRUD ==========
+function showCreateProduct() {
   document.getElementById('modalTitle').textContent = '新增产品';
   document.getElementById('modalBody').innerHTML = `
     <div class="form-row">
@@ -652,118 +794,89 @@ function openAddProduct() {
       <div class="form-group"><label>产品名称 *</label><input id="f_name" placeholder="必填"></div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label>类目</label><input id="f_category" placeholder="如：电子产品"></div>
+      <div class="form-group"><label>组别</label><input id="f_category" placeholder="如：美一组"></div>
       <div class="form-group"><label>供应商</label><input id="f_supplier" placeholder="供应商名称"></div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label>1688价格</label><input id="f_p1688" type="number" step="0.01" value="0"></div>
-      <div class="form-group"><label>亚马逊价格</label><input id="f_pamz" type="number" step="0.01" value="0"></div>
+      <div class="form-group"><label>采购价</label><input id="f_p1688" type="number" step="0.01" value="0"></div>
+      <div class="form-group"><label>库存</label><input id="f_stock" type="number" value="0"></div>
     </div>
-    <div class="form-row">
-      <div class="form-group"><label>售价</label><input id="f_psell" type="number" step="0.01" value="0"></div>
-      <div class="form-group"><label>库存数量</label><input id="f_stock" type="number" value="0"></div>
-    </div>
-    <div class="form-group"><label>采购链接</label><input id="f_link" placeholder="https://..."></div>
+    <div class="form-group"><label>采购链接</label><input id="f_link" placeholder="https://detail.1688.com/..."></div>
     <div class="form-group"><label>图片URL</label><input id="f_img" placeholder="https://..."></div>
     <div class="form-group"><label>备注</label><textarea id="f_remarks" rows="2" style="width:100%"></textarea></div>
   `;
   document.getElementById('modalFooter').innerHTML = `
     <button class="btn btn-outline" onclick="closeModal()">取消</button>
-    <button class="btn btn-primary" onclick="submitAddProduct()">创建</button>
+    <button class="btn btn-primary" onclick="submitCreateProduct()">创建</button>
   `;
   document.getElementById('modalOverlay').classList.add('active');
 }
 
-async function submitAddProduct() {
-  const data = {
+async function submitCreateProduct() {
+  const d = {
     sku: document.getElementById('f_sku').value,
     product_name: document.getElementById('f_name').value,
     category: document.getElementById('f_category').value,
     supplier: document.getElementById('f_supplier').value,
     price_1688: parseFloat(document.getElementById('f_p1688').value) || 0,
-    price_amazon: parseFloat(document.getElementById('f_pamz').value) || 0,
-    price_selling: parseFloat(document.getElementById('f_psell').value) || 0,
     stock_quantity: parseInt(document.getElementById('f_stock').value) || 0,
     purchase_link: document.getElementById('f_link').value,
     image_url: document.getElementById('f_img').value,
     remarks: document.getElementById('f_remarks').value,
   };
-  if (!data.sku || !data.product_name) { toast('SKU和产品名称为必填', 'error'); return; }
+  if (!d.sku || !d.product_name) { toast('SKU和名称为必填', 'error'); return; }
   try {
-    await api('/api/products', 'POST', data);
+    await api('/api/products', 'POST', d);
     toast('创建成功', 'success');
     closeModal();
-    loadProducts();
-    loadStats();
+    loadData();
   } catch(e) { toast(e.message, 'error'); }
-}
-
-async function deleteProduct(id) {
-  if (!confirm('确定删除这个产品吗？')) return;
-  try {
-    await api(`/api/products/${id}`, 'DELETE');
-    toast('删除成功', 'success');
-    loadProducts();
-    loadStats();
-  } catch(e) { toast(e.message, 'error'); }
-}
-
-function closeModal() {
-  document.getElementById('modalOverlay').classList.remove('active');
 }
 
 // ========== ORDERS ==========
 async function loadOrders() {
   try {
-    const status = document.getElementById('orderStatusFilter').value;
+    const status = document.getElementById('orderFilter').value;
     const data = await api(`/api/orders?page_size=50&status=${encodeURIComponent(status)}`);
-    orders = data.items;
-    renderOrders();
-    document.getElementById('orderCount').textContent = data.total;
+    const list = document.getElementById('ordersList');
+    if (!data.items.length) {
+      list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--gray-400);">暂无采购单</div>';
+      return;
+    }
+    list.innerHTML = data.items.map(o => `
+      <div style="background:#fff;border:1px solid var(--gray-200);border-radius:8px;padding:16px;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+          <span style="font-weight:600;font-size:14px;">${o.order_number}</span>
+          <span style="font-size:12px;padding:2px 8px;border-radius:10px;background:${o.status==='待审核'?'#fef3c7':o.status==='已批准'?'#dbeafe':'#d1fae5'};color:${o.status==='待审核'?'#92400e':o.status==='已批准'?'#1e40af':'#065f46'}">${o.status}</span>
+        </div>
+        <div style="font-size:12px;color:var(--gray-500);">
+          <div>供应商: ${o.supplier || '-'}</div>
+          <div>金额: ¥${o.total_amount.toFixed(2)}</div>
+          <div>商品数: ${o.item_count} 项</div>
+          <div>${o.created_by} | ${new Date(o.created_at).toLocaleDateString()}</div>
+        </div>
+      </div>
+    `).join('');
   } catch(e) {
-    document.getElementById('ordersGrid').innerHTML = `<div class="empty-state"><h3>加载失败</h3></div>`;
+    document.getElementById('ordersList').innerHTML = '<div style="text-align:center;padding:40px;color:var(--danger);">加载失败</div>';
   }
 }
 
-function renderOrders() {
-  if (!orders.length) {
-    document.getElementById('ordersGrid').innerHTML = `<div class="empty-state"><div class="icon">📄</div><h3>暂无采购单</h3><p>点击"新建采购单"创建</p></div>`;
-    return;
-  }
-  document.getElementById('ordersGrid').innerHTML = orders.map(o => `
-    <div class="order-card">
-      <div class="order-header">
-        <span class="order-number">${o.order_number}</span>
-        <span class="status-badge ${o.status === '待审核' ? 'status-pending' : o.status === '已批准' ? 'status-ordered' : 'status-warehoused'}">${o.status}</span>
-      </div>
-      <div class="order-detail">
-        <div>供应商: ${o.supplier || '-'}</div>
-        <div>金额: ¥${o.total_amount.toFixed(2)}</div>
-        <div>商品数: ${o.item_count} 项</div>
-        <div>创建人: ${o.created_by} | ${new Date(o.created_at).toLocaleDateString()}</div>
-      </div>
-    </div>
-  `).join('');
-}
-
-function filterOrders() { loadOrders(); }
-
-function openCreateOrder() {
-  // Simple modal for creating order
+function showCreateOrder() {
   document.getElementById('modalTitle').textContent = '新建采购单';
   document.getElementById('modalBody').innerHTML = `
     <div class="form-group"><label>供应商</label><input id="o_supplier" placeholder="供应商名称"></div>
-    <div class="form-group"><label>备注</label><textarea id="o_notes" rows="3" style="width:100%"></textarea></div>
-    <div class="form-group"><label>添加商品（输入SKU和数量）</label></div>
+    <div class="form-group"><label>备注</label><textarea id="o_notes" rows="2" style="width:100%"></textarea></div>
+    <div style="font-size:12px;color:var(--gray-500);margin-bottom:8px;">商品列表</div>
     <div id="orderItems">
-      <div class="form-row" style="margin-bottom:8px">
-        <input placeholder="SKU" class="oi-sku" style="flex:1">
-        <input type="number" placeholder="数量" class="oi-qty" style="width:80px" value="1">
-        <input type="number" step="0.01" placeholder="单价" class="oi-price" style="width:100px" value="0">
-        <button class="btn btn-danger btn-sm" onclick="this.parentElement.remove()">×</button>
+      <div class="form-row" style="margin-bottom:6px;">
+        <input placeholder="SKU" class="oi-sku" style="padding:6px 8px;border:1px solid var(--gray-200);border-radius:4px;">
+        <input type="number" placeholder="数量" class="oi-qty" style="width:80px;padding:6px 8px;border:1px solid var(--gray-200);border-radius:4px;" value="1">
+        <input type="number" step="0.01" placeholder="单价" class="oi-price" style="width:100px;padding:6px 8px;border:1px solid var(--gray-200);border-radius:4px;" value="0">
+        <button class="btn btn-sm" style="background:var(--danger);color:#fff;border:none;padding:6px 10px;border-radius:4px;cursor:pointer;" onclick="this.parentElement.remove()">×</button>
       </div>
     </div>
-    <button class="btn btn-outline btn-sm" onclick="addOrderItem()">+ 添加一行</button>
+    <button class="btn btn-sm btn-outline" onclick="addOrderItem()" style="margin-top:4px;">+ 添加一行</button>
   `;
   document.getElementById('modalFooter').innerHTML = `
     <button class="btn btn-outline" onclick="closeModal()">取消</button>
@@ -775,12 +888,12 @@ function openCreateOrder() {
 function addOrderItem() {
   const div = document.createElement('div');
   div.className = 'form-row';
-  div.style.marginBottom = '8px';
+  div.style.marginBottom = '6px';
   div.innerHTML = `
-    <input placeholder="SKU" class="oi-sku" style="flex:1">
-    <input type="number" placeholder="数量" class="oi-qty" style="width:80px" value="1">
-    <input type="number" step="0.01" placeholder="单价" class="oi-price" style="width:100px" value="0">
-    <button class="btn btn-danger btn-sm" onclick="this.parentElement.remove()">×</button>
+    <input placeholder="SKU" class="oi-sku" style="padding:6px 8px;border:1px solid var(--gray-200);border-radius:4px;">
+    <input type="number" placeholder="数量" class="oi-qty" style="width:80px;padding:6px 8px;border:1px solid var(--gray-200);border-radius:4px;" value="1">
+    <input type="number" step="0.01" placeholder="单价" class="oi-price" style="width:100px;padding:6px 8px;border:1px solid var(--gray-200);border-radius:4px;" value="0">
+    <button class="btn btn-sm" style="background:var(--danger);color:#fff;border:none;padding:6px 10px;border-radius:4px;cursor:pointer;" onclick="this.parentElement.remove()">×</button>
   `;
   document.getElementById('orderItems').appendChild(div);
 }
@@ -809,44 +922,67 @@ async function submitCreateOrder() {
 
 // ========== AI ==========
 async function aiAnalyze() {
-  const query = document.getElementById('aiQuery').value;
-  if (!query) { toast('请输入问题', 'error'); return; }
-  document.getElementById('aiResponse').innerHTML = '<div class="loading"></div> 分析中...';
+  const q = document.getElementById('aiQuery').value;
+  if (!q) { toast('请输入问题', 'error'); return; }
+  document.getElementById('aiResponse').innerHTML = '<span class="loading"></span> 分析中...';
   try {
-    const data = await api('/api/ai/analyze', 'POST', {query});
-    document.getElementById('aiResponse').innerHTML = data.reply || '暂无分析结果';
-  } catch(e) {
-    document.getElementById('aiResponse').innerHTML = '分析失败: ' + e.message;
-  }
+    const d = await api('/api/ai/analyze', 'POST', {query: q});
+    document.getElementById('aiResponse').innerHTML = d.reply || '暂无分析结果';
+  } catch(e) { document.getElementById('aiResponse').innerHTML = '分析失败: '+e.message; }
 }
 
 async function aiSuggestOrder() {
-  document.getElementById('aiResponse').innerHTML = '<div class="loading"></div> 生成建议中...';
+  document.getElementById('aiResponse').innerHTML = '<span class="loading"></span> 生成建议中...';
   try {
-    const data = await api('/api/ai/suggest-order', 'POST');
+    const d = await api('/api/ai/suggest-order', 'POST');
     let html = '💡 AI采购建议\n\n';
-    if (data.items && data.items.length) {
-      data.items.forEach(item => {
-        html += `- ${item.sku}: 建议采购 ${item.suggested_quantity} 个\n  理由: ${item.reason || '库存不足'}\n`;
-      });
-    } else {
-      html += data.message || '暂无建议';
-    }
+    if (d.items && d.items.length) {
+      d.items.forEach(i => { html += `- ${i.sku}: 建议采购 ${i.suggested_quantity} 个\n  理由: ${i.reason || '库存不足'}\n`; });
+    } else html += d.message || '暂无建议';
     document.getElementById('aiResponse').innerHTML = html;
-  } catch(e) {
-    document.getElementById('aiResponse').innerHTML = '生成失败: ' + e.message;
-  }
+  } catch(e) { document.getElementById('aiResponse').innerHTML = '生成失败: '+e.message; }
+}
+
+// ========== IMPORT ==========
+function showImport() {
+  document.getElementById('modalTitle').textContent = '📥 导入数据';
+  document.getElementById('modalBody').innerHTML = `
+    <p style="font-size:13px;color:var(--gray-500);margin-bottom:12px;">将从企业微信表格导出的JSON数据粘贴到下方：</p>
+    <textarea id="importData" rows="10" style="width:100%;font-family:monospace;font-size:12px;padding:8px;border:1px solid var(--gray-200);border-radius:6px;" placeholder='[{"sku":"...","product_name":"...",...}]'></textarea>
+    <div style="margin-top:8px;font-size:12px;color:var(--gray-400);">格式: [{"sku":"SKU001","product_name":"产品名称","category":"美一组","price_1688":15.5,"stock_quantity":100,...}]</div>
+  `;
+  document.getElementById('modalFooter').innerHTML = `
+    <button class="btn btn-outline" onclick="closeModal()">取消</button>
+    <button class="btn btn-primary" onclick="submitImport()">导入</button>
+  `;
+  document.getElementById('modalOverlay').classList.add('active');
+}
+
+async function submitImport() {
+  const raw = document.getElementById('importData').value.trim();
+  if (!raw) { toast('请粘贴数据', 'error'); return; }
+  try {
+    const data = JSON.parse(raw);
+    if (!Array.isArray(data)) throw new Error('数据必须是数组');
+    const r = await api('/api/products/import', 'POST', data);
+    toast(r.message, 'success');
+    closeModal();
+    loadData();
+  } catch(e) { toast('导入失败: '+e.message, 'error'); }
 }
 
 // ========== SETTINGS ==========
+function openSettings() { document.getElementById('settingsPanel').classList.add('active'); }
+function closeSettings() { document.getElementById('settingsPanel').classList.remove('active'); }
+
 function saveSettings() {
-  const apiKey = document.getElementById('settingApiKey').value;
-  const apiBase = document.getElementById('settingApiBase').value;
-  const webhook = document.getElementById('settingWebhook').value;
-  localStorage.setItem('OPENAI_API_KEY', apiKey);
-  localStorage.setItem('OPENAI_API_BASE', apiBase);
-  localStorage.setItem('WECOM_WEBHOOK_URL', webhook);
-  toast('设置已保存到本地（部署后需配置环境变量）', 'success');
+  const k = document.getElementById('settingApiKey').value;
+  const b = document.getElementById('settingApiBase').value;
+  const w = document.getElementById('settingWebhook').value;
+  localStorage.setItem('OPENAI_API_KEY', k);
+  localStorage.setItem('OPENAI_API_BASE', b);
+  localStorage.setItem('WECOM_WEBHOOK_URL', w);
+  toast('设置已保存', 'success');
 }
 
 function loadSettings() {
@@ -855,49 +991,65 @@ function loadSettings() {
   document.getElementById('settingWebhook').value = localStorage.getItem('WECOM_WEBHOOK_URL') || '';
 }
 
-// ========== IMPORT ==========
-function showImportFormat() {
-  document.getElementById('modalTitle').textContent = '导入格式示例';
-  document.getElementById('modalBody').innerHTML = `<pre style="background:var(--gray-50);padding:12px;border-radius:var(--radius);font-size:12px;line-height:1.6;overflow:auto;">
-[
-  {
-    "sku": "SKU001",
-    "product_name": "产品名称",
-    "category": "电子产品",
-    "purchase_link": "https://detail.1688.com/...",
-    "image_url": "https://...",
-    "price_1688": 15.50,
-    "price_amazon": 29.99,
-    "price_selling": 39.99,
-    "supplier": "某某供应商",
-    "stock_quantity": 100,
-    "status": "待采购"
+// ========== FILTER ==========
+function showFilter(colIdx) {
+  // Simple filter by status/category
+  const col = COLUMNS[colIdx];
+  if (col.key === 'status') {
+    const vals = [...new Set(products.map(p => p.status))];
+    // Just show a quick switch
+    const current = document.getElementById('statusFilter')?.value || '';
+    const newVal = current === '待采购' ? '' : '待采购';
+    // Simple toggle
+    if (col.key === 'status') {
+      if (!document.getElementById('statusFilter')) {
+        const input = document.createElement('input');
+        input.id = 'statusFilter';
+        input.type = 'hidden';
+        input.value = '待采购';
+        document.body.appendChild(input);
+      }
+      const f = document.getElementById('statusFilter');
+      f.value = f.value ? '' : '待采购';
+      filterByStatus(f.value);
+    }
   }
-]
-</pre>`;
-  document.getElementById('modalFooter').innerHTML = '<button class="btn btn-outline" onclick="closeModal()">关闭</button>';
-  document.getElementById('modalOverlay').classList.add('active');
 }
 
-async function doImport() {
-  const raw = document.getElementById('importData').value.trim();
-  if (!raw) { toast('请粘贴数据', 'error'); return; }
-  try {
-    const data = JSON.parse(raw);
-    if (!Array.isArray(data)) throw new Error('数据必须是数组');
-    const result = await api('/api/products/import', 'POST', data);
-    toast(result.message, 'success');
-    loadProducts();
-    loadStats();
-  } catch(e) {
-    toast('导入失败: ' + e.message, 'error');
+function filterByStatus(status) {
+  if (!status) {
+    loadData();
+    return;
   }
+  // Filter products client-side
+  const filtered = products.filter(p => p.status === status);
+  const oldProducts = products;
+  products = filtered;
+  renderGrid();
+  products = oldProducts;
+}
+
+// ========== TOAST ==========
+function toast(msg, type='info') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = `toast ${type}`;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3000);
 }
 
 // ========== UTILS ==========
 function escHtml(s) {
   if (!s) return '';
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('active');
+}
+
+function renameDoc(name) {
+  // Just UI update
 }
 
 // ========== INIT ==========
