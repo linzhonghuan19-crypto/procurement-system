@@ -1,9 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from pydantic import BaseModel
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
 from database import get_db, Product, User, PurchaseOrder, OrderItem
 from auth import get_current_user, require_editor
+from datetime import datetime, timedelta
 import os
 import json
 
@@ -18,6 +20,16 @@ class AIAnalysisRequest(BaseModel):
 class AIFillRequest(BaseModel):
     purchase_link: str
     product_name: Optional[str] = None
+
+
+class AIClassifyRequest(BaseModel):
+    product_ids: List[int]
+    category: Optional[str] = None
+
+
+class AISummaryRequest(BaseModel):
+    group_by: str = "category"  # category, status, supplier, attribute
+    date_range: Optional[int] = None  # days
 
 
 def get_openai_client():
@@ -220,3 +232,152 @@ def local_analysis(query: str, products: list) -> str:
         analysis = f"本地数据统计完成。共{total}个产品，可使用AI获取更深入分析（需配置OpenAI API Key）。"
 
     return analysis
+
+
+@router.post("/classify")
+def ai_classify(
+    req: AIClassifyRequest,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    """AI智能分类产品"""
+    products = db.query(Product).filter(Product.id.in_(req.product_ids)).all()
+    if not products:
+        raise HTTPException(status_code=404, detail="未找到产品")
+
+    product_data = []
+    for p in products:
+        product_data.append(
+            f"SKU:{p.sku} | 名称:{p.product_name} | 类目:{p.category} | "
+            f"属性:{p.attribute} | 供应商:{p.supplier} | 状态:{p.status}"
+        )
+
+    system_prompt = """你是智能分类助手。根据产品信息，为每个产品建议最合适的分类（类目）。
+请返回JSON格式（不要加markdown标记）：
+{
+  "classifications": [
+    {"sku": "SKU001", "suggested_category": "建议类目", "confidence": "高/中/低", "reason": "分类理由"},
+    ...
+  ],
+  "summary": "分类总结"
+}
+注意：如果产品已有类目且合理，保持原类目。"""
+    if req.category:
+        system_prompt += f"\n请优先归类到「{req.category}」类别下。"
+
+    messages = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": "请分类以下产品:\n" + "\n".join(product_data)},
+    ]
+
+    reply = get_ai_response(messages)
+    if reply is None:
+        # 本地分类
+        category_groups = {}
+        for p in products:
+            cat = p.category or "未分类"
+            if cat not in category_groups:
+                category_groups[cat] = []
+            category_groups[cat].append(p.sku)
+
+        classifications = []
+        for cat, skus in category_groups.items():
+            for sku in skus:
+                classifications.append({
+                    "sku": sku,
+                    "suggested_category": cat,
+                    "confidence": "中",
+                    "reason": "保持现有分类",
+                })
+
+        return {
+            "success": True,
+            "classifications": classifications,
+            "summary": f"共 {len(products)} 个产品，分布在 {len(category_groups)} 个类目",
+            "ai_enabled": False,
+        }
+
+    try:
+        cleaned = reply.strip().removeprefix("```json").removeprefix("```").removesuffix("```").strip()
+        parsed = json.loads(cleaned)
+        return {"success": True, **parsed, "ai_enabled": True}
+    except (json.JSONDecodeError, AttributeError):
+        return {"success": True, "classifications": [], "summary": reply, "ai_enabled": True}
+
+
+@router.post("/summary")
+def ai_summary(
+    req: AISummaryRequest,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    """AI生成产品数据总结报告"""
+    query = db.query(Product)
+    if req.date_range:
+        cutoff = datetime.utcnow() - timedelta(days=req.date_range)
+        query = query.filter(Product.updated_at >= cutoff)
+
+    total = query.count()
+    group_col = getattr(Product, req.group_by, Product.category)
+
+    groups = (
+        query.with_entities(group_col, func.count(Product.id))
+        .filter(group_col != "", group_col.isnot(None))
+        .group_by(group_col)
+        .order_by(func.count(Product.id).desc())
+        .all()
+    )
+
+    # Stats
+    low_stock = query.filter(Product.stock_quantity < 10, Product.stock_quantity > 0).count()
+    out_of_stock = query.filter(Product.stock_quantity == 0).count()
+    total_value = query.with_entities(
+        func.sum(Product.purchase_price * Product.purchase_quantity)
+    ).scalar() or 0
+    pending = query.filter(Product.status == "待采购").count()
+
+    group_summary = f"按「{req.group_by}」分组统计:\n"
+    for name, count in groups[:20]:
+        group_summary += f"  - {name}: {count}个\n"
+
+    # Try AI for better summary
+    system_prompt = f"""你是一个数据分析助手。根据以下采购数据统计，生成一份简洁的总结报告。
+用中文回复，涵盖关键发现和 actionable 的建议。保持简洁，突出最重要的数据。"""
+
+    data_summary = (
+        f"总产品数: {total}\n"
+        f"低库存(<10): {low_stock}\n"
+        f"缺货: {out_of_stock}\n"
+        f"待采购: {pending}\n"
+        f"采购总价值: ¥{float(total_value):.2f}\n\n"
+        f"{group_summary}"
+    )
+
+    messages = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": f"数据:\n{data_summary}"},
+    ]
+
+    reply = get_ai_response(messages)
+    if reply is None:
+        reply = (
+            f"📊 数据总结\n"
+            f"总产品数: {total}\n"
+            f"低库存: {low_stock} | 缺货: {out_of_stock} | 待采购: {pending}\n"
+            f"采购总价值: ¥{float(total_value):.2f}\n\n"
+            f"{group_summary}"
+        )
+
+    return {
+        "success": True,
+        "summary": reply,
+        "stats": {
+            "total": total,
+            "low_stock": low_stock,
+            "out_of_stock": out_of_stock,
+            "pending": pending,
+            "total_value": round(float(total_value), 2),
+            "groups": [{"name": g[0], "count": g[1]} for g in groups[:20]],
+        },
+        "ai_enabled": get_openai_client() is not None,
+    }
