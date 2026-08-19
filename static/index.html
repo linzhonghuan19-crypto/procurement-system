@@ -132,7 +132,7 @@ a { color: var(--primary); text-decoration: none; }
 .filter-toolbar .filter-count { font-size: 11px; color: var(--gray-500); margin-left: auto; white-space: nowrap; }
 
 /* ===== GRID ===== */
-.grid-container { flex: 1; overflow: auto; overflow-y: auto; position: relative; min-height: 0; }
+.grid-container { flex: 1; overflow: auto; overflow-y: auto; position: relative; min-height: 0; scroll-behavior: auto; will-change: scroll-position; }
 .grid-scroll { min-width: 100%; }
 .grid-table { border-collapse: collapse; width: max-content; }
 .grid-table th.col-header { 
@@ -243,10 +243,14 @@ a { color: var(--primary); text-decoration: none; }
 .status-transit { color: #6d28d9; }
 .status-warehoused { color: #065f46; }
 .status-discontinued { color: var(--gray-400); }
-.grid-table tr:nth-child(even) td.cell { background: #fafafa; }
-.grid-table tr:nth-child(even) td.row-num { background: var(--header-bg); }
-.grid-table tr:hover td.cell { background: #f5f8ff; }
-.grid-table tr:hover td.row-num { background: #e8ecf4; }
+.grid-table tr.abs-row-even td.cell { background: #fafafa; }
+.grid-table tr.abs-row-even td.row-num { background: var(--header-bg); }
+.grid-table tr.abs-row-odd td.cell { background: #fff; }
+.grid-table tr.abs-row-odd td.row-num { background: #f5f6f8; }
+.grid-table tr.abs-row-odd:hover td.cell, .grid-table tr.abs-row-even:hover td.cell { background: #f5f8ff; }
+.grid-table tr.abs-row-odd:hover td.row-num, .grid-table tr.abs-row-even:hover td.row-num { background: #e8ecf4; }
+.grid-table .v-spacer { pointer-events: none; }
+.grid-table .v-spacer td { border: none; padding: 0; height: 100%; }
 
 /* ===== STATUS BAR ===== */
 .status-bar { 
@@ -1100,10 +1104,13 @@ function showColumnFilter(colIdx, event) {
 
 function closeFilterPopup() { if (activeFilterPopup) { activeFilterPopup.remove(); activeFilterPopup = null; } }
 function filterPopupList(query) {
-  const list = document.getElementById('popupList');
-  if (!list) return;
-  const q = query.toLowerCase();
-  list.querySelectorAll('label').forEach(l => { l.style.display = l.textContent.toLowerCase().includes(q) ? '' : 'none'; });
+  if (filterPopupList._timer) clearTimeout(filterPopupList._timer);
+  filterPopupList._timer = setTimeout(() => {
+    const list = document.getElementById('popupList');
+    if (!list) return;
+    const q = query.toLowerCase();
+    list.querySelectorAll('label').forEach(l => { l.style.display = l.textContent.toLowerCase().includes(q) ? '' : 'none'; });
+  }, 150);
 }
 function toggleSelectAll(checkbox) {
   const list = document.getElementById('popupList');
@@ -1143,10 +1150,11 @@ function updateFilterTags() {
   container.innerHTML = html;
 }
 
-// ========== GRID RENDER ==========
+// ========== GRID RENDER (virtual scrolling) ==========
 function renderGrid() {
   const header = document.getElementById('gridHeader');
   const body = document.getElementById('gridBody');
+  const container = document.getElementById('gridContainer');
   let hHtml = '<tr>';
   COLUMNS.forEach((col, i) => {
     const sortDir = sortState[col.key];
@@ -1167,12 +1175,17 @@ function renderGrid() {
     body.innerHTML = '<tr><td colspan="'+COLUMNS.length+'" style="text-align:center;padding:40px;color:var(--gray-400);">'+(products.length?'没有匹配的数据':'暂无数据，点击工具栏"新增"添加产品')+'</td></tr>';
     return;
   }
-  let bHtml = '';
-  data.forEach((p, rowIdx) => {
-    bHtml += '<tr>';
+
+  const ROW_H = 28;
+  const BUFFER = 20;
+  let prevStart = -1, prevEnd = -1;
+  let rafId = null;
+
+  function buildRowHtml(p, absRow) {
+    let html = '<tr data-abs-row="' + absRow + '" class="abs-row-' + (absRow % 2 === 0 ? 'even' : 'odd') + '">';
     COLUMNS.forEach((col, colIdx) => {
       if (col.key === 'row_num') {
-        bHtml += '<td class="row-num'+(highlightRowCol?' selected-row':'')+'">'+(rowIdx+1)+'</td>';
+        html += '<td class="row-num'+(highlightRowCol?' selected-row':'')+'">' + (absRow + 1) + '</td>';
         return;
       }
       let val = p[col.key];
@@ -1195,21 +1208,50 @@ function renderGrid() {
       } else {
         content = escHtml(String(val));
       }
-      bHtml += '<td class="'+cls+(highlightRowCol?' highlight-row':'')+'" data-row="'+rowIdx+'" data-col="'+colIdx+'" data-key="'+col.key+'" data-id="'+(p.id||'')+'" onclick="selectCell(this)" ondblclick="startEdit(this)">'
+      html += '<td class="'+cls+(highlightRowCol?' highlight-row':'')+'" data-abs-row="'+absRow+'" data-col="'+colIdx+'" data-key="'+col.key+'" data-id="'+(p.id||'')+'" onclick="selectCell(this)" ondblclick="startEdit(this)">'
         + '<div class="cell-content'+(col.type==='number'?' num':'')+'">'+content+'</div>'
         + '<input class="cell-edit" onblur="finishEdit(this)" onkeydown="if(event.key===\'Enter\')this.blur();if(event.key===\'Escape\'){this.value=this.dataset.old;this.blur()}">'
         + '</td>';
     });
-    bHtml += '</tr>';
-  });
-  body.innerHTML = bHtml;
+    html += '</tr>';
+    return html;
+  }
+
+  function update() {
+    const scrollTop = container.scrollTop;
+    const viewH = container.clientHeight;
+    const startIdx = Math.max(0, Math.floor(scrollTop / ROW_H) - BUFFER);
+    const endIdx = Math.min(data.length, Math.ceil((scrollTop + viewH) / ROW_H) + BUFFER);
+    if (startIdx === prevStart && endIdx === prevEnd) return;
+    prevStart = startIdx; prevEnd = endIdx;
+
+    let bHtml = '';
+    if (startIdx > 0) {
+      bHtml += '<tr class="v-spacer" style="height:' + (startIdx * ROW_H) + 'px;pointer-events:none"><td colspan="' + COLUMNS.length + '"></td></tr>';
+    }
+    for (let i = startIdx; i < endIdx; i++) {
+      bHtml += buildRowHtml(data[i], i);
+    }
+    if (endIdx < data.length) {
+      bHtml += '<tr class="v-spacer" style="height:' + ((data.length - endIdx) * ROW_H) + 'px;pointer-events:none"><td colspan="' + COLUMNS.length + '"></td></tr>';
+    }
+    body.innerHTML = bHtml;
+  }
+
+  if (body._scrollHandler) container.removeEventListener('scroll', body._scrollHandler);
+  body._scrollHandler = function() {
+    if (rafId) cancelAnimationFrame(rafId);
+    rafId = requestAnimationFrame(update);
+  };
+  container.addEventListener('scroll', body._scrollHandler, { passive: true });
+  update();
 }
 
 function selectCell(el) {
   if (selectedCell) selectedCell.classList.remove('selected');
   selectedCell = el;
   el.classList.add('selected');
-  const row = parseInt(el.dataset.row) + 1;
+  const row = parseInt(el.dataset.absRow) + 1;
   const col = String.fromCharCode(65 + parseInt(el.dataset.col));
   document.getElementById('cellRef').textContent = col + row;
   const content = el.querySelector('.cell-content');
@@ -1236,31 +1278,31 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Enter' && selectedCell && !editingCell) { e.preventDefault(); startEdit(selectedCell); }
   if (e.key === 'Tab' && selectedCell) {
     e.preventDefault();
-    const col = parseInt(selectedCell.dataset.col), row = parseInt(selectedCell.dataset.row);
-    const next = document.querySelector('td[data-row="'+row+'"][data-col="'+(col+1)+'"]');
+    const col = parseInt(selectedCell.dataset.col), row = parseInt(selectedCell.dataset.absRow);
+    const next = document.querySelector('td[data-abs-row="'+row+'"][data-col="'+(col+1)+'"]');
     if (next) { selectCell(next); if (editingCell) startEdit(next); }
   }
   if (e.key === 'ArrowDown' && selectedCell) {
     e.preventDefault();
-    const col = parseInt(selectedCell.dataset.col), row = parseInt(selectedCell.dataset.row);
-    const next = document.querySelector('td[data-row="'+(row+1)+'"][data-col="'+col+'"]');
+    const col = parseInt(selectedCell.dataset.col), row = parseInt(selectedCell.dataset.absRow);
+    const next = document.querySelector('td[data-abs-row="'+(row+1)+'"][data-col="'+col+'"]');
     if (next) selectCell(next);
   }
   if (e.key === 'ArrowUp' && selectedCell) {
     e.preventDefault();
-    const col = parseInt(selectedCell.dataset.col), row = parseInt(selectedCell.dataset.row);
-    const next = document.querySelector('td[data-row="'+(row-1)+'"][data-col="'+col+'"]');
+    const col = parseInt(selectedCell.dataset.col), row = parseInt(selectedCell.dataset.absRow);
+    const next = document.querySelector('td[data-abs-row="'+(row-1)+'"][data-col="'+col+'"]');
     if (next) selectCell(next);
   }
   if (e.key === 'ArrowLeft' && selectedCell) {
     e.preventDefault();
-    const col = parseInt(selectedCell.dataset.col), row = parseInt(selectedCell.dataset.row);
-    if (col > 0) { const next = document.querySelector('td[data-row="'+row+'"][data-col="'+(col-1)+'"]'); if (next) selectCell(next); }
+    const col = parseInt(selectedCell.dataset.col), row = parseInt(selectedCell.dataset.absRow);
+    if (col > 0) { const next = document.querySelector('td[data-abs-row="'+row+'"][data-col="'+(col-1)+'"]'); if (next) selectCell(next); }
   }
   if (e.key === 'ArrowRight' && selectedCell) {
     e.preventDefault();
-    const col = parseInt(selectedCell.dataset.col), row = parseInt(selectedCell.dataset.row);
-    const next = document.querySelector('td[data-row="'+row+'"][data-col="'+(col+1)+'"]');
+    const col = parseInt(selectedCell.dataset.col), row = parseInt(selectedCell.dataset.absRow);
+    const next = document.querySelector('td[data-abs-row="'+row+'"][data-col="'+(col+1)+'"]');
     if (next) selectCell(next);
   }
 });
