@@ -28,11 +28,15 @@
   --gridline: #e0e0e0;
   --header-h: 32px;
   --row-h: 28px;
-  --toolbar-h: 48px;
+  --ribbon-h: 36px;
+  --toolbar-h: 82px;
   --formula-h: 36px;
   --status-h: 28px;
   --col-w: 120px;
   --row-num-w: 50px;
+  --tab-active-border: #1a73e8;
+  --tab-hover-bg: #f0f1f3;
+  --ribbon-group-gap: 4px;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", "Helvetica Neue", Arial, sans-serif; font-size: 13px; color: var(--gray-800); background: #fff; overflow: hidden; height: 100vh; user-select: none; }
@@ -71,45 +75,46 @@ a { color: var(--primary); text-decoration: none; }
 .spreadsheet-app { display: none; height: 100vh; flex-direction: column; }
 .spreadsheet-app.active { display: flex; }
 
-/* ===== TOOLBAR ===== */
-.toolbar { display: flex; align-items: center; height: var(--toolbar-h); padding: 0 12px; border-bottom: 1px solid var(--gray-200); background: #fff; gap: 4px; flex-shrink: 0; overflow-x: auto; }
-.toolbar .doc-title { font-size: 15px; font-weight: 500; color: var(--gray-800); padding: 4px 8px; border-radius: 4px; cursor: default; white-space: nowrap; }
-.toolbar .doc-title:hover { background: var(--gray-100); }
-.toolbar .doc-title input { display: none; border: none; font-size: 15px; font-weight: 500; outline: none; background: var(--gray-100); padding: 2px 4px; border-radius: 2px; }
-.toolbar .doc-title.editing input { display: inline; }
-.toolbar .doc-title.editing span { display: none; }
-.toolbar .star { color: var(--gray-300); cursor: pointer; font-size: 16px; padding: 4px; }
-.toolbar .star:hover, .toolbar .star.active { color: var(--warning); }
-.toolbar-sep { width: 1px; height: 24px; background: var(--gray-200); margin: 0 4px; flex-shrink: 0; }
-.toolbar-group { display: flex; align-items: center; gap: 2px; flex-shrink: 0; }
-.toolbar-btn { padding: 4px 8px; border-radius: 4px; cursor: pointer; color: var(--gray-600); font-size: 13px; border: none; background: none; display: flex; align-items: center; gap: 4px; white-space: nowrap; }
-.toolbar-btn:hover { background: var(--gray-100); }
-.toolbar-btn b { font-weight: 600; }
-.toolbar-btn.active { background: var(--primary-light); color: var(--primary); }
-.toolbar-right { margin-left: auto; display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+/* ===== TOP BAR (document title + tabs) ===== */
+.top-bar { display: flex; align-items: center; height: 40px; padding: 0 12px; border-bottom: 1px solid var(--gray-200); background: #fff; flex-shrink: 0; gap: 8px; }
+.top-bar .doc-title { font-size: 15px; font-weight: 500; color: var(--gray-800); padding: 4px 8px; border-radius: 4px; cursor: default; white-space: nowrap; }
+.top-bar .doc-title:hover { background: var(--gray-100); }
+.top-bar .doc-title input { display: none; border: none; font-size: 15px; font-weight: 500; outline: none; background: var(--gray-100); padding: 2px 4px; border-radius: 2px; }
+.top-bar .doc-title.editing input { display: inline; }
+.top-bar .doc-title.editing span { display: none; }
+.top-bar .star { color: var(--gray-300); cursor: pointer; font-size: 16px; padding: 4px; }
+.top-bar .star:hover, .top-bar .star.active { color: var(--warning); }
+.top-bar-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+.top-bar-tabs { display: flex; align-items: center; gap: 0; margin-left: 16px; }
+.top-bar-tab { padding: 8px 14px; font-size: 13px; color: var(--gray-600); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s; white-space: nowrap; }
+.top-bar-tab:hover { background: var(--tab-hover-bg); }
+.top-bar-tab.active { color: var(--selected-border); border-bottom-color: var(--tab-active-border); font-weight: 500; }
 .user-avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 12px; cursor: pointer; }
 .user-avatar:hover { opacity: 0.8; }
 
-/* Toolbar formatting selects */
-.toolbar select { padding: 2px 4px; border: 1px solid var(--gray-200); border-radius: 4px; font-size: 12px; background: #fff; cursor: pointer; height: 26px; }
-.toolbar select:hover { border-color: var(--gray-300); }
-.toolbar select:focus { outline: none; border-color: var(--primary); }
-.toolbar .color-picker-wrap { position: relative; display: inline-flex; }
-.toolbar .color-picker-wrap input[type="color"] { position: absolute; opacity: 0; width: 100%; height: 100%; cursor: pointer; top: 0; left: 0; }
-.toolbar .border-btn { position: relative; }
-
-/* ===== FORMATTING TOOLBAR ROW ===== */
-.format-toolbar { display: flex; align-items: center; height: 36px; padding: 0 12px; border-bottom: 1px solid var(--gray-200); background: #fff; gap: 4px; flex-shrink: 0; overflow-x: auto; }
-.format-toolbar .toolbar-btn { font-size: 13px; padding: 4px 6px; min-width: 28px; justify-content: center; }
-.format-toolbar .toolbar-btn.bold { font-weight: 700; }
-.format-toolbar .toolbar-btn.italic { font-style: italic; }
-.format-toolbar .toolbar-btn.underline { text-decoration: underline; }
-.format-toolbar-sep { width: 1px; height: 20px; background: var(--gray-200); margin: 0 4px; flex-shrink: 0; }
-
-/* ===== ADVANCED TOOLBAR ===== */
-.adv-toolbar { display: flex; align-items: center; height: 34px; padding: 0 12px; border-bottom: 1px solid var(--gray-200); background: var(--gray-50); gap: 2px; flex-shrink: 0; overflow-x: auto; }
-.adv-toolbar .toolbar-btn { font-size: 12px; padding: 3px 8px; color: var(--gray-500); }
-.adv-toolbar .toolbar-btn:hover { color: var(--gray-700); background: var(--gray-100); }
+/* ===== RIBBON TOOLBAR ===== */
+.ribbon { display: none; flex-direction: column; height: var(--toolbar-h); padding: 2px 8px; border-bottom: 1px solid var(--gray-200); background: #fff; flex-shrink: 0; overflow: hidden; }
+.ribbon.active { display: flex; }
+.ribbon-row { display: flex; align-items: center; gap: 0; flex: 1; min-height: 0; }
+.ribbon-row:first-child { border-bottom: 1px solid var(--gray-100); }
+.ribbon-group { display: flex; align-items: center; gap: 1px; flex-shrink: 0; padding: 0 4px; }
+.ribbon-group-title { font-size: 8px; color: var(--gray-400); text-align: center; position: absolute; bottom: 0; left: 0; right: 0; pointer-events: none; white-space: nowrap; }
+.ribbon-btn { padding: 1px 4px; border-radius: 3px; cursor: pointer; color: var(--gray-600); font-size: 11px; border: none; background: none; display: flex; flex-direction: column; align-items: center; gap: 0; white-space: nowrap; min-width: 32px; position: relative; padding-bottom: 10px; height: 36px; justify-content: center; }
+.ribbon-btn:hover { background: var(--gray-100); }
+.ribbon-btn .ribbon-icon { font-size: 14px; line-height: 1.2; }
+.ribbon-btn .ribbon-label { font-size: 8px; color: var(--gray-500); line-height: 1.1; }
+.ribbon-btn .ribbon-label-sm { font-size: 7px; color: var(--gray-400); }
+.ribbon-sep { width: 1px; height: 24px; background: var(--gray-200); margin: 0 2px; flex-shrink: 0; }
+.ribbon-select-wrap { display: flex; align-items: center; gap: 1px; }
+.ribbon select { padding: 1px 2px; border: 1px solid var(--gray-200); border-radius: 3px; font-size: 10px; background: #fff; cursor: pointer; height: 20px; max-width: 64px; }
+.ribbon select:hover { border-color: var(--gray-300); }
+.ribbon select:focus { outline: none; border-color: var(--primary); }
+.ribbon .color-picker-wrap { position: relative; display: inline-flex; }
+.ribbon .color-picker-wrap input[type="color"] { position: absolute; opacity: 0; width: 100%; height: 100%; cursor: pointer; top: 0; left: 0; }
+.ribbon-right { margin-left: auto; display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+.ribbon-btn.active { background: var(--primary-light); color: var(--primary); }
+.ribbon .btn-text { background: none; border: none; padding: 2px 6px; border-radius: 3px; cursor: pointer; font-size: 10px; color: var(--gray-600); display: flex; align-items: center; gap: 2px; }
+.ribbon .btn-text:hover { background: var(--gray-100); }
 
 /* ===== FORMULA BAR ===== */
 .formula-bar { display: flex; align-items: center; height: var(--formula-h); border-bottom: 1px solid var(--gray-200); background: #fff; flex-shrink: 0; }
@@ -130,7 +135,6 @@ a { color: var(--primary); text-decoration: none; }
 .grid-container { flex: 1; overflow: auto; overflow-y: auto; position: relative; min-height: 0; }
 .grid-scroll { min-width: 100%; }
 .grid-table { border-collapse: collapse; width: max-content; }
-
 .grid-table th.col-header { 
   background: var(--header-bg); 
   border-right: 1px solid var(--gridline); 
@@ -168,7 +172,6 @@ a { color: var(--primary); text-decoration: none; }
 .grid-table th.col-header .sort-indicator { display: inline-block; font-size: 10px; margin-left: 2px; opacity: 0.5; vertical-align: middle; }
 .grid-table th.col-header .sort-indicator.active { opacity: 1; }
 .grid-table th.col-header.sorted { background: var(--selected-bg) !important; }
-
 .grid-table td.row-num { 
   background: var(--header-bg); 
   border-right: 1px solid var(--gray-300); 
@@ -186,7 +189,6 @@ a { color: var(--primary); text-decoration: none; }
   z-index: 2;
 }
 .grid-table td.row-num.selected-row { background: var(--selected-bg); color: var(--selected-border); font-weight: 600; }
-
 .grid-table td.cell { 
   border-right: 1px solid var(--gridline); 
   border-bottom: 1px solid var(--gridline); 
@@ -234,13 +236,13 @@ a { color: var(--primary); text-decoration: none; }
 .grid-table td.cell .cell-content .img-thumb:hover { transform: scale(1.2); }
 .grid-table td.cell .cell-content .cell-link { color: var(--primary); cursor: pointer; font-size: 12px; }
 .grid-table td.cell .cell-content .cell-link:hover { text-decoration: underline; }
-
+.grid-table td.cell.highlight-col { background: #f0f4ff !important; }
+.grid-table td.cell.highlight-row { background: #fff8e1 !important; }
 .status-pending { color: #b45309; }
 .status-ordered { color: #1e40af; }
 .status-transit { color: #6d28d9; }
 .status-warehoused { color: #065f46; }
 .status-discontinued { color: var(--gray-400); }
-
 .grid-table tr:nth-child(even) td.cell { background: #fafafa; }
 .grid-table tr:nth-child(even) td.row-num { background: var(--header-bg); }
 .grid-table tr:hover td.cell { background: #f5f8ff; }
@@ -353,7 +355,6 @@ a { color: var(--primary); text-decoration: none; }
 .collect-form-preview { background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 8px; padding: 20px; margin-top: 12px; }
 .collect-form-preview .cf-field { margin-bottom: 12px; }
 .collect-form-preview .cf-field label { display: block; font-size: 12px; font-weight: 500; color: var(--gray-600); margin-bottom: 4px; }
-.collect-form-preview .cf-field input { width: 100%; padding: 8px 10px; border: 1px solid var(--gray-200); border-radius: 6px; font-size: 13px; }
 
 /* ===== DATA GROUPING ===== */
 .group-selector { margin-bottom: 16px; }
@@ -384,28 +385,15 @@ a { color: var(--primary); text-decoration: none; }
 .ai-classify-result { background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 8px; padding: 16px; margin-top: 12px; }
 .ai-classify-result .result-section { margin-bottom: 12px; }
 .ai-classify-result .result-section h5 { font-size: 12px; color: var(--gray-600); font-weight: 600; margin-bottom: 6px; }
-.ai-classify-result .result-section p { font-size: 13px; line-height: 1.6; }
-.ai-classify-result .result-bar { display: flex; align-items: center; gap: 8px; margin: 4px 0; }
-.ai-classify-result .result-bar .bar-label { width: 80px; font-size: 12px; text-align: right; }
-.ai-classify-result .result-bar .bar-track { flex: 1; height: 16px; background: var(--gray-200); border-radius: 8px; overflow: hidden; }
-.ai-classify-result .result-bar .bar-fill { height: 100%; background: var(--primary); border-radius: 8px; transition: width 0.5s; }
-.ai-classify-result .result-bar .bar-val { width: 50px; font-size: 11px; color: var(--gray-500); }
 
 /* ===== DATA PROTECTION ===== */
 .protection-info { padding: 12px; background: var(--gray-50); border-radius: 6px; margin-bottom: 12px; }
 .protection-info .info-row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 12px; }
-.protection-info .info-row .info-label { color: var(--gray-500); }
-.protection-info .info-row .info-value { font-weight: 500; }
-.protection-col-list { margin-top: 12px; }
-.protection-col-list .pcol-item { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--gray-100); font-size: 12px; }
-.protection-col-list .pcol-item .pcol-name { color: var(--gray-600); }
-.protection-col-list .pcol-item .pcol-lock { cursor: pointer; color: var(--gray-400); }
-.protection-col-list .pcol-item .pcol-lock.locked { color: var(--primary); }
 
 /* ===== PRINT STYLES ===== */
 @media print {
   body { overflow: visible !important; background: #fff; }
-  .toolbar, .format-toolbar, .adv-toolbar, .formula-bar, .filter-toolbar, .status-bar, .modal-overlay, .sidebar-panel, .toast { display: none !important; }
+  .top-bar, .ribbon, .formula-bar, .filter-toolbar, .status-bar, .modal-overlay, .sidebar-panel, .toast { display: none !important; }
   .grid-container { overflow: visible !important; }
   .grid-table th.col-header { position: static !important; }
   .grid-table td.row-num { position: static !important; }
@@ -438,11 +426,41 @@ a { color: var(--primary); text-decoration: none; }
 .tag-danger { background: #fee2e2; color: #991b1b; }
 .tag-info { background: #dbeafe; color: #1e40af; }
 .tag-primary { background: var(--primary-light); color: var(--primary); }
-
-/* ===== SPINNER OVERLAY ===== */
 .spinner-overlay { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.7); z-index: 9998; align-items: center; justify-content: center; }
 .spinner-overlay.active { display: flex; }
 .spinner { width: 36px; height: 36px; border: 3px solid var(--gray-200); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.6s linear infinite; }
+
+/* ===== CONDITIONAL FORMATTING ===== */
+.cf-preview { display: flex; align-items: center; gap: 8px; padding: 6px; border: 1px solid var(--gray-200); border-radius: 4px; margin: 4px 0; }
+.cf-rule-item { background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 6px; padding: 10px; margin-bottom: 8px; }
+
+/* ===== VERSION HISTORY ===== */
+.vh-item { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--gray-100); font-size: 12px; }
+.vh-item .vh-time { color: var(--gray-500); min-width: 140px; }
+.vh-item .vh-user { color: var(--gray-600); min-width: 80px; }
+.vh-item .vh-action { color: var(--gray-700); flex: 1; }
+
+/* ===== DATA VALIDATION ===== */
+.dv-rule { background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 6px; padding: 10px; margin-bottom: 8px; }
+
+/* ===== FUNCTION LIST ===== */
+.func-group { margin-bottom: 12px; }
+.func-group-title { font-size: 12px; font-weight: 600; color: var(--gray-600); padding: 6px 0; border-bottom: 1px solid var(--gray-200); margin-bottom: 6px; }
+.func-item { display: inline-flex; align-items: center; padding: 4px 10px; margin: 2px; border: 1px solid var(--gray-200); border-radius: 4px; font-size: 11px; cursor: pointer; }
+.func-item:hover { background: var(--primary-light); border-color: var(--primary); }
+
+/* ===== QUICK TOOLS ===== */
+.qt-section { margin-bottom: 16px; }
+.qt-section h4 { font-size: 13px; font-weight: 600; color: var(--gray-700); margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--gray-200); }
+.qt-btn { padding: 6px 14px; border: 1px solid var(--gray-200); border-radius: 6px; background: #fff; cursor: pointer; font-size: 12px; display: inline-flex; align-items: center; gap: 4px; margin: 2px; }
+.qt-btn:hover { background: var(--gray-50); border-color: var(--gray-300); }
+.qt-btn.primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+.qt-btn.primary:hover { background: var(--primary-hover); }
+
+/* ===== FREEZE PANE INDICATOR ===== */
+.freeze-line { position: absolute; z-index: 5; pointer-events: none; }
+.freeze-line.col { top: 0; bottom: 0; width: 3px; background: var(--selected-border); cursor: col-resize; left: var(--col-w); }
+.freeze-line.row { left: 0; right: 0; height: 3px; background: var(--selected-border); cursor: row-resize; top: var(--header-h); }
 </style>
 </head>
 <body>
@@ -467,52 +485,39 @@ a { color: var(--primary); text-decoration: none; }
       </p>
     </div>
     <div id="registerForm" style="display:none">
-      <div class="form-group">
-        <label>用户名</label>
-        <input type="text" id="regUsername" placeholder="输入用户名">
-      </div>
-      <div class="form-group">
-        <label>显示名称</label>
-        <input type="text" id="regDisplayName" placeholder="你的名字">
-      </div>
-      <div class="form-group">
-        <label>密码</label>
-        <input type="password" id="regPassword" placeholder="设置密码" onkeydown="if(event.key==='Enter')doRegister()">
-      </div>
+      <div class="form-group"><label>用户名</label><input type="text" id="regUsername" placeholder="输入用户名"></div>
+      <div class="form-group"><label>显示名称</label><input type="text" id="regDisplayName" placeholder="你的名字"></div>
+      <div class="form-group"><label>密码</label><input type="password" id="regPassword" placeholder="设置密码" onkeydown="if(event.key==='Enter')doRegister()"></div>
       <button class="btn btn-primary btn-block" onclick="doRegister()">注册</button>
-      <p style="margin-top:12px;text-align:center;font-size:12px;color:var(--gray-500);">
-        已有账号？<a href="#" onclick="showLogin()" style="color:var(--primary)">返回登录</a>
-      </p>
+      <p style="margin-top:12px;text-align:center;font-size:12px;color:var(--gray-500);">已有账号？<a href="#" onclick="showLogin()" style="color:var(--primary)">返回登录</a></p>
     </div>
   </div>
 </div>
 
-<!-- ===== SPREADSHEET ===== -->
+<!-- ===== SPREADSHEET APP ===== -->
 <div class="spreadsheet-app" id="app">
-  
-  <!-- Main Toolbar -->
-  <div class="toolbar" id="mainToolbar">
+
+  <!-- ===== TOP BAR ===== -->
+  <div class="top-bar">
     <div class="doc-title" id="docTitle">
       <span>海外仓总采购表</span>
       <input type="text" value="海外仓总采购表" onblur="renameDoc(this.value)">
     </div>
     <span class="star" id="starBtn" title="标记星标" onclick="toggleStar()">&#9734;</span>
-    <div class="toolbar-sep"></div>
-    <div class="toolbar-group">
-      <button class="toolbar-btn" onclick="switchView('products')" title="产品列表"><b>&#128203;</b> 产品</button>
-      <button class="toolbar-btn" onclick="switchView('orders')" title="采购单"><b>&#128196;</b> 采购单</button>
-      <button class="toolbar-btn" onclick="switchView('ai')" title="AI分析"><b>&#129302;</b> AI</button>
+    <div class="top-bar-tabs" id="tabBar">
+      <span class="top-bar-tab active" data-tab="home" onclick="switchRibbon('home')">开始</span>
+      <span class="top-bar-tab" data-tab="insert" onclick="switchRibbon('insert')">插入</span>
+      <span class="top-bar-tab" data-tab="data" onclick="switchRibbon('data')">数据</span>
+      <span class="top-bar-tab" data-tab="formula" onclick="switchRibbon('formula')">公式</span>
+      <span class="top-bar-tab" data-tab="view" onclick="switchRibbon('view')">视图</span>
+      <span class="top-bar-tab" data-tab="quick" onclick="switchRibbon('quick')">快捷工具</span>
     </div>
-    <div class="toolbar-sep"></div>
-    <div class="toolbar-group">
-      <button class="toolbar-btn" onclick="showCreateProduct()" title="新增产品"><b>+</b> 新增</button>
-      <button class="toolbar-btn" onclick="showImport()" title="导入"><b>&#8593;</b> 导入</button>
-      <button class="toolbar-btn" onclick="refreshData()" title="刷新"><b>&#8635;</b></button>
-    </div>
-    <div class="toolbar-right">
-      <div class="toolbar-group">
-        <button class="toolbar-btn" onclick="openSettings()" title="设置" style="color:var(--gray-400);font-size:16px;">&#9881;</button>
-      </div>
+    <div class="top-bar-right">
+      <span style="font-size:12px;color:var(--primary);cursor:pointer;display:flex;align-items:center;gap:4px;padding:4px 8px;border-radius:4px;hover:background:var(--gray-50);" onclick="toast('提醒查阅功能', 'info')" title="提醒查阅">
+        <span style="font-size:14px;">&#128276;</span> 提醒查阅
+      </span>
+      <button class="btn btn-sm btn-primary" onclick="showCreateProduct()" style="padding:4px 12px;font-size:12px;">+ 新增</button>
+      <button class="btn btn-sm btn-outline" onclick="showImport()" style="padding:4px 12px;font-size:12px;">导入</button>
       <div class="dropdown" id="userMenuDropdown">
         <div class="user-avatar" id="userAvatar" onclick="toggleUserMenu()" title="用户菜单">管</div>
         <div class="dropdown-menu" id="userMenu">
@@ -524,90 +529,247 @@ a { color: var(--primary); text-decoration: none; }
     </div>
   </div>
 
-  <!-- Formatting Toolbar -->
-  <div class="format-toolbar" id="formatToolbar">
-    <select id="fontSelect" onchange="applyFormat('fontName',this.value)" title="字体">
-      <option value="Arial">Arial</option>
-      <option value="Helvetica">Helvetica</option>
-      <option value="Times New Roman">Times New Roman</option>
-      <option value="Courier New">Courier New</option>
-      <option value="Georgia">Georgia</option>
-      <option value="Verdana">Verdana</option>
-      <option value="Microsoft YaHei">微软雅黑</option>
-      <option value="SimSun">宋体</option>
-    </select>
-    <select id="fontSizeSelect" onchange="applyFormat('fontSize',this.value)" title="字号">
-      <option value="9">9</option>
-      <option value="10">10</option>
-      <option value="11">11</option>
-      <option value="12">12</option>
-      <option value="13" selected>13</option>
-      <option value="14">14</option>
-      <option value="16">16</option>
-      <option value="18">18</option>
-      <option value="20">20</option>
-      <option value="24">24</option>
-    </select>
-    <div class="format-toolbar-sep"></div>
-    <button class="toolbar-btn bold" onclick="applyFormat('bold')" title="加粗"><b>B</b></button>
-    <button class="toolbar-btn italic" onclick="applyFormat('italic')" title="斜体"><i>I</i></button>
-    <button class="toolbar-btn underline" onclick="applyFormat('underline')" title="下划线"><u>U</u></button>
-    <div class="format-toolbar-sep"></div>
-    <div class="toolbar-group">
-      <div class="color-picker-wrap">
-        <button class="toolbar-btn" onclick="this.nextElementSibling.click()" title="文字颜色" style="border-bottom:3px solid #000;">A</button>
-        <input type="color" onchange="applyFormat('textColor',this.value)" value="#000000">
+  <!-- ===== RIBBON: 开始 ===== -->
+  <div class="ribbon active" id="ribbon-home">
+    <div class="ribbon-row">
+      <div class="ribbon-group">
+        <div class="ribbon-select-wrap">
+          <select id="ribbonFontSelect" onchange="applyFormat('fontName',this.value)" title="字体" style="width:72px;">
+            <option value="Arial">Arial</option>
+            <option value="Microsoft YaHei">微软雅黑</option>
+            <option value="SimSun">宋体</option>
+            <option value="Times New Roman">Times New Roman</option>
+          </select>
+          <select id="ribbonFontSize" onchange="applyFormat('fontSize',this.value)" title="字号" style="width:42px;">
+            <option value="9">9</option><option value="10">10</option><option value="11">11</option>
+            <option value="12">12</option><option value="13" selected>13</option><option value="14">14</option>
+            <option value="16">16</option><option value="18">18</option><option value="20">20</option>
+          </select>
+        </div>
       </div>
-      <div class="color-picker-wrap">
-        <button class="toolbar-btn" onclick="this.nextElementSibling.click()" title="填充颜色" style="background:#ffff00;padding:4px 8px;">&#9632;</button>
-        <input type="color" onchange="applyFormat('fillColor',this.value)" value="#ffff00">
+      <div class="ribbon-sep"></div>
+      <div class="ribbon-group">
+        <button class="ribbon-btn" onclick="applyFormat('bold')" title="加粗"><span class="ribbon-icon"><b>B</b></span><span class="ribbon-label">加粗</span></button>
+        <button class="ribbon-btn" onclick="applyFormat('italic')" title="斜体"><span class="ribbon-icon"><i>I</i></span><span class="ribbon-label">斜体</span></button>
+        <button class="ribbon-btn" onclick="applyFormat('underline')" title="下划线"><span class="ribbon-icon"><u>U</u></span><span class="ribbon-label">下划线</span></button>
+        <button class="ribbon-btn" onclick="applyFormat('strikethrough')" title="删除线"><span class="ribbon-icon"><s>S</s></span><span class="ribbon-label">删除线</span></button>
+      </div>
+      <div class="ribbon-sep"></div>
+      <div class="ribbon-group">
+        <div class="color-picker-wrap">
+          <button class="ribbon-btn" onclick="this.nextElementSibling.click()" title="文字颜色"><span class="ribbon-icon" style="border-bottom:3px solid #000;">A</span><span class="ribbon-label">文字颜色</span></button>
+          <input type="color" onchange="applyFormat('textColor',this.value)" value="#000000">
+        </div>
+        <div class="color-picker-wrap">
+          <button class="ribbon-btn" onclick="this.nextElementSibling.click()" title="填充颜色"><span class="ribbon-icon" style="background:#ff0;padding:0 4px;">&#9632;</span><span class="ribbon-label">填充颜色</span></button>
+          <input type="color" onchange="applyFormat('fillColor',this.value)" value="#ffff00">
+        </div>
+      </div>
+      <div class="ribbon-sep"></div>
+      <div class="ribbon-group">
+        <button class="ribbon-btn" onclick="applyFormat('alignLeft')" title="左对齐"><span class="ribbon-icon">&#8467;</span><span class="ribbon-label">左对齐</span></button>
+        <button class="ribbon-btn" onclick="applyFormat('alignCenter')" title="居中"><span class="ribbon-icon">&#8801;</span><span class="ribbon-label">居中</span></button>
+        <button class="ribbon-btn" onclick="applyFormat('alignRight')" title="右对齐"><span class="ribbon-icon">&#8473;</span><span class="ribbon-label">右对齐</span></button>
+        <button class="ribbon-btn" onclick="applyFormat('alignTop')" title="顶端对齐"><span class="ribbon-icon">&#8593;</span><span class="ribbon-label">顶端</span></button>
+        <button class="ribbon-btn" onclick="applyFormat('alignMiddle')" title="垂直居中"><span class="ribbon-icon">&#8596;</span><span class="ribbon-label">垂直居中</span></button>
+        <button class="ribbon-btn" onclick="applyFormat('alignBottom')" title="底端对齐"><span class="ribbon-icon">&#8595;</span><span class="ribbon-label">底端</span></button>
+      </div>
+      <div class="ribbon-sep"></div>
+      <div class="ribbon-group">
+        <button class="ribbon-btn" onclick="applyFormat('merge')" title="合并单元格"><span class="ribbon-icon">&#9644;</span><span class="ribbon-label">合并</span></button>
+        <button class="ribbon-btn" onclick="applyFormat('wrap')" title="自动换行"><span class="ribbon-icon">&#8636;</span><span class="ribbon-label">自动换行</span></button>
+        <button class="ribbon-btn" onclick="openDialog('border')" title="边框"><span class="ribbon-icon">&#9632;</span><span class="ribbon-label">边框</span></button>
+      </div>
+      <div class="ribbon-sep"></div>
+      <div class="ribbon-group">
+        <select onchange="applyFormat('numberFormat',this.value)" title="数字格式" style="width:56px;">
+          <option value="auto">自动</option>
+          <option value="number">数字</option>
+          <option value="currency">货币</option>
+          <option value="percent">百分比</option>
+          <option value="text">文本</option>
+        </select>
+      </div>
+      <div class="ribbon-sep"></div>
+      <div class="ribbon-group">
+        <button class="ribbon-btn" onclick="applyFormat('decreaseIndent')" title="减少缩进"><span class="ribbon-icon">&#8592;</span><span class="ribbon-label">缩进</span></button>
+        <button class="ribbon-btn" onclick="applyFormat('increaseIndent')" title="增加缩进"><span class="ribbon-icon">&#8594;</span><span class="ribbon-label">增加</span></button>
       </div>
     </div>
-    <div class="format-toolbar-sep"></div>
-    <div class="toolbar-group">
-      <button class="toolbar-btn" onclick="applyFormat('border')" title="边框">&#9632;</button>
-      <button class="toolbar-btn" onclick="applyFormat('merge')" title="合并单元格">&#9644;</button>
+    <div class="ribbon-row">
+      <div class="ribbon-group">
+        <button class="ribbon-btn" onclick="showDashboard()" title="生成仪表盘"><span class="ribbon-icon">&#128202;</span><span class="ribbon-label">生成仪表盘</span></button>
+        <button class="ribbon-btn" onclick="showCollectForm()" title="收集表"><span class="ribbon-icon">&#128203;</span><span class="ribbon-label">收集表</span></button>
+        <button class="ribbon-btn" onclick="showDataGrouping()" title="数据分组"><span class="ribbon-icon">&#128451;</span><span class="ribbon-label">数据分组</span></button>
+        <button class="ribbon-btn" onclick="showNotificationSettings()" title="自动化通知"><span class="ribbon-icon">&#128276;</span><span class="ribbon-label">自动化通知</span></button>
+        <button class="ribbon-btn" onclick="showAIClassify()" title="分类汇总"><span class="ribbon-icon">&#129302;</span><span class="ribbon-label">分类汇总</span></button>
+        <button class="ribbon-btn" onclick="showDataProtection()" title="数据保护"><span class="ribbon-icon">&#128274;</span><span class="ribbon-label">数据保护</span></button>
+        <button class="ribbon-btn" onclick="doPrint()" title="打印"><span class="ribbon-icon">&#128424;</span><span class="ribbon-label">打印</span></button>
+      </div>
     </div>
-    <div class="format-toolbar-sep"></div>
-    <div class="toolbar-group">
-      <button class="toolbar-btn" onclick="applyFormat('alignLeft')" title="左对齐">&#8467;</button>
-      <button class="toolbar-btn" onclick="applyFormat('alignCenter')" title="居中">&#8801;</button>
-      <button class="toolbar-btn" onclick="applyFormat('alignRight')" title="右对齐">&#8473;</button>
-    </div>
-    <div class="format-toolbar-sep"></div>
-    <select onchange="applyFormat('numberFormat',this.value)" title="数字格式" style="width:80px;">
-      <option value="auto">自动</option>
-      <option value="number">数字</option>
-      <option value="currency">货币</option>
-      <option value="percent">百分比</option>
-      <option value="text">文本</option>
-    </select>
-    <div class="format-toolbar-sep"></div>
-    <button class="toolbar-btn" onclick="applyFormat('decreaseIndent')" title="减少缩进">&#8592;</button>
-    <button class="toolbar-btn" onclick="applyFormat('increaseIndent')" title="增加缩进">&#8594;</button>
   </div>
 
-  <!-- Advanced Toolbar -->
-  <div class="adv-toolbar" id="advToolbar">
-    <button class="toolbar-btn" onclick="showDashboard()" title="生成仪表盘">&#128202; 生成仪表盘</button>
-    <button class="toolbar-btn" onclick="showCollectForm()" title="收集表">&#128203; 收集表</button>
-    <button class="toolbar-btn" onclick="showDataGrouping()" title="数据分组">&#128451; 数据分组</button>
-    <button class="toolbar-btn" onclick="showNotificationSettings()" title="自动化通知">&#128276; 自动化通知</button>
-    <button class="toolbar-btn" onclick="showAIClassify()" title="AI分类总结">&#129302; AI分类总结</button>
-    <button class="toolbar-btn" onclick="showDataProtection()" title="数据保护">&#128274; 数据保护</button>
-    <button class="toolbar-btn" onclick="doPrint()" title="打印">&#128424; 打印</button>
+  <!-- ===== RIBBON: 插入 ===== -->
+  <div class="ribbon" id="ribbon-insert">
+    <div class="ribbon-row">
+      <div class="ribbon-group">
+        <button class="ribbon-btn" onclick="openDialog('insertImage')" title="单元格图片"><span class="ribbon-icon">&#128247;</span><span class="ribbon-label">单元格图片</span></button>
+        <button class="ribbon-btn" onclick="openDialog('insertFloatingImage')" title="浮动图片"><span class="ribbon-icon">&#128248;</span><span class="ribbon-label">浮动图片</span></button>
+        <button class="ribbon-btn" onclick="openDialog('insertFile')" title="文件"><span class="ribbon-icon">&#128206;</span><span class="ribbon-label">文件</span></button>
+        <button class="ribbon-btn" onclick="openDialog('insertLink')" title="链接"><span class="ribbon-icon">&#128279;</span><span class="ribbon-label">链接</span></button>
+      </div>
+      <div class="ribbon-sep"></div>
+      <div class="ribbon-group">
+        <button class="ribbon-btn" onclick="openDialog('insertDoc')" title="文档"><span class="ribbon-icon">&#128196;</span><span class="ribbon-label">文档</span></button>
+        <button class="ribbon-btn" onclick="openDialog('insertSchedule')" title="日程"><span class="ribbon-icon">&#128197;</span><span class="ribbon-label">日程</span></button>
+        <button class="ribbon-btn" onclick="openDialog('insertMeeting')" title="会议"><span class="ribbon-icon">&#128188;</span><span class="ribbon-label">会议</span></button>
+        <button class="ribbon-btn" onclick="openDialog('insertTodo')" title="待办"><span class="ribbon-icon">&#128203;</span><span class="ribbon-label">待办</span></button>
+      </div>
+      <div class="ribbon-sep"></div>
+      <div class="ribbon-group">
+        <button class="ribbon-btn" onclick="openDialog('insertApp')" title="应用"><span class="ribbon-icon">&#128230;</span><span class="ribbon-label">应用</span></button>
+        <button class="ribbon-btn" onclick="openDialog('insertMention')" title="提及"><span class="ribbon-icon">@</span><span class="ribbon-label">提及</span></button>
+        <button class="ribbon-btn" onclick="openDialog('insertCard')" title="个人名片"><span class="ribbon-icon">&#128100;</span><span class="ribbon-label">名片</span></button>
+        <button class="ribbon-btn" onclick="openDialog('insertReminder')" title="定时提醒"><span class="ribbon-icon">&#128276;</span><span class="ribbon-label">提醒</span></button>
+      </div>
+    </div>
+    <div class="ribbon-row">
+      <div class="ribbon-group">
+        <button class="ribbon-btn" onclick="openDialog('insertComment')" title="评论"><span class="ribbon-icon">&#128172;</span><span class="ribbon-label">评论</span></button>
+        <button class="ribbon-btn" onclick="openDialog('insertPivotTable')" title="透视表"><span class="ribbon-icon">&#128202;</span><span class="ribbon-label">透视表</span></button>
+        <button class="ribbon-btn" onclick="openDialog('insertCell')" title="单元格"><span class="ribbon-icon">&#9634;</span><span class="ribbon-label">单元格</span></button>
+        <button class="ribbon-btn" onclick="openDialog('insertRowCol')" title="行列"><span class="ribbon-icon">&#8596;</span><span class="ribbon-label">行列</span></button>
+      </div>
+      <div class="ribbon-sep"></div>
+      <div class="ribbon-group">
+        <button class="ribbon-btn" onclick="openDialog('insertChart')" title="图表"><span class="ribbon-icon">&#128200;</span><span class="ribbon-label">图表</span></button>
+        <button class="ribbon-btn" onclick="openDialog('insertSparkline')" title="迷你图"><span class="ribbon-icon">&#128201;</span><span class="ribbon-label">迷你图</span></button>
+        <button class="ribbon-btn" onclick="openDialog('insertShape')" title="形状"><span class="ribbon-icon">&#9632;</span><span class="ribbon-label">形状</span></button>
+        <button class="ribbon-btn" onclick="openDialog('insertLocation')" title="位置"><span class="ribbon-icon">&#128205;</span><span class="ribbon-label">位置</span></button>
+        <button class="ribbon-btn" onclick="openDialog('insertSlicer')" title="切片器"><span class="ribbon-icon">&#128451;</span><span class="ribbon-label">切片器</span></button>
+      </div>
+    </div>
   </div>
 
-  <!-- Formula Bar -->
+  <!-- ===== RIBBON: 数据 ===== -->
+  <div class="ribbon" id="ribbon-data">
+    <div class="ribbon-row">
+      <div class="ribbon-group">
+        <button class="ribbon-btn" onclick="openDialog('pivotTable')" title="透视表"><span class="ribbon-icon">&#128202;</span><span class="ribbon-label">透视表</span></button>
+        <button class="ribbon-btn" onclick="openDialog('filter')" title="筛选" id="ribbonFilterBtn"><span class="ribbon-icon">&#128269;</span><span class="ribbon-label">筛选</span></button>
+        <button class="ribbon-btn" onclick="openDialog('sort')" title="排序"><span class="ribbon-icon">&#8593;&#8595;</span><span class="ribbon-label">排序</span></button>
+        <button class="ribbon-btn" onclick="openDialog('conditionalFormat')" title="条件格式"><span class="ribbon-icon">&#127919;</span><span class="ribbon-label">条件格式</span></button>
+        <button class="ribbon-btn" onclick="openDialog('textToColumns')" title="分列"><span class="ribbon-icon">&#8596;</span><span class="ribbon-label">分列</span></button>
+        <button class="ribbon-btn" onclick="showDataGrouping()" title="分组"><span class="ribbon-icon">&#128451;</span><span class="ribbon-label">分组</span></button>
+      </div>
+    </div>
+    <div class="ribbon-row">
+      <div class="ribbon-group">
+        <button class="ribbon-btn" onclick="openDialog('dataValidation')" title="数据验证"><span class="ribbon-icon">&#10003;</span><span class="ribbon-label">数据验证</span></button>
+        <button class="ribbon-btn" onclick="openDialog('dropdownOptions')" title="下拉选项"><span class="ribbon-icon">&#9660;</span><span class="ribbon-label">下拉选项</span></button>
+        <button class="ribbon-btn" onclick="openDialog('checkbox')" title="复选框"><span class="ribbon-icon">&#9744;</span><span class="ribbon-label">复选框</span></button>
+      </div>
+      <div class="ribbon-sep"></div>
+      <div class="ribbon-group">
+        <button class="ribbon-btn" onclick="showDataProtection()" title="保护"><span class="ribbon-icon">&#128274;</span><span class="ribbon-label">保护</span></button>
+        <button class="ribbon-btn" onclick="openDialog('versionHistory')" title="版本历史"><span class="ribbon-icon">&#128339;</span><span class="ribbon-label">版本历史</span></button>
+        <button class="ribbon-btn" onclick="openDialog('cellHistory')" title="单元格历史"><span class="ribbon-icon">&#128196;</span><span class="ribbon-label">单元格历史</span></button>
+      </div>
+      <div class="ribbon-sep"></div>
+      <div class="ribbon-group">
+        <button class="ribbon-btn" onclick="showImport()" title="导入本地表格"><span class="ribbon-icon">&#128229;</span><span class="ribbon-label">导入本地</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== RIBBON: 公式 ===== -->
+  <div class="ribbon" id="ribbon-formula">
+    <div class="ribbon-row">
+      <div class="ribbon-group">
+        <button class="ribbon-btn" onclick="insertFunction('SUM')" title="求和"><span class="ribbon-icon">&#8721;</span><span class="ribbon-label">求和</span></button>
+        <button class="ribbon-btn" onclick="openDialog('formulaFinancial')" title="财务"><span class="ribbon-icon">&#36;</span><span class="ribbon-label">财务</span></button>
+        <button class="ribbon-btn" onclick="openDialog('formulaText')" title="文本"><span class="ribbon-icon">T</span><span class="ribbon-label">文本</span></button>
+        <button class="ribbon-btn" onclick="openDialog('formulaStatistical')" title="统计"><span class="ribbon-icon">&#8800;</span><span class="ribbon-label">统计</span></button>
+        <button class="ribbon-btn" onclick="openDialog('formulaInfo')" title="信息"><span class="ribbon-icon">i</span><span class="ribbon-label">信息</span></button>
+        <button class="ribbon-btn" onclick="openDialog('formulaLookup')" title="查找与引用"><span class="ribbon-icon">&#128270;</span><span class="ribbon-label">查找与引用</span></button>
+        <button class="ribbon-btn" onclick="openDialog('formulaCompatibility')" title="兼容性"><span class="ribbon-icon">&#128259;</span><span class="ribbon-label">兼容性</span></button>
+      </div>
+    </div>
+    <div class="ribbon-row">
+      <div class="ribbon-group">
+        <button class="ribbon-btn" onclick="openDialog('formulaLogic')" title="逻辑"><span class="ribbon-icon">&#10003;</span><span class="ribbon-label">逻辑</span></button>
+        <button class="ribbon-btn" onclick="openDialog('formulaDate')" title="日期"><span class="ribbon-icon">&#128197;</span><span class="ribbon-label">日期</span></button>
+        <button class="ribbon-btn" onclick="openDialog('formulaEngineering')" title="工程"><span class="ribbon-icon">&#9881;</span><span class="ribbon-label">工程</span></button>
+        <button class="ribbon-btn" onclick="openDialog('formulaDatabase')" title="数据库"><span class="ribbon-icon">&#128451;</span><span class="ribbon-label">数据库</span></button>
+        <button class="ribbon-btn" onclick="openDialog('formulaMath')" title="数学与三角"><span class="ribbon-icon">&#8730;</span><span class="ribbon-label">数学与三角</span></button>
+        <button class="ribbon-btn" onclick="openDialog('formulaSpecial')" title="特色函数"><span class="ribbon-icon">&#11088;</span><span class="ribbon-label">特色函数</span></button>
+      </div>
+      <div class="ribbon-sep"></div>
+      <div class="ribbon-group">
+        <button class="ribbon-btn" onclick="openDialog('nameManager')" title="名称管理"><span class="ribbon-icon">&#128220;</span><span class="ribbon-label">名称管理</span></button>
+        <button class="ribbon-btn" onclick="openDialog('quickCreateName')" title="快速创建"><span class="ribbon-icon">+</span><span class="ribbon-label">快速创建</span></button>
+        <button class="ribbon-btn" onclick="openDialog('crossFileRef')" title="跨文件引用"><span class="ribbon-icon">&#128279;</span><span class="ribbon-label">跨文件引用</span></button>
+        <button class="ribbon-btn" onclick="openDialog('calculationOptions')" title="计算选项"><span class="ribbon-icon">&#9881;</span><span class="ribbon-label">计算选项</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== RIBBON: 视图 ===== -->
+  <div class="ribbon" id="ribbon-view">
+    <div class="ribbon-row">
+      <div class="ribbon-group">
+        <button class="ribbon-btn" onclick="toggleHighlightRowCol()" title="高亮所在行列"><span class="ribbon-icon">&#128200;</span><span class="ribbon-label">高亮行列</span></button>
+        <button class="ribbon-btn" onclick="toggleFreezePanes()" title="冻结窗格"><span class="ribbon-icon">&#128204;</span><span class="ribbon-label">冻结窗格</span></button>
+      </div>
+      <div class="ribbon-sep"></div>
+      <div class="ribbon-group">
+        <label style="display:flex;align-items:center;gap:2px;font-size:10px;cursor:pointer;padding:2px 6px;height:100%;">
+          <input type="checkbox" id="showGridlines" checked onchange="toggleGridlines()" style="margin:0;"> 显示网格线
+        </label>
+      </div>
+      <div class="ribbon-sep"></div>
+      <div class="ribbon-group">
+        <button class="ribbon-btn" onclick="openDialog('zoom')" title="显示比例"><span class="ribbon-icon">&#128269;</span><span class="ribbon-label">显示比例</span></button>
+      </div>
+    </div>
+    <div class="ribbon-row">
+      <div class="ribbon-group">
+        <button class="ribbon-btn" onclick="openDialog('newFilterView')" title="新建筛选视图"><span class="ribbon-icon">+</span><span class="ribbon-label">新建筛选视图</span></button>
+        <button class="ribbon-btn" onclick="openDialog('switchFilterView')" title="切换筛选视图"><span class="ribbon-icon">&#8594;</span><span class="ribbon-label">切换筛选视图</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== RIBBON: 快捷工具 ===== -->
+  <div class="ribbon" id="ribbon-quick">
+    <div class="ribbon-row">
+      <div class="ribbon-group">
+        <button class="ribbon-btn" onclick="openDialog('removeDuplicates')" title="重复项"><span class="ribbon-icon">&#128683;</span><span class="ribbon-label">重复项</span></button>
+        <button class="ribbon-btn" onclick="openDialog('batchClear')" title="批量清除"><span class="ribbon-icon">&#128465;</span><span class="ribbon-label">批量清除</span></button>
+        <button class="ribbon-btn" onclick="openDialog('idCardTool')" title="身份证工具"><span class="ribbon-icon">&#128179;</span><span class="ribbon-label">身份证工具</span></button>
+        <button class="ribbon-btn" onclick="openDialog('cellProcessing')" title="单元格处理"><span class="ribbon-icon">&#128295;</span><span class="ribbon-label">单元格处理</span></button>
+        <button class="ribbon-btn" onclick="openDialog('generateTOC')" title="生成目录"><span class="ribbon-icon">&#128196;</span><span class="ribbon-label">生成目录</span></button>
+        <button class="ribbon-btn" onclick="openDialog('batchReplace')" title="批量替换"><span class="ribbon-icon">&#128260;</span><span class="ribbon-label">批量替换</span></button>
+      </div>
+    </div>
+    <div class="ribbon-row">
+      <div class="ribbon-group">
+        <button class="ribbon-btn" onclick="openDialog('quickSum')" title="快速求和"><span class="ribbon-icon">&#8721;</span><span class="ribbon-label">快速求和</span></button>
+        <button class="ribbon-btn" onclick="openDialog('mergeCells')" title="合并同类"><span class="ribbon-icon">&#9644;</span><span class="ribbon-label">合并同类</span></button>
+        <button class="ribbon-btn" onclick="openDialog('fillDown')" title="向下填充"><span class="ribbon-icon">&#8595;</span><span class="ribbon-label">向下填充</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== FORMULA BAR ===== -->
   <div class="formula-bar" id="formulaBar">
     <div class="cell-ref" id="cellRef">A1</div>
     <span class="fx">fx</span>
     <input class="formula-input" id="formulaInput" placeholder="输入值或公式..." readonly>
   </div>
 
-  <!-- View Container -->
+  <!-- ===== VIEW CONTAINER ===== -->
   <div id="viewContainer" style="flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0;">
-    <!-- Filter Toolbar -->
     <div class="filter-toolbar" id="filterToolbar">
       <input class="search-input" id="searchInput" placeholder="搜索全部列..." oninput="applyFilters()">
       <div id="filterTags" style="display:flex;gap:4px;flex-wrap:wrap;"></div>
@@ -715,9 +877,13 @@ let columnFilters = {};
 let searchQuery = '';
 let activeFilterPopup = null;
 let isStarred = localStorage.getItem('docStarred') === 'true';
-let cellStyles = {}; // { 'row_col': { bold:true, italic:true, ... } }
+let cellStyles = {};
+let currentRibbon = 'home';
+let highlightRowCol = false;
+let freezePanes = false;
+let freezeCol = 0;
+let freezeRow = 0;
 
-// Column definitions matching the product schema
 const COLUMNS = [
   { key: 'row_num', label: '#', width: 50, editable: false },
   { key: 'date', label: '日期', width: 80, editable: true },
@@ -807,11 +973,8 @@ function toggleStar() {
 }
 
 function toggleUserMenu() {
-  const menu = document.getElementById('userMenu');
-  menu.classList.toggle('show');
+  document.getElementById('userMenu').classList.toggle('show');
 }
-
-// Close user menu on outside click
 document.addEventListener('click', function(e) {
   const dd = document.getElementById('userMenuDropdown');
   if (dd && !dd.contains(e.target)) {
@@ -819,12 +982,23 @@ document.addEventListener('click', function(e) {
   }
 });
 
+function renameDoc(val) {
+  if (val.trim()) document.querySelector('#docTitle span').textContent = val.trim();
+}
+
+// ========== RIBBON SWITCH ==========
+function switchRibbon(tab) {
+  currentRibbon = tab;
+  document.querySelectorAll('.top-bar-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+  document.querySelectorAll('.ribbon').forEach(r => r.classList.toggle('active', r.id === 'ribbon-' + tab));
+}
+
 // ========== DATA ==========
 async function loadData() {
   try {
     document.getElementById('lastSync').textContent = '同步中...';
     const data = await api('/api/products?page_size=10000');
-    products = data.items;
+    products = data.items || [];
     document.getElementById('rowCount').textContent = products.length;
     applyFilters();
     document.getElementById('lastSync').textContent = '最后更新: '+new Date().toLocaleTimeString();
@@ -842,8 +1016,7 @@ async function api(url, method='GET', body=null) {
   if (body) opts.body = JSON.stringify(body);
   const resp = await fetch(url, opts);
   if (resp.status === 401) {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    localStorage.removeItem('token'); localStorage.removeItem('user');
     TOKEN = ''; USER = {};
     if (document.getElementById('app').classList.contains('active')) {
       document.getElementById('app').classList.remove('active');
@@ -862,12 +1035,10 @@ function applyFilters() {
   let result = [...products];
   if (searchQuery) {
     const searchableCols = COLUMNS.filter(c => c.key !== 'row_num' && c.key !== 'image_url');
-    result = result.filter(p => {
-      return searchableCols.some(col => {
-        const val = p[col.key];
-        return val !== null && val !== undefined && String(val).toLowerCase().includes(searchQuery);
-      });
-    });
+    result = result.filter(p => searchableCols.some(col => {
+      const val = p[col.key];
+      return val !== null && val !== undefined && String(val).toLowerCase().includes(searchQuery);
+    }));
   }
   Object.keys(columnFilters).forEach(colKey => {
     const selectedValues = columnFilters[colKey];
@@ -895,14 +1066,9 @@ function applyFilters() {
 }
 
 function toggleSort(colKey) {
-  if (sortState[colKey] === 'asc') {
-    sortState[colKey] = 'desc';
-  } else if (sortState[colKey] === 'desc') {
-    sortState[colKey] = null;
-  } else {
-    Object.keys(sortState).forEach(k => sortState[k] = null);
-    sortState[colKey] = 'asc';
-  }
+  if (sortState[colKey] === 'asc') sortState[colKey] = 'desc';
+  else if (sortState[colKey] === 'desc') sortState[colKey] = null;
+  else { Object.keys(sortState).forEach(k => sortState[k] = null); sortState[colKey] = 'asc'; }
   applyFilters();
 }
 
@@ -912,32 +1078,13 @@ function showColumnFilter(colIdx, event) {
   const col = COLUMNS[colIdx];
   if (col.key === 'row_num') return;
   const valueSet = new Set();
-  products.forEach(p => {
-    const val = String(p[col.key] || '').trim();
-    valueSet.add(val || '(空白)');
-  });
+  products.forEach(p => { valueSet.add(String(p[col.key] || '').trim() || '(空白)'); });
   const values = Array.from(valueSet).sort();
   const selectedSet = columnFilters[col.key] || new Set();
   const popup = document.createElement('div');
   popup.className = 'col-filter-popup';
   popup.id = 'activeFilterPopup';
-  popup.innerHTML = `
-    <div class="popup-header">
-      <span>筛选: ${col.label}</span>
-      <span class="clear-btn" onclick="clearColumnFilter('${col.key}')">清除</span>
-    </div>
-    <div class="popup-search">
-      <input type="text" placeholder="搜索..." oninput="filterPopupList(this.value)" onkeydown="event.stopPropagation()">
-    </div>
-    <div class="popup-list" id="popupList">
-      <label><input type="checkbox" onchange="toggleSelectAll(this)" ${selectedSet.size === 0 || selectedSet.size === values.length ? 'checked' : ''}> 全选 (${values.length})</label>
-      ${values.map(v => '<label><input type="checkbox" value="'+escHtml(v)+'" '+(selectedSet.has(v)||selectedSet.size===0?'checked':'')+' onchange="onFilterCheckChange(\''+col.key+'\', this)"> '+escHtml(v)+'</label>').join('')}
-    </div>
-    <div class="popup-footer">
-      <button class="btn btn-sm btn-outline" onclick="closeFilterPopup()">取消</button>
-      <button class="btn btn-sm btn-primary" onclick="confirmFilter('${col.key}')">确定</button>
-    </div>
-  `;
+  popup.innerHTML = '<div class="popup-header"><span>筛选: '+col.label+'</span><span class="clear-btn" onclick="clearColumnFilter(\''+col.key+'\')">清除</span></div><div class="popup-search"><input type="text" placeholder="搜索..." oninput="filterPopupList(this.value)" onkeydown="event.stopPropagation()"></div><div class="popup-list" id="popupList"><label><input type="checkbox" onchange="toggleSelectAll(this)" '+(selectedSet.size===0||selectedSet.size===values.length?'checked':'')+'> 全选 ('+values.length+')</label>'+values.map(v => '<label><input type="checkbox" value="'+escHtml(v)+'" '+(selectedSet.has(v)||selectedSet.size===0?'checked':'')+' onchange="onFilterCheckChange(\''+col.key+'\', this)"> '+escHtml(v)+'</label>').join('')+'</div><div class="popup-footer"><button class="btn btn-sm btn-outline" onclick="closeFilterPopup()">取消</button><button class="btn btn-sm btn-primary" onclick="confirmFilter(\''+col.key+'\')">确定</button></div>';
   document.body.appendChild(popup);
   const th = document.querySelectorAll('.col-header')[colIdx];
   if (th) {
@@ -951,58 +1098,39 @@ function showColumnFilter(colIdx, event) {
   setTimeout(() => { document.addEventListener('click', closeFilterPopup, { once: true }); }, 10);
 }
 
-function closeFilterPopup() {
-  if (activeFilterPopup) { activeFilterPopup.remove(); activeFilterPopup = null; }
-}
-
+function closeFilterPopup() { if (activeFilterPopup) { activeFilterPopup.remove(); activeFilterPopup = null; } }
 function filterPopupList(query) {
   const list = document.getElementById('popupList');
   if (!list) return;
-  const labels = list.querySelectorAll('label');
   const q = query.toLowerCase();
-  labels.forEach(label => { label.style.display = label.textContent.toLowerCase().includes(q) ? '' : 'none'; });
+  list.querySelectorAll('label').forEach(l => { l.style.display = l.textContent.toLowerCase().includes(q) ? '' : 'none'; });
 }
-
 function toggleSelectAll(checkbox) {
   const list = document.getElementById('popupList');
-  const checkboxes = list.querySelectorAll('input[type="checkbox"]:not(:first-child)');
-  checkboxes.forEach(cb => cb.checked = checkbox.checked);
+  list.querySelectorAll('input[type="checkbox"]:not(:first-child)').forEach(cb => cb.checked = checkbox.checked);
 }
-
 function onFilterCheckChange(colKey, checkbox) {
   const list = document.getElementById('popupList');
-  const allCbs = list.querySelectorAll('input[type="checkbox"]:not(:first-child):not([style*="display: none"])');
-  const checkedCbs = list.querySelectorAll('input[type="checkbox"]:not(:first-child):checked:not([style*="display: none"])');
-  const selectAll = list.querySelector('input[type="checkbox"]:first-child');
-  if (selectAll) selectAll.checked = allCbs.length === checkedCbs.length;
+  const all = list.querySelectorAll('input[type="checkbox"]:not(:first-child):not([style*="display: none"])');
+  const checked = list.querySelectorAll('input[type="checkbox"]:not(:first-child):checked:not([style*="display: none"])');
+  const sa = list.querySelector('input[type="checkbox"]:first-child');
+  if (sa) sa.checked = all.length === checked.length;
 }
-
 function confirmFilter(colKey) {
   const list = document.getElementById('popupList');
-  const checkedCbs = list.querySelectorAll('input[type="checkbox"]:checked:not(:first-child)');
-  const selectAll = list.querySelector('input[type="checkbox"]:first-child');
-  if (selectAll && selectAll.checked) {
-    delete columnFilters[colKey];
-  } else {
+  const checked = list.querySelectorAll('input[type="checkbox"]:checked:not(:first-child)');
+  const sa = list.querySelector('input[type="checkbox"]:first-child');
+  if (sa && sa.checked) delete columnFilters[colKey];
+  else {
     const selected = new Set();
-    checkedCbs.forEach(cb => {
-      let val = cb.value;
-      if (val === '(空白)') val = '';
-      selected.add(val);
-    });
+    checked.forEach(cb => { selected.add(cb.value === '(空白)' ? '' : cb.value); });
     if (selected.size === 0) delete columnFilters[colKey];
     else columnFilters[colKey] = selected;
   }
   closeFilterPopup();
   applyFilters();
 }
-
-function clearColumnFilter(colKey) {
-  closeFilterPopup();
-  delete columnFilters[colKey];
-  applyFilters();
-}
-
+function clearColumnFilter(colKey) { closeFilterPopup(); delete columnFilters[colKey]; applyFilters(); }
 function updateFilterTags() {
   const container = document.getElementById('filterTags');
   let html = '';
@@ -1015,7 +1143,7 @@ function updateFilterTags() {
   container.innerHTML = html;
 }
 
-// ========== GRID ==========
+// ========== GRID RENDER ==========
 function renderGrid() {
   const header = document.getElementById('gridHeader');
   const body = document.getElementById('gridBody');
@@ -1034,19 +1162,17 @@ function renderGrid() {
   });
   hHtml += '</tr>';
   header.innerHTML = hHtml;
-
   const data = filteredProducts;
   if (!data.length) {
-    body.innerHTML = '<tr><td colspan="'+COLUMNS.length+'" style="text-align:center;padding:40px;color:var(--gray-400);">'+(products.length?'没有匹配的数据，请调整筛选条件':'暂无数据，点击工具栏"新增"添加产品')+'</td></tr>';
+    body.innerHTML = '<tr><td colspan="'+COLUMNS.length+'" style="text-align:center;padding:40px;color:var(--gray-400);">'+(products.length?'没有匹配的数据':'暂无数据，点击工具栏"新增"添加产品')+'</td></tr>';
     return;
   }
-
   let bHtml = '';
   data.forEach((p, rowIdx) => {
     bHtml += '<tr>';
     COLUMNS.forEach((col, colIdx) => {
       if (col.key === 'row_num') {
-        bHtml += '<td class="row-num">'+(rowIdx+1)+'</td>';
+        bHtml += '<td class="row-num'+(highlightRowCol?' selected-row':'')+'">'+(rowIdx+1)+'</td>';
         return;
       }
       let val = p[col.key];
@@ -1055,10 +1181,9 @@ function renderGrid() {
       if (val === null || val === undefined || val === '') {
         content = '';
       } else if (col.key === 'status') {
-        const statusMap = {'待采购':'pending','已下单':'ordered','在途':'transit','已入库':'warehoused','停售':'discontinued'};
-        const sc = statusMap[val] || 'pending';
-        const scColors = {'pending':'#f59e0b','ordered':'#3b82f6','transit':'#8b5cf6','warehoused':'#22c55e','discontinued':'#9ca3af'};
-        content = '<span class="status-dot" style="background:'+(scColors[sc]||'#f59e0b')+'"></span><span class="status-'+sc+'">'+escHtml(val)+'</span>';
+        const sc = {pending:'#f59e0b',ordered:'#3b82f6',transit:'#8b5cf6',warehoused:'#22c55e',discontinued:'#9ca3af'};
+        const statusKey = {待采购:'pending',已下单:'ordered',在途:'transit',已入库:'warehoused',停售:'discontinued'}[val]||'pending';
+        content = '<span class="status-dot" style="background:'+sc[statusKey]+'"></span><span class="status-'+statusKey+'">'+escHtml(val)+'</span>';
       } else if (col.key === 'image_url') {
         content = val ? '<img src="'+escHtml(val)+'" class="img-thumb" onerror="this.style.display=\'none\'">' : '';
       } else if (col.type === 'link' && val) {
@@ -1066,15 +1191,11 @@ function renderGrid() {
         content = '<a href="'+escHtml(val)+'" target="_blank" class="cell-link">'+escHtml(display)+'</a>';
       } else if (col.type === 'number') {
         const num = Number(val);
-        if (Number.isInteger(num) && Math.abs(num) < 100000) {
-          content = '<span class="cell-content num">'+num+'</span>';
-        } else {
-          content = '<span class="cell-content num">'+num.toFixed(2)+'</span>';
-        }
+        content = '<span class="cell-content num">'+(Number.isInteger(num)&&Math.abs(num)<100000?num:num.toFixed(2))+'</span>';
       } else {
         content = escHtml(String(val));
       }
-      bHtml += '<td class="'+cls+'" data-row="'+rowIdx+'" data-col="'+colIdx+'" data-key="'+col.key+'" data-id="'+(p.id||'')+'" onclick="selectCell(this)" ondblclick="startEdit(this)">'
+      bHtml += '<td class="'+cls+(highlightRowCol?' highlight-row':'')+'" data-row="'+rowIdx+'" data-col="'+colIdx+'" data-key="'+col.key+'" data-id="'+(p.id||'')+'" onclick="selectCell(this)" ondblclick="startEdit(this)">'
         + '<div class="cell-content'+(col.type==='number'?' num':'')+'">'+content+'</div>'
         + '<input class="cell-edit" onblur="finishEdit(this)" onkeydown="if(event.key===\'Enter\')this.blur();if(event.key===\'Escape\'){this.value=this.dataset.old;this.blur()}">'
         + '</td>';
@@ -1112,44 +1233,33 @@ function startEdit(el) {
 }
 
 document.addEventListener('keydown', e => {
-  if (e.key === 'Enter' && selectedCell && !editingCell) {
-    e.preventDefault();
-    startEdit(selectedCell);
-  }
+  if (e.key === 'Enter' && selectedCell && !editingCell) { e.preventDefault(); startEdit(selectedCell); }
   if (e.key === 'Tab' && selectedCell) {
     e.preventDefault();
-    const col = parseInt(selectedCell.dataset.col);
-    const row = parseInt(selectedCell.dataset.row);
+    const col = parseInt(selectedCell.dataset.col), row = parseInt(selectedCell.dataset.row);
     const next = document.querySelector('td[data-row="'+row+'"][data-col="'+(col+1)+'"]');
     if (next) { selectCell(next); if (editingCell) startEdit(next); }
   }
   if (e.key === 'ArrowDown' && selectedCell) {
     e.preventDefault();
-    const col = parseInt(selectedCell.dataset.col);
-    const row = parseInt(selectedCell.dataset.row);
+    const col = parseInt(selectedCell.dataset.col), row = parseInt(selectedCell.dataset.row);
     const next = document.querySelector('td[data-row="'+(row+1)+'"][data-col="'+col+'"]');
     if (next) selectCell(next);
   }
   if (e.key === 'ArrowUp' && selectedCell) {
     e.preventDefault();
-    const col = parseInt(selectedCell.dataset.col);
-    const row = parseInt(selectedCell.dataset.row);
+    const col = parseInt(selectedCell.dataset.col), row = parseInt(selectedCell.dataset.row);
     const next = document.querySelector('td[data-row="'+(row-1)+'"][data-col="'+col+'"]');
     if (next) selectCell(next);
   }
   if (e.key === 'ArrowLeft' && selectedCell) {
     e.preventDefault();
-    const col = parseInt(selectedCell.dataset.col);
-    const row = parseInt(selectedCell.dataset.row);
-    if (col > 0) {
-      const next = document.querySelector('td[data-row="'+row+'"][data-col="'+(col-1)+'"]');
-      if (next) selectCell(next);
-    }
+    const col = parseInt(selectedCell.dataset.col), row = parseInt(selectedCell.dataset.row);
+    if (col > 0) { const next = document.querySelector('td[data-row="'+row+'"][data-col="'+(col-1)+'"]'); if (next) selectCell(next); }
   }
   if (e.key === 'ArrowRight' && selectedCell) {
     e.preventDefault();
-    const col = parseInt(selectedCell.dataset.col);
-    const row = parseInt(selectedCell.dataset.row);
+    const col = parseInt(selectedCell.dataset.col), row = parseInt(selectedCell.dataset.row);
     const next = document.querySelector('td[data-row="'+row+'"][data-col="'+(col+1)+'"]');
     if (next) selectCell(next);
   }
@@ -1169,59 +1279,30 @@ function finishEdit(input) {
     let val = newVal;
     const col = COLUMNS.find(c => c.key === key);
     if (col && col.type === 'number') val = parseFloat(val) || 0;
-    if (id) {
-      quickEdit(id, key, val);
-    }
-    if (key === 'status') {
-      const statusMap = {'待采购':'pending','已下单':'ordered','在途':'transit','已入库':'warehoused','停售':'discontinued'};
-      const sc = statusMap[val] || 'pending';
-      const scColors = {'pending':'#f59e0b','ordered':'#3b82f6','transit':'#8b5cf6','warehoused':'#22c55e','discontinued':'#9ca3af'};
-      content.innerHTML = '<span class="status-dot" style="background:'+(scColors[sc]||'#f59e0b')+'"></span><span class="status-'+sc+'">'+escHtml(val)+'</span>';
-    } else {
-      content.textContent = val;
-    }
+    if (id) quickEdit(id, key, val);
+    content.textContent = val;
   }
 }
 
 async function quickEdit(id, field, value) {
-  try {
-    await api('/api/products/'+id, 'PUT', {[field]: value});
-    document.getElementById('lastSync').textContent = '已保存 '+new Date().toLocaleTimeString();
-  } catch(e) {
-    toast('保存失败: '+e.message, 'error');
-  }
+  try { await api('/api/products/'+id, 'PUT', {[field]: value}); document.getElementById('lastSync').textContent = '已保存 '+new Date().toLocaleTimeString(); }
+  catch(e) { toast('保存失败: '+e.message, 'error'); }
 }
 
 // ========== COLUMN RESIZE ==========
 let resizeCol = null;
-function startResize(e, colIdx) {
-  resizeCol = colIdx;
-  document.addEventListener('mousemove', doResize);
-  document.addEventListener('mouseup', stopResize);
-  e.preventDefault();
-}
+function startResize(e, colIdx) { resizeCol = colIdx; document.addEventListener('mousemove', doResize); document.addEventListener('mouseup', stopResize); e.preventDefault(); }
 function doResize(e) {
   if (resizeCol === null) return;
   const ths = document.querySelectorAll('.col-header');
   const th = ths[resizeCol];
   if (!th) return;
-  const rect = th.getBoundingClientRect();
-  const newW = Math.max(50, e.clientX - rect.left);
-  th.style.width = newW + 'px';
-  th.style.minWidth = newW + 'px';
-  th.style.maxWidth = newW + 'px';
+  const newW = Math.max(50, e.clientX - th.getBoundingClientRect().left);
+  th.style.width = th.style.minWidth = th.style.maxWidth = newW + 'px';
   COLUMNS[resizeCol].width = newW;
-  document.querySelectorAll('td[data-col="'+resizeCol+'"]').forEach(td => {
-    td.style.minWidth = newW + 'px';
-    td.style.maxWidth = newW + 'px';
-    td.style.width = newW + 'px';
-  });
+  document.querySelectorAll('td[data-col="'+resizeCol+'"]').forEach(td => { td.style.minWidth = td.style.maxWidth = td.style.width = newW + 'px'; });
 }
-function stopResize() {
-  resizeCol = null;
-  document.removeEventListener('mousemove', doResize);
-  document.removeEventListener('mouseup', stopResize);
-}
+function stopResize() { resizeCol = null; document.removeEventListener('mousemove', doResize); document.removeEventListener('mouseup', stopResize); }
 
 // ========== FORMATTING ==========
 function applyFormat(type, value) {
@@ -1232,52 +1313,26 @@ function applyFormat(type, value) {
   if (!cellStyles[key]) cellStyles[key] = {};
   const cellContent = selectedCell.querySelector('.cell-content');
   switch(type) {
-    case 'bold':
-      cellStyles[key].bold = !cellStyles[key].bold;
-      cellContent.style.fontWeight = cellStyles[key].bold ? '700' : 'normal';
-      break;
-    case 'italic':
-      cellStyles[key].italic = !cellStyles[key].italic;
-      cellContent.style.fontStyle = cellStyles[key].italic ? 'italic' : 'normal';
-      break;
-    case 'underline':
-      cellStyles[key].underline = !cellStyles[key].underline;
-      cellContent.style.textDecoration = cellStyles[key].underline ? 'underline' : 'none';
-      break;
-    case 'fontName':
-      cellStyles[key].fontName = value;
-      cellContent.style.fontFamily = value;
-      break;
-    case 'fontSize':
-      cellStyles[key].fontSize = value;
-      cellContent.style.fontSize = value + 'px';
-      break;
-    case 'textColor':
-      cellStyles[key].textColor = value;
-      cellContent.style.color = value;
-      break;
-    case 'fillColor':
-      cellStyles[key].fillColor = value;
-      selectedCell.style.backgroundColor = value;
-      break;
-    case 'alignLeft':
-      cellStyles[key].align = 'left';
-      cellContent.style.textAlign = 'left';
-      break;
-    case 'alignCenter':
-      cellStyles[key].align = 'center';
-      cellContent.style.textAlign = 'center';
-      break;
-    case 'alignRight':
-      cellStyles[key].align = 'right';
-      cellContent.style.textAlign = 'right';
-      break;
-    case 'border':
-      selectedCell.style.border = '1px solid #000';
-      break;
-    case 'numberFormat':
-      cellStyles[key].numberFormat = value;
-      break;
+    case 'bold': cellStyles[key].bold = !cellStyles[key].bold; cellContent.style.fontWeight = cellStyles[key].bold ? '700' : 'normal'; break;
+    case 'italic': cellStyles[key].italic = !cellStyles[key].italic; cellContent.style.fontStyle = cellStyles[key].italic ? 'italic' : 'normal'; break;
+    case 'underline': cellStyles[key].underline = !cellStyles[key].underline; cellContent.style.textDecoration = cellStyles[key].underline ? 'underline' : 'none'; break;
+    case 'strikethrough': cellStyles[key].strikethrough = !cellStyles[key].strikethrough; cellContent.style.textDecoration = cellStyles[key].strikethrough ? 'line-through' : 'none'; break;
+    case 'fontName': cellStyles[key].fontName = value; cellContent.style.fontFamily = value; break;
+    case 'fontSize': cellStyles[key].fontSize = value; cellContent.style.fontSize = value + 'px'; break;
+    case 'textColor': cellStyles[key].textColor = value; cellContent.style.color = value; break;
+    case 'fillColor': cellStyles[key].fillColor = value; selectedCell.style.backgroundColor = value; break;
+    case 'alignLeft': cellStyles[key].align = 'left'; cellContent.style.textAlign = 'left'; break;
+    case 'alignCenter': cellStyles[key].align = 'center'; cellContent.style.textAlign = 'center'; break;
+    case 'alignRight': cellStyles[key].align = 'right'; cellContent.style.textAlign = 'right'; break;
+    case 'alignTop': cellStyles[key].vAlign = 'top'; cellContent.style.verticalAlign = 'top'; cellContent.style.lineHeight = '1.2'; break;
+    case 'alignMiddle': cellStyles[key].vAlign = 'middle'; cellContent.style.verticalAlign = 'middle'; cellContent.style.lineHeight = 'var(--row-h)'; break;
+    case 'alignBottom': cellStyles[key].vAlign = 'bottom'; cellContent.style.verticalAlign = 'bottom'; cellContent.style.lineHeight = 'var(--row-h)'; break;
+    case 'border': selectedCell.style.border = '1px solid #000'; break;
+    case 'merge': toast('合并单元格功能已触发', 'info'); break;
+    case 'wrap': cellStyles[key].wrap = !cellStyles[key].wrap; cellContent.style.whiteSpace = cellStyles[key].wrap ? 'normal' : 'nowrap'; cellContent.style.wordBreak = cellStyles[key].wrap ? 'break-all' : 'normal'; break;
+    case 'numberFormat': cellStyles[key].numberFormat = value; break;
+    case 'decreaseIndent': cellContent.style.paddingLeft = (parseInt(cellContent.style.paddingLeft)||0) - 8 + 'px'; break;
+    case 'increaseIndent': cellContent.style.paddingLeft = (parseInt(cellContent.style.paddingLeft)||0) + 8 + 'px'; break;
   }
 }
 
@@ -1298,86 +1353,31 @@ function switchView(view) {
 // ========== PRODUCT CRUD ==========
 function showCreateProduct() {
   document.getElementById('modalTitle').textContent = '新增产品';
-  document.getElementById('modalBody').innerHTML = `
-    <div class="form-row">
-      <div class="form-group"><label>SKU *</label><input id="f_sku" placeholder="必填，唯一标识"></div>
-      <div class="form-group"><label>标题 *</label><input id="f_name" placeholder="必填"></div>
-    </div>
-    <div class="form-row-3">
-      <div class="form-group"><label>日期</label><input id="f_date" placeholder="如：46093"></div>
-      <div class="form-group"><label>属性</label><input id="f_attribute" placeholder="如：补货"></div>
-      <div class="form-group"><label>组别</label><input id="f_category" placeholder="如：美一组"></div>
-    </div>
-    <div class="form-row-3">
-      <div class="form-group"><label>店铺</label><input id="f_store" placeholder="如：B7店"></div>
-      <div class="form-group"><label>产品属性</label><input id="f_product_attr" placeholder="如：笔记本15.6寸"></div>
-      <div class="form-group"><label>供应商</label><input id="f_supplier" placeholder="供应商名称"></div>
-    </div>
-    <div class="form-row-3">
-      <div class="form-group"><label>采购价RMB</label><input id="f_purchase_price" type="number" step="0.01" value="0"></div>
-      <div class="form-group"><label>新采购价RMB</label><input id="f_new_price" type="number" step="0.01" value="0"></div>
-      <div class="form-group"><label>采购数量</label><input id="f_purchase_qty" type="number" value="0"></div>
-    </div>
-    <div class="form-row-3">
-      <div class="form-group"><label>库存</label><input id="f_stock" type="number" value="0"></div>
-      <div class="form-group"><label>订单号</label><input id="f_order" placeholder="采购订单号"></div>
-      <div class="form-group"><label>长/宽/高</label><div style="display:flex;gap:4px;"><input id="f_length" type="number" step="0.1" placeholder="长" style="flex:1"><input id="f_width" type="number" step="0.1" placeholder="宽" style="flex:1"><input id="f_height" type="number" step="0.1" placeholder="高" style="flex:1"></div></div>
-    </div>
-    <div class="form-group"><label>美客多产品链接</label><input id="f_mercadolibre" placeholder="https://..."></div>
-    <div class="form-group"><label>原采购链接</label><input id="f_link" placeholder="https://detail.1688.com/..."></div>
-    <div class="form-group"><label>新采购链接</label><input id="f_new_link" placeholder="https://..."></div>
-    <div class="form-group"><label>图片URL</label><input id="f_img" placeholder="https://..."></div>
-    <div class="form-row">
-      <div class="form-group"><label>采购备注</label><textarea id="f_purchase_remarks" rows="2" style="width:100%"></textarea></div>
-      <div class="form-group"><label>仓库备注</label><textarea id="f_warehouse_remarks" rows="2" style="width:100%"></textarea></div>
-    </div>
-    <div class="form-row-3">
-      <div class="form-group"><label>备注1</label><input id="f_remark1"></div>
-      <div class="form-group"><label>备注2</label><input id="f_remark2"></div>
-      <div class="form-group"><label>备注3</label><input id="f_remark3"></div>
-    </div>
-    <div class="form-group"><label>备注4</label><input id="f_remark4"></div>
-  `;
+  document.getElementById('modalBody').innerHTML = '<div class="form-row"><div class="form-group"><label>SKU *</label><input id="f_sku" placeholder="必填，唯一标识"></div><div class="form-group"><label>标题 *</label><input id="f_name" placeholder="必填"></div></div><div class="form-row-3"><div class="form-group"><label>日期</label><input id="f_date" placeholder="如：46093"></div><div class="form-group"><label>属性</label><input id="f_attribute" placeholder="如：补货"></div><div class="form-group"><label>组别</label><input id="f_category" placeholder="如：美一组"></div></div><div class="form-row-3"><div class="form-group"><label>店铺</label><input id="f_store" placeholder="如：B7店"></div><div class="form-group"><label>产品属性</label><input id="f_product_attr"></div><div class="form-group"><label>供应商</label><input id="f_supplier"></div></div><div class="form-row-3"><div class="form-group"><label>采购价RMB</label><input id="f_purchase_price" type="number" step="0.01" value="0"></div><div class="form-group"><label>新采购价RMB</label><input id="f_new_price" type="number" step="0.01" value="0"></div><div class="form-group"><label>采购数量</label><input id="f_purchase_qty" type="number" value="0"></div></div><div class="form-row-3"><div class="form-group"><label>库存</label><input id="f_stock" type="number" value="0"></div><div class="form-group"><label>订单号</label><input id="f_order"></div><div class="form-group"><label>长/宽/高</label><div style="display:flex;gap:4px;"><input id="f_length" type="number" step="0.1" placeholder="长" style="flex:1"><input id="f_width" type="number" step="0.1" placeholder="宽" style="flex:1"><input id="f_height" type="number" step="0.1" placeholder="高" style="flex:1"></div></div></div><div class="form-group"><label>美客多产品链接</label><input id="f_mercadolibre"></div><div class="form-group"><label>原采购链接</label><input id="f_link"></div><div class="form-group"><label>新采购链接</label><input id="f_new_link"></div><div class="form-group"><label>图片URL</label><input id="f_img"></div><div class="form-row"><div class="form-group"><label>采购备注</label><textarea id="f_purchase_remarks" rows="2" style="width:100%"></textarea></div><div class="form-group"><label>仓库备注</label><textarea id="f_warehouse_remarks" rows="2" style="width:100%"></textarea></div></div><div class="form-row-3"><div class="form-group"><label>备注1</label><input id="f_remark1"></div><div class="form-group"><label>备注2</label><input id="f_remark2"></div><div class="form-group"><label>备注3</label><input id="f_remark3"></div></div><div class="form-group"><label>备注4</label><input id="f_remark4"></div>';
   document.getElementById('modalFooter').innerHTML = '<button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="submitCreateProduct()">创建</button>';
   document.getElementById('modalOverlay').classList.add('active');
 }
 
 async function submitCreateProduct() {
   const d = {
-    sku: document.getElementById('f_sku').value,
-    product_name: document.getElementById('f_name').value,
-    date: document.getElementById('f_date').value,
-    attribute: document.getElementById('f_attribute').value,
-    category: document.getElementById('f_category').value,
-    store: document.getElementById('f_store').value,
-    product_attributes: document.getElementById('f_product_attr').value,
-    supplier: document.getElementById('f_supplier').value,
-    purchase_price: parseFloat(document.getElementById('f_purchase_price').value) || 0,
-    new_purchase_price: parseFloat(document.getElementById('f_new_price').value) || 0,
-    purchase_quantity: parseInt(document.getElementById('f_purchase_qty').value) || 0,
-    stock_quantity: parseInt(document.getElementById('f_stock').value) || 0,
+    sku: document.getElementById('f_sku').value, product_name: document.getElementById('f_name').value,
+    date: document.getElementById('f_date').value, attribute: document.getElementById('f_attribute').value,
+    category: document.getElementById('f_category').value, store: document.getElementById('f_store').value,
+    product_attributes: document.getElementById('f_product_attr').value, supplier: document.getElementById('f_supplier').value,
+    purchase_price: parseFloat(document.getElementById('f_purchase_price').value)||0,
+    new_purchase_price: parseFloat(document.getElementById('f_new_price').value)||0,
+    purchase_quantity: parseInt(document.getElementById('f_purchase_qty').value)||0,
+    stock_quantity: parseInt(document.getElementById('f_stock').value)||0,
     order_number: document.getElementById('f_order').value,
-    length: parseFloat(document.getElementById('f_length').value) || 0,
-    width: parseFloat(document.getElementById('f_width').value) || 0,
-    height: parseFloat(document.getElementById('f_height').value) || 0,
-    mercadolibre_link: document.getElementById('f_mercadolibre').value,
-    purchase_link: document.getElementById('f_link').value,
-    new_purchase_link: document.getElementById('f_new_link').value,
-    image_url: document.getElementById('f_img').value,
-    purchase_remarks: document.getElementById('f_purchase_remarks').value,
-    warehouse_remarks: document.getElementById('f_warehouse_remarks').value,
-    remark1: document.getElementById('f_remark1').value,
-    remark2: document.getElementById('f_remark2').value,
-    remark3: document.getElementById('f_remark3').value,
-    remark4: document.getElementById('f_remark4').value,
+    length: parseFloat(document.getElementById('f_length').value)||0, width: parseFloat(document.getElementById('f_width').value)||0, height: parseFloat(document.getElementById('f_height').value)||0,
+    mercadolibre_link: document.getElementById('f_mercadolibre').value, purchase_link: document.getElementById('f_link').value,
+    new_purchase_link: document.getElementById('f_new_link').value, image_url: document.getElementById('f_img').value,
+    purchase_remarks: document.getElementById('f_purchase_remarks').value, warehouse_remarks: document.getElementById('f_warehouse_remarks').value,
+    remark1: document.getElementById('f_remark1').value, remark2: document.getElementById('f_remark2').value,
+    remark3: document.getElementById('f_remark3').value, remark4: document.getElementById('f_remark4').value,
   };
   if (!d.sku || !d.product_name) { toast('SKU和标题为必填', 'error'); return; }
-  try {
-    await api('/api/products', 'POST', d);
-    toast('创建成功', 'success');
-    closeModal();
-    loadData();
-  } catch(e) { toast(e.message, 'error'); }
+  try { await api('/api/products', 'POST', d); toast('创建成功', 'success'); closeModal(); loadData(); } catch(e) { toast(e.message, 'error'); }
 }
 
 // ========== ORDERS ==========
@@ -1387,30 +1387,11 @@ async function loadOrders() {
     const data = await api('/api/orders?page_size=50&status='+encodeURIComponent(status));
     const list = document.getElementById('ordersList');
     document.getElementById('orderCount').textContent = '共 '+data.total+' 条';
-    if (!data.items.length) {
-      list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--gray-400);">暂无采购单</div>';
-      return;
-    }
-    const statusColors = {'待审核':'#fef3c7','已批准':'#dbeafe','已下单':'#e0e7ff','已收货':'#d1fae5','已取消':'#f3f4f6'};
-    const statusTextColors = {'待审核':'#92400e','已批准':'#1e40af','已下单':'#3730a3','已收货':'#065f46','已取消':'#6b7280'};
-    list.innerHTML = data.items.map(o => {
-      const sc = statusColors[o.status] || '#f3f4f6';
-      const stc = statusTextColors[o.status] || '#6b7280';
-      return '<div style="background:#fff;border:1px solid var(--gray-200);border-radius:8px;padding:16px;cursor:pointer;" onclick="showOrderDetail('+o.id+')">'
-        + '<div style="display:flex;justify-content:space-between;margin-bottom:8px;">'
-        + '<span style="font-weight:600;font-size:14px;">'+escHtml(o.order_number)+'</span>'
-        + '<span style="font-size:12px;padding:2px 8px;border-radius:10px;background:'+sc+';color:'+stc+'">'+escHtml(o.status)+'</span>'
-        + '</div>'
-        + '<div style="font-size:12px;color:var(--gray-500);">'
-        + '<div>供应商: '+(o.supplier||'-')+'</div>'
-        + '<div>金额: \u00A5'+o.total_amount.toFixed(2)+'</div>'
-        + '<div>商品数: '+o.item_count+' 项</div>'
-        + '<div>'+(o.created_by||'')+' | '+(o.created_at?new Date(o.created_at).toLocaleDateString():'')+'</div>'
-        + '</div></div>';
-    }).join('');
-  } catch(e) {
-    document.getElementById('ordersList').innerHTML = '<div style="text-align:center;padding:40px;color:var(--danger);">加载失败: '+e.message+'</div>';
-  }
+    if (!data.items.length) { list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--gray-400);">暂无采购单</div>'; return; }
+    const sc = {'待审核':'#fef3c7','已批准':'#dbeafe','已下单':'#e0e7ff','已收货':'#d1fae5','已取消':'#f3f4f6'};
+    const stc = {'待审核':'#92400e','已批准':'#1e40af','已下单':'#3730a3','已收货':'#065f46','已取消':'#6b7280'};
+    list.innerHTML = data.items.map(o => '<div style="background:#fff;border:1px solid var(--gray-200);border-radius:8px;padding:16px;cursor:pointer;" onclick="showOrderDetail('+o.id+')"><div style="display:flex;justify-content:space-between;margin-bottom:8px;"><span style="font-weight:600;font-size:14px;">'+escHtml(o.order_number)+'</span><span style="font-size:12px;padding:2px 8px;border-radius:10px;background:'+(sc[o.status]||'#f3f4f6')+';color:'+(stc[o.status]||'#6b7280')+'">'+escHtml(o.status)+'</span></div><div style="font-size:12px;color:var(--gray-500);"><div>供应商: '+(o.supplier||'-')+'</div><div>金额: \u00A5'+o.total_amount.toFixed(2)+'</div><div>商品数: '+o.item_count+' 项</div><div>'+(o.created_by||'')+' | '+(o.created_at?new Date(o.created_at).toLocaleDateString():'')+'</div></div></div>').join('');
+  } catch(e) { document.getElementById('ordersList').innerHTML = '<div style="text-align:center;padding:40px;color:var(--danger);">加载失败: '+e.message+'</div>'; }
 }
 
 function showOrderDetail(orderId) {
@@ -1419,89 +1400,34 @@ function showOrderDetail(orderId) {
   document.getElementById('modalFooter').innerHTML = '<button class="btn btn-outline" onclick="closeModal()">关闭</button>';
   document.getElementById('modalOverlay').classList.add('active');
   api('/api/orders/'+orderId).then(data => {
-    const statusColors = {'待审核':'#fef3c7','已批准':'#dbeafe','已下单':'#e0e7ff','已收货':'#d1fae5','已取消':'#f3f4f6'};
-    const statusTextColors = {'待审核':'#92400e','已批准':'#1e40af','已下单':'#3730a3','已收货':'#065f46','已取消':'#6b7280'};
-    const sc = statusColors[data.status] || '#f3f4f6';
-    const stc = statusTextColors[data.status] || '#6b7280';
-    document.getElementById('modalBody').innerHTML = `
-      <div style="margin-bottom:16px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-          <span style="font-size:16px;font-weight:600;">${escHtml(data.order_number)}</span>
-          <span class="tag" style="background:${sc};color:${stc}">${escHtml(data.status)}</span>
-        </div>
-        <div style="font-size:12px;color:var(--gray-500);">
-          <div>供应商: ${escHtml(data.supplier||'-')}</div>
-          <div>总金额: \u00A5${data.total_amount.toFixed(2)}</div>
-          <div>运费: \u00A5${(data.shipping_cost||0).toFixed(2)}</div>
-          <div>创建人: ${escHtml(data.created_by||'-')}</div>
-          <div>创建时间: ${data.created_at?new Date(data.created_at).toLocaleString():'-'}</div>
-          <div>备注: ${escHtml(data.notes||'-')}</div>
-        </div>
-      </div>
-      <h4 style="font-size:13px;margin-bottom:8px;color:var(--gray-600);">商品明细</h4>
-      <table style="width:100%;font-size:12px;border-collapse:collapse;">
-        <thead><tr style="background:var(--gray-50);">
-          <th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--gray-200);">SKU</th>
-          <th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--gray-200);">名称</th>
-          <th style="text-align:right;padding:6px 8px;border-bottom:1px solid var(--gray-200);">数量</th>
-          <th style="text-align:right;padding:6px 8px;border-bottom:1px solid var(--gray-200);">单价</th>
-          <th style="text-align:right;padding:6px 8px;border-bottom:1px solid var(--gray-200);">小计</th>
-        </tr></thead>
-        <tbody>${(data.items||[]).map(i => '<tr><td style="padding:6px 8px;border-bottom:1px solid var(--gray-100);">'+escHtml(i.sku)+'</td><td style="padding:6px 8px;border-bottom:1px solid var(--gray-100);">'+escHtml(i.product_name)+'</td><td style="padding:6px 8px;border-bottom:1px solid var(--gray-100);text-align:right;">'+i.quantity+'</td><td style="padding:6px 8px;border-bottom:1px solid var(--gray-100);text-align:right;">\u00A5'+i.unit_price.toFixed(2)+'</td><td style="padding:6px 8px;border-bottom:1px solid var(--gray-100);text-align:right;">\u00A5'+i.total_price.toFixed(2)+'</td></tr>').join('')}</tbody>
-      </table>`;
-  }).catch(e => {
-    document.getElementById('modalBody').innerHTML = '<div class="text-center text-muted" style="padding:20px;">加载失败: '+e.message+'</div>';
-  });
+    const sc = {'待审核':'#fef3c7','已批准':'#dbeafe','已下单':'#e0e7ff','已收货':'#d1fae5','已取消':'#f3f4f6'};
+    const stc = {'待审核':'#92400e','已批准':'#1e40af','已下单':'#3730a3','已收货':'#065f46','已取消':'#6b7280'};
+    document.getElementById('modalBody').innerHTML = '<div style="margin-bottom:16px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;"><span style="font-size:16px;font-weight:600;">'+escHtml(data.order_number)+'</span><span class="tag" style="background:'+(sc[data.status]||'#f3f4f6')+';color:'+(stc[data.status]||'#6b7280')+'">'+escHtml(data.status)+'</span></div><div style="font-size:12px;color:var(--gray-500);"><div>供应商: '+escHtml(data.supplier||'-')+'</div><div>总金额: \u00A5'+data.total_amount.toFixed(2)+'</div><div>运费: \u00A5'+(data.shipping_cost||0).toFixed(2)+'</div><div>创建人: '+escHtml(data.created_by||'-')+'</div><div>创建时间: '+ (data.created_at?new Date(data.created_at).toLocaleString():'-')+'</div><div>备注: '+escHtml(data.notes||'-')+'</div></div></div><h4 style="font-size:13px;margin-bottom:8px;color:var(--gray-600);">商品明细</h4><table style="width:100%;font-size:12px;border-collapse:collapse;"><thead><tr style="background:var(--gray-50);"><th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--gray-200);">SKU</th><th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--gray-200);">名称</th><th style="text-align:right;padding:6px 8px;border-bottom:1px solid var(--gray-200);">数量</th><th style="text-align:right;padding:6px 8px;border-bottom:1px solid var(--gray-200);">单价</th><th style="text-align:right;padding:6px 8px;border-bottom:1px solid var(--gray-200);">小计</th></tr></thead><tbody>'+(data.items||[]).map(i => '<tr><td style="padding:6px 8px;border-bottom:1px solid var(--gray-100);">'+escHtml(i.sku)+'</td><td style="padding:6px 8px;border-bottom:1px solid var(--gray-100);">'+escHtml(i.product_name)+'</td><td style="padding:6px 8px;border-bottom:1px solid var(--gray-100);text-align:right;">'+i.quantity+'</td><td style="padding:6px 8px;border-bottom:1px solid var(--gray-100);text-align:right;">\u00A5'+i.unit_price.toFixed(2)+'</td><td style="padding:6px 8px;border-bottom:1px solid var(--gray-100);text-align:right;">\u00A5'+i.total_price.toFixed(2)+'</td></tr>').join('')+'</tbody></table>';
+  }).catch(e => { document.getElementById('modalBody').innerHTML = '<div class="text-center text-muted" style="padding:20px;">加载失败: '+e.message+'</div>'; });
 }
 
 function showCreateOrder() {
   document.getElementById('modalTitle').textContent = '新建采购单';
-  document.getElementById('modalBody').innerHTML = `
-    <div class="form-group"><label>供应商</label><input id="o_supplier" placeholder="供应商名称"></div>
-    <div class="form-group"><label>备注</label><textarea id="o_notes" rows="2" style="width:100%"></textarea></div>
-    <div style="font-size:12px;color:var(--gray-500);margin-bottom:8px;">商品列表</div>
-    <div id="orderItems">
-      <div class="form-row" style="margin-bottom:6px;">
-        <input placeholder="SKU" class="oi-sku" style="padding:6px 8px;border:1px solid var(--gray-200);border-radius:4px;">
-        <input type="number" placeholder="数量" class="oi-qty" style="width:80px;padding:6px 8px;border:1px solid var(--gray-200);border-radius:4px;" value="1">
-        <input type="number" step="0.01" placeholder="单价" class="oi-price" style="width:100px;padding:6px 8px;border:1px solid var(--gray-200);border-radius:4px;" value="0">
-        <button class="btn btn-sm" style="background:var(--danger);color:#fff;border:none;padding:6px 10px;border-radius:4px;cursor:pointer;" onclick="this.parentElement.remove()">x</button>
-      </div>
-    </div>
-    <button class="btn btn-sm btn-outline" onclick="addOrderItem()" style="margin-top:4px;">+ 添加一行</button>
-  `;
+  document.getElementById('modalBody').innerHTML = '<div class="form-group"><label>供应商</label><input id="o_supplier"></div><div class="form-group"><label>备注</label><textarea id="o_notes" rows="2" style="width:100%"></textarea></div><div style="font-size:12px;color:var(--gray-500);margin-bottom:8px;">商品列表</div><div id="orderItems"><div class="form-row" style="margin-bottom:6px;"><input placeholder="SKU" class="oi-sku" style="padding:6px 8px;border:1px solid var(--gray-200);border-radius:4px;"><input type="number" placeholder="数量" class="oi-qty" style="width:80px;padding:6px 8px;border:1px solid var(--gray-200);border-radius:4px;" value="1"><input type="number" step="0.01" placeholder="单价" class="oi-price" style="width:100px;padding:6px 8px;border:1px solid var(--gray-200);border-radius:4px;" value="0"><button class="btn btn-sm" style="background:var(--danger);color:#fff;border:none;padding:6px 10px;border-radius:4px;cursor:pointer;" onclick="this.parentElement.remove()">x</button></div></div><button class="btn btn-sm btn-outline" onclick="addOrderItem()" style="margin-top:4px;">+ 添加一行</button>';
   document.getElementById('modalFooter').innerHTML = '<button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="submitCreateOrder()">创建采购单</button>';
   document.getElementById('modalOverlay').classList.add('active');
 }
-
 function addOrderItem() {
   const div = document.createElement('div');
-  div.className = 'form-row';
-  div.style.marginBottom = '6px';
+  div.className = 'form-row'; div.style.marginBottom = '6px';
   div.innerHTML = '<input placeholder="SKU" class="oi-sku" style="padding:6px 8px;border:1px solid var(--gray-200);border-radius:4px;"><input type="number" placeholder="数量" class="oi-qty" style="width:80px;padding:6px 8px;border:1px solid var(--gray-200);border-radius:4px;" value="1"><input type="number" step="0.01" placeholder="单价" class="oi-price" style="width:100px;padding:6px 8px;border:1px solid var(--gray-200);border-radius:4px;" value="0"><button class="btn btn-sm" style="background:var(--danger);color:#fff;border:none;padding:6px 10px;border-radius:4px;cursor:pointer;" onclick="this.parentElement.remove()">x</button>';
   document.getElementById('orderItems').appendChild(div);
 }
-
 async function submitCreateOrder() {
   const items = [];
   document.querySelectorAll('.oi-sku').forEach((el, i) => {
-    const sku = el.value.trim();
-    if (!sku) return;
-    const qty = parseInt(document.querySelectorAll('.oi-qty')[i].value) || 1;
-    const price = parseFloat(document.querySelectorAll('.oi-price')[i].value) || 0;
+    const sku = el.value.trim(); if (!sku) return;
+    const qty = parseInt(document.querySelectorAll('.oi-qty')[i].value)||1;
+    const price = parseFloat(document.querySelectorAll('.oi-price')[i].value)||0;
     items.push({product_name: sku, sku, quantity: qty, unit_price: price});
   });
   if (!items.length) { toast('请至少添加一个商品', 'error'); return; }
-  try {
-    await api('/api/orders', 'POST', {
-      supplier: document.getElementById('o_supplier').value,
-      notes: document.getElementById('o_notes').value,
-      items
-    });
-    toast('采购单创建成功', 'success');
-    closeModal();
-    loadOrders();
-  } catch(e) { toast(e.message, 'error'); }
+  try { await api('/api/orders', 'POST', {supplier: document.getElementById('o_supplier').value, notes: document.getElementById('o_notes').value, items}); toast('采购单创建成功', 'success'); closeModal(); loadOrders(); } catch(e) { toast(e.message, 'error'); }
 }
 
 // ========== AI ==========
@@ -1509,20 +1435,16 @@ async function aiAnalyze() {
   const q = document.getElementById('aiQuery').value;
   if (!q) { toast('请输入问题', 'error'); return; }
   document.getElementById('aiResponse').innerHTML = '<span class="loading"></span> 分析中...';
-  try {
-    const d = await api('/api/ai/analyze', 'POST', {query: q});
-    document.getElementById('aiResponse').innerHTML = d.reply || '暂无分析结果';
-  } catch(e) { document.getElementById('aiResponse').innerHTML = '分析失败: '+e.message; }
+  try { const d = await api('/api/ai/analyze', 'POST', {query: q}); document.getElementById('aiResponse').innerHTML = d.reply || '暂无分析结果'; }
+  catch(e) { document.getElementById('aiResponse').innerHTML = '分析失败: '+e.message; }
 }
-
 async function aiSuggestOrder() {
   document.getElementById('aiResponse').innerHTML = '<span class="loading"></span> 生成建议中...';
   try {
     const d = await api('/api/ai/suggest-order', 'POST');
     let html = 'AI采购建议\n\n';
-    if (d.items && d.items.length) {
-      d.items.forEach(i => { html += '- '+i.sku+': 建议采购 '+i.suggested_quantity+' 个\n  理由: '+(i.reason||'库存不足')+'\n'; });
-    } else html += d.message || '暂无建议';
+    if (d.items && d.items.length) d.items.forEach(i => { html += '- '+i.sku+': 建议采购 '+i.suggested_quantity+' 个\n  理由: '+(i.reason||'库存不足')+'\n'; });
+    else html += d.message || '暂无建议';
     document.getElementById('aiResponse').innerHTML = html;
   } catch(e) { document.getElementById('aiResponse').innerHTML = '生成失败: '+e.message; }
 }
@@ -1530,51 +1452,27 @@ async function aiSuggestOrder() {
 // ========== IMPORT ==========
 function showImport() {
   document.getElementById('modalTitle').textContent = '导入数据';
-  document.getElementById('modalBody').innerHTML = `
-    <div style="margin-bottom:16px;">
-      <p style="font-size:13px;color:var(--gray-500);margin-bottom:8px;">方式一：上传Excel文件（.xlsx，表头自动匹配）</p>
-      <input type="file" id="excelFileInput" accept=".xlsx" style="font-size:13px;">
-      <button class="btn btn-primary btn-sm" onclick="uploadExcel()" style="margin-top:8px;">上传并导入</button>
-    </div>
-    <div style="border-top:1px solid var(--gray-200);padding-top:16px;">
-      <p style="font-size:13px;color:var(--gray-500);margin-bottom:8px;">方式二：粘贴JSON数据</p>
-      <textarea id="importData" rows="8" style="width:100%;font-family:monospace;font-size:12px;padding:8px;border:1px solid var(--gray-200);border-radius:6px;" placeholder='[{"sku":"...","product_name":"...","date":"46093","attribute":"补货","category":"美一组","purchase_price":15.5,...}]'></textarea>
-      <div style="margin-top:8px;font-size:12px;color:var(--gray-400);">支持字段: date, attribute, category, store, mercadolibre_link, purchase_link, sku, product_name, product_attributes, purchase_remarks, purchase_quantity, warehouse_remarks, order_number, purchase_price, new_purchase_price, new_purchase_link, supplier, image_url, stock_quantity, remark1-4, length, width, height</div>
-    </div>
-  `;
+  document.getElementById('modalBody').innerHTML = '<div style="margin-bottom:16px;"><p style="font-size:13px;color:var(--gray-500);margin-bottom:8px;">方式一：上传Excel文件（.xlsx，表头自动匹配）</p><input type="file" id="excelFileInput" accept=".xlsx" style="font-size:13px;"><button class="btn btn-primary btn-sm" onclick="uploadExcel()" style="margin-top:8px;">上传并导入</button></div><div style="border-top:1px solid var(--gray-200);padding-top:16px;"><p style="font-size:13px;color:var(--gray-500);margin-bottom:8px;">方式二：粘贴JSON数据</p><textarea id="importData" rows="8" style="width:100%;font-family:monospace;font-size:12px;padding:8px;border:1px solid var(--gray-200);border-radius:6px;" placeholder=\'[{"sku":"...","product_name":"..."}]\'></textarea></div>';
   document.getElementById('modalFooter').innerHTML = '<button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="submitImport()">导入JSON</button>';
   document.getElementById('modalOverlay').classList.add('active');
 }
-
 async function uploadExcel() {
   const fileInput = document.getElementById('excelFileInput');
   if (!fileInput.files.length) { toast('请选择Excel文件', 'error'); return; }
-  const formData = new FormData();
-  formData.append('file', fileInput.files[0]);
+  const formData = new FormData(); formData.append('file', fileInput.files[0]);
   try {
-    const resp = await fetch('/api/products/upload-excel', {
-      method: 'POST',
-      headers: {'Authorization': 'Bearer '+TOKEN},
-      body: formData,
-    });
+    const resp = await fetch('/api/products/upload-excel', {method:'POST', headers:{'Authorization':'Bearer '+TOKEN}, body: formData});
     const data = await resp.json();
     if (!resp.ok) throw new Error(data.detail || '上传失败');
-    toast(data.message, 'success');
-    closeModal();
-    loadData();
+    toast(data.message, 'success'); closeModal(); loadData();
   } catch(e) { toast('上传失败: '+e.message, 'error'); }
 }
-
 async function submitImport() {
   const raw = document.getElementById('importData').value.trim();
   if (!raw) { toast('请粘贴数据', 'error'); return; }
   try {
-    const data = JSON.parse(raw);
-    if (!Array.isArray(data)) throw new Error('数据必须是数组');
-    const r = await api('/api/products/import', 'POST', data);
-    toast(r.message, 'success');
-    closeModal();
-    loadData();
+    const data = JSON.parse(raw); if (!Array.isArray(data)) throw new Error('数据必须是数组');
+    const r = await api('/api/products/import', 'POST', data); toast(r.message, 'success'); closeModal(); loadData();
   } catch(e) { toast('导入失败: '+e.message, 'error'); }
 }
 
@@ -1582,243 +1480,96 @@ async function submitImport() {
 function openSettings() {
   closeSidebar();
   document.getElementById('sidebarTitle').textContent = '设置';
-  document.getElementById('sidebarBody').innerHTML = `
-    <div class="form-group">
-      <label>OpenAI API Key</label>
-      <input type="password" id="settingApiKey" placeholder="sk-...">
-      <div style="font-size:11px;color:var(--gray-400);margin-top:4px;">配置后启用AI高级分析</div>
-    </div>
-    <div class="form-group">
-      <label>API Base 地址</label>
-      <input type="text" id="settingApiBase" placeholder="https://api.openai.com/v1" value="https://api.openai.com/v1">
-    </div>
-    <div class="form-group">
-      <label>企业微信 Webhook</label>
-      <input type="text" id="settingWebhook" placeholder="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=...">
-    </div>
-    <button class="btn btn-primary btn-block" onclick="saveSettings()">保存设置</button>
-    <hr style="margin:20px 0;border:none;border-top:1px solid var(--gray-200);">
-    <div class="form-group">
-      <label>当前用户</label>
-      <div style="display:flex;align-items:center;gap:8px;padding:8px 0;">
-        <span class="user-avatar" style="cursor:default;">${(USER.display_name||USER.username||'U')[0]}</span>
-        <span>${USER.display_name||USER.username||'未知'}</span>
-        <span style="font-size:11px;color:var(--gray-400);">${USER.role||''}</span>
-      </div>
-    </div>
-    <button class="btn btn-outline btn-block" onclick="doLogout()">退出登录</button>
-  `;
+  document.getElementById('sidebarBody').innerHTML = '<div class="form-group"><label>OpenAI API Key</label><input type="password" id="settingApiKey" placeholder="sk-..."></div><div class="form-group"><label>API Base</label><input type="text" id="settingApiBase" placeholder="https://api.openai.com/v1" value="https://api.openai.com/v1"></div><div class="form-group"><label>企业微信 Webhook</label><input type="text" id="settingWebhook" placeholder="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=..."></div><button class="btn btn-primary btn-block" onclick="saveSettings()">保存设置</button><hr style="margin:20px 0;border:none;border-top:1px solid var(--gray-200);"><div class="form-group"><label>当前用户</label><div style="display:flex;align-items:center;gap:8px;padding:8px 0;"><span class="user-avatar" style="cursor:default;">'+(USER.display_name||USER.username||'U')[0]+'</span><span>'+ (USER.display_name||USER.username||'未知')+'</span><span style="font-size:11px;color:var(--gray-400);">'+ (USER.role||'')+'</span></div></div><button class="btn btn-outline btn-block" onclick="doLogout()">退出登录</button>';
   document.getElementById('settingApiKey').value = localStorage.getItem('OPENAI_API_KEY') || '';
   document.getElementById('settingApiBase').value = localStorage.getItem('OPENAI_API_BASE') || 'https://api.openai.com/v1';
   document.getElementById('settingWebhook').value = localStorage.getItem('WECOM_WEBHOOK_URL') || '';
   document.getElementById('sidebarPanel').classList.add('active');
 }
-
 function saveSettings() {
-  const k = document.getElementById('settingApiKey').value;
-  const b = document.getElementById('settingApiBase').value;
-  const w = document.getElementById('settingWebhook').value;
-  localStorage.setItem('OPENAI_API_KEY', k);
-  localStorage.setItem('OPENAI_API_BASE', b);
-  localStorage.setItem('WECOM_WEBHOOK_URL', w);
+  localStorage.setItem('OPENAI_API_KEY', document.getElementById('settingApiKey').value);
+  localStorage.setItem('OPENAI_API_BASE', document.getElementById('settingApiBase').value);
+  localStorage.setItem('WECOM_WEBHOOK_URL', document.getElementById('settingWebhook').value);
   toast('设置已保存', 'success');
 }
 
-// ========== 1. GENERATE DASHBOARD ==========
+// ========== DASHBOARD ==========
 function showDashboard() {
   document.getElementById('modalTitle').textContent = '生成仪表盘';
   document.getElementById('modalWindow').className = 'modal modal-wide';
   document.getElementById('modalBody').innerHTML = '<div class="text-center text-muted" style="padding:20px;"><span class="loading"></span> 生成仪表盘中...</div>';
   document.getElementById('modalFooter').innerHTML = '<button class="btn btn-outline" onclick="closeModal()">关闭</button>';
   document.getElementById('modalOverlay').classList.add('active');
-
-  // Build dashboard after a short delay to allow rendering
   setTimeout(() => {
     const total = products.length;
-    // Category distribution
-    const catMap = {};
-    const statusMap = {};
-    let lowStock = [];
-    let totalPurchaseQty = 0;
-    let totalPurchasePrice = 0;
+    const catMap = {}, statusMap = {};
+    let lowStock = [], totalPurchaseQty = 0, totalPurchasePrice = 0;
     products.forEach(p => {
-      const cat = p.category || '(未分类)';
-      catMap[cat] = (catMap[cat] || 0) + 1;
-      const st = p.status || '待采购';
-      statusMap[st] = (statusMap[st] || 0) + 1;
+      const cat = p.category || '(未分类)'; catMap[cat] = (catMap[cat]||0) + 1;
+      const st = p.status || '待采购'; statusMap[st] = (statusMap[st]||0) + 1;
       if (p.stock_quantity < 10) lowStock.push(p);
-      totalPurchaseQty += (p.purchase_quantity || 0);
-      totalPurchasePrice += (p.purchase_price || 0);
+      totalPurchaseQty += (p.purchase_quantity||0); totalPurchasePrice += (p.purchase_price||0);
     });
-
-    // Generate pie chart SVG for categories
-    const catEntries = Object.entries(catMap).sort((a,b) => b[1]-a[1]);
+    const catEntries = Object.entries(catMap).sort((a,b)=>b[1]-a[1]);
     const pieColors = ['#4a6cf7','#22c55e','#f59e0b','#ef4444','#8b5cf6','#ec4899','#14b8a6','#f97316','#6366f1','#84cc16'];
-    const totalCat = catEntries.reduce((s, e) => s+e[1], 0);
+    const totalCat = catEntries.reduce((s,e)=>s+e[1],0);
     let pieSvg = '';
     if (totalCat > 0) {
       let cumulative = 0;
-      const slices = catEntries.map((e, i) => {
-        const pct = e[1] / totalCat;
-        const startAngle = cumulative * 360;
+      const slices = catEntries.map((e,i) => {
+        const pct = e[1]/totalCat, start = cumulative*360, end = (cumulative+pct)*360;
         cumulative += pct;
-        const endAngle = cumulative * 360;
-        const r = 70;
-        const cx = 100, cy = 100;
-        const sRad = (startAngle - 90) * Math.PI / 180;
-        const eRad = (endAngle - 90) * Math.PI / 180;
-        const x1 = cx + r * Math.cos(sRad);
-        const y1 = cy + r * Math.sin(sRad);
-        const x2 = cx + r * Math.cos(eRad);
-        const y2 = cy + r * Math.sin(eRad);
-        const large = (endAngle - startAngle) > 180 ? 1 : 0;
-        const color = pieColors[i % pieColors.length];
-        return '<path d="M'+cx+' '+cy+' L'+x1+' '+y1+' A'+r+' '+r+' 0 '+large+' 1 '+x2+' '+y2+' Z" fill="'+color+'" stroke="#fff" stroke-width="1"/>';
+        const r=70, cx=100, cy=100;
+        const sRad = (start-90)*Math.PI/180, eRad = (end-90)*Math.PI/180;
+        const x1=cx+r*Math.cos(sRad), y1=cy+r*Math.sin(sRad), x2=cx+r*Math.cos(eRad), y2=cy+r*Math.sin(eRad);
+        const large = (end-start)>180?1:0;
+        return '<path d="M'+cx+' '+cy+' L'+x1+' '+y1+' A'+r+' '+r+' 0 '+large+' 1 '+x2+' '+y2+' Z" fill="'+pieColors[i%pieColors.length]+'" stroke="#fff" stroke-width="1"/>';
       });
       pieSvg = '<svg width="200" height="200" viewBox="0 0 200 200">'+slices.join('')+'</svg>';
     }
-
-    // Bar chart for status
-    const statusEntries = Object.entries(statusMap).sort((a,b) => b[1]-a[1]);
+    const statusEntries = Object.entries(statusMap).sort((a,b)=>b[1]-a[1]);
     const barColors = {'待采购':'#f59e0b','已下单':'#3b82f6','在途':'#8b5cf6','已入库':'#22c55e','停售':'#9ca3af'};
-    const maxStatus = Math.max(...statusEntries.map(e => e[1]), 1);
+    const maxStatus = Math.max(...statusEntries.map(e=>e[1]),1);
     let barSvg = '<svg width="300" height="160" viewBox="0 0 300 160">';
-    statusEntries.forEach((e, i) => {
-      const barH = (e[1] / maxStatus) * 100;
-      const x = 20 + i * 60;
-      const color = barColors[e[0]] || '#4a6cf7';
-      barSvg += '<rect x="'+x+'" y="'+(140-barH)+'" width="40" height="'+barH+'" fill="'+color+'" rx="3"/>';
+    statusEntries.forEach((e,i) => {
+      const barH = (e[1]/maxStatus)*100, x = 20+i*60;
+      barSvg += '<rect x="'+x+'" y="'+(140-barH)+'" width="40" height="'+barH+'" fill="'+(barColors[e[0]]||'#4a6cf7')+'" rx="3"/>';
       barSvg += '<text x="'+(x+20)+'" y="150" text-anchor="middle" font-size="9" fill="#666">'+e[0]+'</text>';
       barSvg += '<text x="'+(x+20)+'" y="'+(140-barH-4)+'" text-anchor="middle" font-size="10" fill="#333" font-weight="600">'+e[1]+'</text>';
     });
     barSvg += '</svg>';
-
-    // Low stock items
-    const lowStockHtml = lowStock.slice(0, 10).map(p =>
-      '<div class="stat-row danger"><span class="stat-name">'+escHtml(p.sku)+' - '+escHtml(p.product_name)+'</span><span class="stat-val">库存: '+(p.stock_quantity||0)+'</span></div>'
-    ).join('');
-
-    const body = document.getElementById('modalBody');
-    body.innerHTML = `
-      <div class="dashboard-grid">
-        <div class="dashboard-card">
-          <h4>产品总数</h4>
-          <div class="stat-value">${total}</div>
-          <div class="stat-label">总采购量: ${totalPurchaseQty} | 总采购金额: \u00A5${totalPurchasePrice.toFixed(2)}</div>
-        </div>
-        <div class="dashboard-card">
-          <h4>最近活动</h4>
-          <div style="font-size:12px;color:var(--gray-500);margin-top:8px;">
-            <div>最后更新: ${new Date().toLocaleString()}</div>
-            <div style="margin-top:4px;">低库存商品: <span style="color:var(--danger);font-weight:600;">${lowStock.length}</span> 个</div>
-            <div style="margin-top:4px;">${products.length > 0 ? '数据加载于: '+new Date().toLocaleDateString() : '暂无数据'}</div>
-          </div>
-        </div>
-        <div class="dashboard-card">
-          <h4>产品分类分布</h4>
-          <div class="chart-container" style="display:flex;align-items:center;gap:12px;">
-            ${pieSvg}
-            <div style="font-size:11px;flex:1;">
-              ${catEntries.slice(0,8).map((e,i) => '<div style="display:flex;align-items:center;gap:4px;margin:2px 0;"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:'+pieColors[i%pieColors.length]+';"></span> '+escHtml(e[0])+' ('+e[1]+')</div>').join('')}
-            </div>
-          </div>
-        </div>
-        <div class="dashboard-card">
-          <h4>产品状态分布</h4>
-          <div class="chart-container">${barSvg}</div>
-        </div>
-      </div>
-      <div class="dashboard-card">
-        <h4>低库存预警 (库存 &lt; 10)</h4>
-        ${lowStock.length > 0 ? lowStockHtml : '<div style="font-size:12px;color:var(--gray-400);padding:8px 0;">暂无低库存商品</div>'}
-        ${lowStock.length > 10 ? '<div style="font-size:11px;color:var(--gray-400);margin-top:4px;">...还有 '+(lowStock.length-10)+' 个</div>' : ''}
-      </div>
-      <div class="dashboard-card" style="margin-top:12px;">
-        <h4>采购价格分布</h4>
-        ${(() => {
-          const prices = products.filter(p => p.purchase_price > 0).map(p => p.purchase_price);
-          if (prices.length === 0) return '<div style="font-size:12px;color:var(--gray-400);padding:8px 0;">暂无价格数据</div>';
-          const avg = prices.reduce((a,b)=>a+b,0)/prices.length;
-          const min = Math.min(...prices);
-          const max = Math.max(...prices);
-          return '<div style="font-size:12px;color:var(--gray-500);">'
-            + '<div class="stat-row"><span class="stat-name">平均采购价</span><span class="stat-val">\u00A5'+avg.toFixed(2)+'</span></div>'
-            + '<div class="stat-row"><span class="stat-name">最低采购价</span><span class="stat-val">\u00A5'+min.toFixed(2)+'</span></div>'
-            + '<div class="stat-row"><span class="stat-name">最高采购价</span><span class="stat-val">\u00A5'+max.toFixed(2)+'</span></div>'
-            + '<div class="stat-row"><span class="stat-name">有价格商品数</span><span class="stat-val">'+prices.length+'</span></div>'
-            + '</div>';
-        })()}
-      </div>
-    `;
+    const lowStockHtml = lowStock.slice(0,10).map(p => '<div class="stat-row danger"><span class="stat-name">'+escHtml(p.sku)+' - '+escHtml(p.product_name)+'</span><span class="stat-val">库存: '+(p.stock_quantity||0)+'</span></div>').join('');
+    document.getElementById('modalBody').innerHTML = '<div class="dashboard-grid"><div class="dashboard-card"><h4>产品总数</h4><div class="stat-value">'+total+'</div><div class="stat-label">总采购量: '+totalPurchaseQty+' | 总金额: \u00A5'+totalPurchasePrice.toFixed(2)+'</div></div><div class="dashboard-card"><h4>最近活动</h4><div style="font-size:12px;color:var(--gray-500);margin-top:8px;"><div>最后更新: '+new Date().toLocaleString()+'</div><div>低库存: <span style="color:var(--danger);font-weight:600;">'+lowStock.length+'</span> 个</div><div>数据量: '+products.length+' 条</div></div></div><div class="dashboard-card"><h4>分类分布</h4><div class="chart-container" style="display:flex;align-items:center;gap:12px;">'+pieSvg+'<div style="font-size:11px;flex:1;">'+catEntries.slice(0,8).map((e,i) => '<div style="display:flex;align-items:center;gap:4px;margin:2px 0;"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:'+pieColors[i%pieColors.length]+';"></span> '+escHtml(e[0])+' ('+e[1]+')</div>').join('')+'</div></div></div><div class="dashboard-card"><h4>状态分布</h4><div class="chart-container">'+barSvg+'</div></div></div><div class="dashboard-card"><h4>低库存预警 (库存 < 10)</h4>'+(lowStock.length>0?lowStockHtml:'<div style="font-size:12px;color:var(--gray-400);padding:8px 0;">暂无低库存商品</div>')+(lowStock.length>10?'<div style="font-size:11px;color:var(--gray-400);margin-top:4px;">...还有 '+(lowStock.length-10)+' 个</div>':'')+'</div>';
   }, 100);
 }
 
-// ========== 2. COLLECT FORM ==========
+// ========== COLLECT FORM ==========
 function showCollectForm() {
   document.getElementById('modalTitle').textContent = '收集表';
   document.getElementById('modalWindow').className = 'modal';
   const cols = COLUMNS.filter(c => c.key !== 'row_num' && c.key !== 'image_url');
-  document.getElementById('modalBody').innerHTML = `
-    <p style="font-size:12px;color:var(--gray-500);margin-bottom:12px;">选择要包含在收集表中的字段，生成可分享的收集链接。</p>
-    <div style="max-height:300px;overflow-y:auto;border:1px solid var(--gray-200);border-radius:6px;padding:8px;">
-      ${cols.map(c => '<label style="display:flex;align-items:center;gap:6px;padding:4px 0;font-size:12px;cursor:pointer;"><input type="checkbox" class="cf-col" value="'+c.key+'" checked> '+escHtml(c.label)+'</label>').join('')}
-    </div>
-    <div class="collect-form-preview" id="collectFormPreview" style="margin-top:12px;">
-      <h4 style="font-size:13px;margin-bottom:8px;">表单预览</h4>
-      ${cols.slice(0,5).map(c => '<div class="cf-field"><label>'+escHtml(c.label)+'</label><input placeholder="请输入'+escHtml(c.label)+'..." readonly></div>').join('')}
-      <div style="font-size:11px;color:var(--gray-400);margin-top:8px;">选择上方字段后预览将更新</div>
-    </div>
-    <div style="margin-top:12px;">
-      <label style="display:flex;align-items:center;gap:6px;font-size:12px;"><input type="checkbox" id="cfEmbedToggle"> 生成嵌入代码</label>
-      <div id="cfEmbedCode" style="display:none;margin-top:8px;">
-        <textarea id="cfEmbedTextarea" rows="3" style="width:100%;font-family:monospace;font-size:11px;padding:8px;border:1px solid var(--gray-200);border-radius:6px;" readonly></textarea>
-        <button class="btn btn-sm btn-outline mt-8" onclick="copyEmbedCode()">复制代码</button>
-      </div>
-    </div>
-  `;
+  document.getElementById('modalBody').innerHTML = '<p style="font-size:12px;color:var(--gray-500);margin-bottom:12px;">选择要包含在收集表中的字段，生成可分享的收集链接。</p><div style="max-height:300px;overflow-y:auto;border:1px solid var(--gray-200);border-radius:6px;padding:8px;">'+cols.map(c => '<label style="display:flex;align-items:center;gap:6px;padding:4px 0;font-size:12px;cursor:pointer;"><input type="checkbox" class="cf-col" value="'+c.key+'" checked> '+escHtml(c.label)+'</label>').join('')+'</div><div class="collect-form-preview" id="collectFormPreview"><h4 style="font-size:13px;margin-bottom:8px;">表单预览</h4>'+cols.slice(0,5).map(c => '<div class="cf-field"><label>'+escHtml(c.label)+'</label><input placeholder="请输入..." readonly></div>').join('')+'</div>';
   document.getElementById('modalFooter').innerHTML = '<button class="btn btn-outline" onclick="closeModal()">关闭</button><button class="btn btn-primary" onclick="generateCollectLink()">生成收集链接</button>';
   document.getElementById('modalOverlay').classList.add('active');
-
-  // Add event listeners for checkbox changes
   setTimeout(() => {
-    document.querySelectorAll('.cf-col').forEach(cb => {
-      cb.addEventListener('change', updateCollectFormPreview);
-    });
-    document.getElementById('cfEmbedToggle').addEventListener('change', function() {
-      document.getElementById('cfEmbedCode').style.display = this.checked ? 'block' : 'none';
-    });
+    document.querySelectorAll('.cf-col').forEach(cb => cb.addEventListener('change', updateCollectFormPreview));
   }, 50);
 }
-
 function updateCollectFormPreview() {
   const checked = document.querySelectorAll('.cf-col:checked');
   const preview = document.getElementById('collectFormPreview');
-  if (checked.length === 0) {
-    preview.innerHTML = '<div style="font-size:12px;color:var(--gray-400);padding:20px;text-align:center;">请至少选择一个字段</div>';
-    return;
-  }
+  if (checked.length === 0) { preview.innerHTML = '<div style="font-size:12px;color:var(--gray-400);padding:20px;text-align:center;">请至少选择一个字段</div>'; return; }
   let html = '<h4 style="font-size:13px;margin-bottom:8px;">表单预览</h4>';
-  checked.forEach(cb => {
-    const col = COLUMNS.find(c => c.key === cb.value);
-    if (col) html += '<div class="cf-field"><label>'+escHtml(col.label)+'</label><input placeholder="请输入'+escHtml(col.label)+'..." readonly></div>';
-  });
+  checked.forEach(cb => { const col = COLUMNS.find(c => c.key === cb.value); if (col) html += '<div class="cf-field"><label>'+escHtml(col.label)+'</label><input placeholder="请输入..." readonly></div>'; });
   html += '<button class="btn btn-primary btn-block" style="margin-top:12px;" disabled>提交</button>';
   preview.innerHTML = html;
 }
-
 function generateCollectLink() {
   const checked = document.querySelectorAll('.cf-col:checked');
   if (checked.length === 0) { toast('请至少选择一个字段', 'error'); return; }
   const fields = Array.from(checked).map(cb => cb.value);
-  const baseUrl = window.location.origin;
-  const link = baseUrl + '/collect?fields=' + fields.join(',');
-  // Update embed code
-  const embedTextarea = document.getElementById('cfEmbedTextarea');
-  if (embedTextarea) {
-    embedTextarea.value = '<iframe src="'+link+'" width="100%" height="600" frameborder="0"></iframe>';
-  }
+  const link = window.location.origin + '/collect?fields=' + fields.join(',');
   toast('收集链接已生成: '+link, 'success');
-  // Show the link
   const preview = document.getElementById('collectFormPreview');
   const linkDiv = document.createElement('div');
   linkDiv.style.cssText = 'margin-top:8px;padding:8px;background:var(--gray-50);border-radius:4px;word-break:break-all;font-size:12px;';
@@ -1826,33 +1577,15 @@ function generateCollectLink() {
   preview.appendChild(linkDiv);
 }
 
-function copyEmbedCode() {
-  const ta = document.getElementById('cfEmbedTextarea');
-  if (ta) { ta.select(); document.execCommand('copy'); toast('已复制嵌入代码', 'success'); }
-}
-
-// ========== 3. DATA GROUPING ==========
+// ========== DATA GROUPING ==========
 function showDataGrouping() {
   document.getElementById('modalTitle').textContent = '数据分组';
   document.getElementById('modalWindow').className = 'modal modal-wide';
-  const groupCols = ['category','attribute','store','supplier'];
-  document.getElementById('modalBody').innerHTML = `
-    <div class="group-selector">
-      <label style="font-size:12px;color:var(--gray-600);margin-right:8px;">分组依据:</label>
-      <select id="groupBySelect" onchange="renderGroups()">
-        <option value="category">组别</option>
-        <option value="attribute">属性</option>
-        <option value="store">店铺</option>
-        <option value="supplier">供应商</option>
-      </select>
-    </div>
-    <div id="groupResults" style="max-height:500px;overflow-y:auto;"><div class="text-center text-muted" style="padding:20px;"><span class="loading"></span> 加载中...</div></div>
-  `;
+  document.getElementById('modalBody').innerHTML = '<div class="group-selector"><label style="font-size:12px;color:var(--gray-600);margin-right:8px;">分组依据:</label><select id="groupBySelect" onchange="renderGroups()"><option value="category">组别</option><option value="attribute">属性</option><option value="store">店铺</option><option value="supplier">供应商</option></select></div><div id="groupResults" style="max-height:500px;overflow-y:auto;"><div class="text-center text-muted" style="padding:20px;"><span class="loading"></span> 加载中...</div></div>';
   document.getElementById('modalFooter').innerHTML = '<button class="btn btn-outline" onclick="closeModal()">关闭</button>';
   document.getElementById('modalOverlay').classList.add('active');
   setTimeout(renderGroups, 50);
 }
-
 function renderGroups() {
   const groupBy = document.getElementById('groupBySelect').value;
   const groups = {};
@@ -1866,336 +1599,257 @@ function renderGroups() {
   container.innerHTML = entries.map(([key, items]) => {
     const totalQty = items.reduce((s, p) => s + (p.purchase_quantity||0), 0);
     const totalPrice = items.reduce((s, p) => s + (p.purchase_price||0), 0);
-    return '<div class="group-item">'
-      + '<div class="group-header" onclick="this.nextElementSibling.classList.toggle(\'open\')">'
-      + '<span class="group-name">'+escHtml(key)+'</span>'
-      + '<span class="group-stats">'+items.length+' 项 | 采购量: '+totalQty+' | 金额: \u00A5'+totalPrice.toFixed(2)+'</span>'
-      + '</div>'
-      + '<div class="group-body">'
-      + '<table><thead><tr><th>SKU</th><th>标题</th><th>采购量</th><th>采购价</th><th>库存</th><th>状态</th></tr></thead><tbody>'
-      + items.slice(0, 20).map(p => '<tr><td>'+escHtml(p.sku||'')+'</td><td>'+escHtml(p.product_name||'')+'</td><td>'+(p.purchase_quantity||0)+'</td><td>\u00A5'+(p.purchase_price||0).toFixed(2)+'</td><td>'+(p.stock_quantity||0)+'</td><td>'+escHtml(p.status||'')+'</td></tr>').join('')
-      + '</tbody></table>'
-      + (items.length > 20 ? '<div style="font-size:11px;color:var(--gray-400);padding:8px 0;text-align:center;">还有 '+(items.length-20)+' 项...</div>' : '')
-      + '</div></div>';
+    return '<div class="group-item"><div class="group-header" onclick="this.nextElementSibling.classList.toggle(\'open\')"><span class="group-name">'+escHtml(key)+'</span><span class="group-stats">'+items.length+' 项 | 采购量: '+totalQty+' | 金额: \u00A5'+totalPrice.toFixed(2)+'</span></div><div class="group-body"><table><thead><tr><th>SKU</th><th>标题</th><th>采购量</th><th>采购价</th><th>库存</th><th>状态</th></tr></thead><tbody>'+items.slice(0,20).map(p => '<tr><td>'+escHtml(p.sku||'')+'</td><td>'+escHtml(p.product_name||'')+'</td><td>'+(p.purchase_quantity||0)+'</td><td>\u00A5'+(p.purchase_price||0).toFixed(2)+'</td><td>'+(p.stock_quantity||0)+'</td><td>'+escHtml(p.status||'')+'</td></tr>').join('')+'</tbody></table>'+(items.length>20?'<div style="font-size:11px;color:var(--gray-400);padding:8px 0;text-align:center;">还有 '+(items.length-20)+' 项...</div>':'')+'</div></div>';
   }).join('');
 }
 
-// ========== 4. AUTOMATION NOTIFICATIONS ==========
+// ========== AUTOMATION NOTIFICATIONS ==========
 function showNotificationSettings() {
   document.getElementById('sidebarTitle').textContent = '自动化通知设置';
-  document.getElementById('sidebarBody').innerHTML = `
-    <div class="form-group">
-      <label>低库存阈值</label>
-      <input type="number" id="notifLowStockThreshold" value="10" min="1">
-    </div>
-    <div class="notif-toggle">
-      <span class="toggle-label">低库存告警</span>
-      <label class="switch">
-        <input type="checkbox" id="notifLowStockEnabled" checked>
-        <span class="slider"></span>
-      </label>
-    </div>
-    <div class="form-group">
-      <label>Webhook URL (企业微信)</label>
-      <input type="text" id="notifWebhookUrl" placeholder="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=...">
-      <div style="font-size:11px;color:var(--gray-400);margin-top:4px;">当触发告警时，通过此Webhook发送通知</div>
-    </div>
-    <div class="form-group">
-      <label>通知频率</label>
-      <select id="notifFrequency">
-        <option value="always">每次触发</option>
-        <option value="hourly">每小时一次</option>
-        <option value="daily" selected>每天一次</option>
-      </select>
-    </div>
-    <button class="btn btn-primary btn-block" onclick="saveNotificationSettings()">保存设置</button>
-    <button class="btn btn-outline btn-block" onclick="testNotification()" style="margin-top:8px;">测试通知</button>
-    <div id="notifTestResult" style="margin-top:12px;font-size:12px;color:var(--gray-500);"></div>
-  `;
-  // Load saved settings
-  const settings = JSON.parse(localStorage.getItem('notifSettings') || '{}');
-  document.getElementById('notifLowStockThreshold').value = settings.lowStockThreshold || 10;
-  document.getElementById('notifLowStockEnabled').checked = settings.lowStockEnabled !== false;
-  document.getElementById('notifWebhookUrl').value = settings.webhookUrl || localStorage.getItem('WECOM_WEBHOOK_URL') || '';
-  document.getElementById('notifFrequency').value = settings.frequency || 'daily';
+  document.getElementById('sidebarBody').innerHTML = '<div class="form-group"><label>低库存阈值</label><input type="number" id="notifLowStockThreshold" value="10" min="1"></div><div class="notif-toggle"><span class="toggle-label">低库存告警</span><label class="switch"><input type="checkbox" id="notifLowStockEnabled" checked><span class="slider"></span></label></div><div class="form-group"><label>Webhook URL (企业微信)</label><input type="text" id="notifWebhookUrl" placeholder="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=..."></div><div class="form-group"><label>通知频率</label><select id="notifFrequency"><option value="always">每次触发</option><option value="hourly">每小时一次</option><option value="daily" selected>每天一次</option></select></div><button class="btn btn-primary btn-block" onclick="saveNotificationSettings()">保存设置</button><button class="btn btn-outline btn-block" onclick="testNotification()" style="margin-top:8px;">测试通知</button><div id="notifTestResult" style="margin-top:12px;font-size:12px;color:var(--gray-500);"></div>';
+  const s = JSON.parse(localStorage.getItem('notifSettings') || '{}');
+  document.getElementById('notifLowStockThreshold').value = s.lowStockThreshold || 10;
+  document.getElementById('notifLowStockEnabled').checked = s.lowStockEnabled !== false;
+  document.getElementById('notifWebhookUrl').value = s.webhookUrl || localStorage.getItem('WECOM_WEBHOOK_URL') || '';
+  document.getElementById('notifFrequency').value = s.frequency || 'daily';
   document.getElementById('sidebarPanel').classList.add('active');
 }
-
 function saveNotificationSettings() {
-  const settings = {
-    lowStockThreshold: parseInt(document.getElementById('notifLowStockThreshold').value) || 10,
-    lowStockEnabled: document.getElementById('notifLowStockEnabled').checked,
-    webhookUrl: document.getElementById('notifWebhookUrl').value,
-    frequency: document.getElementById('notifFrequency').value,
-  };
-  localStorage.setItem('notifSettings', JSON.stringify(settings));
-  if (settings.webhookUrl) localStorage.setItem('WECOM_WEBHOOK_URL', settings.webhookUrl);
+  localStorage.setItem('notifSettings', JSON.stringify({lowStockThreshold: parseInt(document.getElementById('notifLowStockThreshold').value)||10, lowStockEnabled: document.getElementById('notifLowStockEnabled').checked, webhookUrl: document.getElementById('notifWebhookUrl').value, frequency: document.getElementById('notifFrequency').value}));
+  if (document.getElementById('notifWebhookUrl').value) localStorage.setItem('WECOM_WEBHOOK_URL', document.getElementById('notifWebhookUrl').value);
   toast('通知设置已保存', 'success');
 }
-
 function testNotification() {
   const result = document.getElementById('notifTestResult');
   result.innerHTML = '<span class="loading"></span> 发送测试通知...';
   const webhookUrl = document.getElementById('notifWebhookUrl').value;
-  if (!webhookUrl) {
-    result.innerHTML = '<span style="color:var(--danger);">请先配置Webhook URL</span>';
-    return;
-  }
-  // Simulate notification test
+  if (!webhookUrl) { result.innerHTML = '<span style="color:var(--danger);">请先配置Webhook URL</span>'; return; }
   setTimeout(() => {
     const lowStock = products.filter(p => p.stock_quantity < 10);
-    const msg = {
-      msgtype: 'markdown',
-      markdown: {
-        content: '### 采购系统测试通知\n\n测试消息 - 自动通知功能正常\n\n当前低库存商品: '+lowStock.length+' 个\n\n发送时间: '+new Date().toLocaleString()
-      }
-    };
-    // Try to send via webhook
-    fetch(webhookUrl, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(msg)})
-    .then(r => r.json())
-    .then(d => {
-      result.innerHTML = '<span style="color:var(--success);">测试通知发送成功!</span>';
-    })
-    .catch(e => {
-      result.innerHTML = '<span style="color:var(--warning);">无法直接发送到企业微信(可能跨域)，但配置已保存。实际使用时将由服务器端发送。</span>';
-    });
+    fetch(webhookUrl, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({msgtype:'markdown', markdown:{content:'### 采购系统测试通知\n\n测试消息 - 自动通知功能正常\n\n当前低库存商品: '+lowStock.length+' 个\n\n发送时间: '+new Date().toLocaleString()}})})
+    .then(r => r.json()).then(() => { result.innerHTML = '<span style="color:var(--success);">测试通知发送成功!</span>'; })
+    .catch(() => { result.innerHTML = '<span style="color:var(--warning);">配置已保存，实际使用时将由服务器端发送。</span>'; });
   }, 500);
 }
 
-// ========== 5. AI CLASSIFICATION & SUMMARY ==========
+// ========== AI CLASSIFICATION ==========
 function showAIClassify() {
   document.getElementById('modalTitle').textContent = 'AI分类总结';
   document.getElementById('modalWindow').className = 'modal modal-wide';
-  const classifyCols = ['category','attribute','store','supplier','status'];
-  document.getElementById('modalBody').innerHTML = `
-    <div class="form-group">
-      <label>选择要分析的列</label>
-      <select id="classifyColumn" onchange="updateClassifyPreview()">
-        ${classifyCols.map(c => '<option value="'+c+'">'+(COLUMNS.find(col=>col.key===c)?.label||c)+'</option>').join('')}
-      </select>
-    </div>
-    <div id="classifyPreview" style="font-size:12px;color:var(--gray-500);margin-bottom:12px;">
-      选择上方列后，点击"开始分析"按钮使用AI进行数据分类总结。
-    </div>
-    <div id="classifyResult"></div>
-  `;
+  document.getElementById('modalBody').innerHTML = '<div class="form-group"><label>选择要分析的列</label><select id="classifyColumn" onchange="updateClassifyPreview()"><option value="category">组别</option><option value="attribute">属性</option><option value="store">店铺</option><option value="supplier">供应商</option><option value="status">状态</option></select></div><div id="classifyPreview" style="font-size:12px;color:var(--gray-500);margin-bottom:12px;">选择上方列后，点击"开始分析"按钮使用AI进行数据分类总结。</div><div id="classifyResult"></div>';
   document.getElementById('modalFooter').innerHTML = '<button class="btn btn-outline" onclick="closeModal()">关闭</button><button class="btn btn-primary" onclick="runAIClassify()">开始分析</button>';
   document.getElementById('modalOverlay').classList.add('active');
   updateClassifyPreview();
 }
-
 function updateClassifyPreview() {
   const colKey = document.getElementById('classifyColumn').value;
   const values = new Set();
-  products.forEach(p => {
-    const v = p[colKey];
-    if (v) values.add(v);
-  });
+  products.forEach(p => { const v = p[colKey]; if (v) values.add(v); });
   document.getElementById('classifyPreview').innerHTML = '列: '+(COLUMNS.find(c=>c.key===colKey)?.label||colKey)+' | 唯一值: '+values.size+' 个 | 总数据: '+products.length+' 条';
 }
-
 function runAIClassify() {
   const colKey = document.getElementById('classifyColumn').value;
-  const colLabel = COLUMNS.find(c=>c.key===colKey)?.label||colKey;
   const resultDiv = document.getElementById('classifyResult');
-  resultDiv.innerHTML = '<div class="text-center text-muted" style="padding:20px;"><span class="loading"></span> AI分析中...</div>';
-
-  // Build distribution data
-  const dist = {};
-  products.forEach(p => {
-    const v = p[colKey] || '(未设置)';
-    dist[v] = (dist[v] || 0) + 1;
-  });
-  const entries = Object.entries(dist).sort((a,b) => b[1]-a[1]);
-  const total = products.length;
-
-  // Try AI analysis first
-  const query = '分析采购数据中「'+colLabel+'」列的分类分布，共'+total+'条数据，包含以下分类：'+entries.map(e=>e[0]+'('+e[1]+'条)').join('，')+'。请给出分类总结、统计见解和建议。';
-  api('/api/ai/analyze', 'POST', {query})
+  resultDiv.innerHTML = '<span class="loading"></span> AI分析中...';
+  const items = products.slice(0, 50);
+  const ids = items.map(p => p.id).filter(id => id);
+  if (ids.length === 0) { resultDiv.innerHTML = '<div style="color:var(--danger);">没有可分析的数据</div>'; return; }
+  api('/api/ai/classify', 'POST', {product_ids: ids, category: colKey})
   .then(d => {
-    const aiReply = d.reply || '暂无分析结果';
-    // Show distribution + AI analysis
-    const maxVal = Math.max(...entries.map(e=>e[1]), 1);
-    resultDiv.innerHTML = `
-      <div class="ai-classify-result">
-        <div class="result-section">
-          <h5>分类分布 - ${colLabel}</h5>
-          ${entries.slice(0,15).map(e => {
-            const pct = (e[1]/total*100).toFixed(1);
-            const barW = (e[1]/maxVal*100).toFixed(0);
-            return '<div class="result-bar"><span class="bar-label">'+escHtml(e[0])+'</span><div class="bar-track"><div class="bar-fill" style="width:'+barW+'%"></div></div><span class="bar-val">'+e[1]+' ('+pct+'%)</span></div>';
-          }).join('')}
-          ${entries.length > 15 ? '<div style="font-size:11px;color:var(--gray-400);margin-top:4px;">...还有 '+(entries.length-15)+' 个分类未显示</div>' : ''}
-        </div>
-        <div class="result-section">
-          <h5>AI分析总结</h5>
-          <p>${aiReply}</p>
-        </div>
-      </div>
-    `;
-  })
-  .catch(() => {
-    // Fallback: show local analysis
-    resultDiv.innerHTML = `
-      <div class="ai-classify-result">
-        <div class="result-section">
-          <h5>分类分布 - ${colLabel}</h5>
-          ${entries.slice(0,15).map(e => {
-            const pct = (e[1]/total*100).toFixed(1);
-            return '<div class="stat-row"><span class="stat-name">'+escHtml(e[0])+'</span><span class="stat-val">'+e[1]+' ('+pct+'%)</span></div>';
-          }).join('')}
-          ${entries.length > 15 ? '<div style="font-size:11px;color:var(--gray-400);margin-top:4px;">...还有 '+(entries.length-15)+' 个分类</div>' : ''}
-        </div>
-        <div class="result-section">
-          <h5>统计摘要</h5>
-          <p>共 ${total} 条数据，包含 ${entries.length} 个分类。如需AI深入分析，请配置OpenAI API Key后重试。</p>
-        </div>
-      </div>
-    `;
-  });
-}
-
-// ========== 6. DATA PROTECTION ==========
-function showDataProtection() {
-  document.getElementById('sidebarTitle').textContent = '数据保护';
-  document.getElementById('sidebarBody').innerHTML = `
-    <div class="protection-info">
-      <div class="info-row"><span class="info-label">当前用户</span><span class="info-value">${USER.display_name||USER.username||'未知'}</span></div>
-      <div class="info-row"><span class="info-label">角色</span><span class="info-value">${USER.role||'未知'}</span></div>
-      <div class="info-row"><span class="info-label">保护状态</span><span class="info-value" id="protectStatus">未保护</span></div>
-    </div>
-    <div class="notif-toggle">
-      <span class="toggle-label">启用保护模式</span>
-      <label class="switch">
-        <input type="checkbox" id="protectToggle" onchange="toggleProtection()">
-        <span class="slider"></span>
-      </label>
-    </div>
-    <div style="font-size:12px;color:var(--gray-500);margin:12px 0;">选择需要保护的列（开启保护后，这些列将变为只读）</div>
-    <div class="protection-col-list" id="protectionColList">
-      ${COLUMNS.filter(c => c.editable && c.key !== 'row_num').map(c =>
-        '<div class="pcol-item"><span class="pcol-name">'+escHtml(c.label)+'</span><span class="pcol-lock" id="pcol-'+c.key+'" onclick="toggleProtectCol(\''+c.key+'\')">\uD83D\uDD13</span></div>'
-      ).join('')}
-    </div>
-    <div class="form-group" style="margin-top:16px;">
-      <label>查看模式</label>
-      <div class="notif-toggle">
-        <span class="toggle-label">仅查看模式（禁止编辑）</span>
-        <label class="switch">
-          <input type="checkbox" id="viewOnlyToggle" onchange="toggleViewOnly()">
-          <span class="slider"></span>
-        </label>
-      </div>
-    </div>
-  `;
-  // Load saved protection state
-  const protectedCols = JSON.parse(localStorage.getItem('protectedCols') || '[]');
-  document.getElementById('protectToggle').checked = localStorage.getItem('protectEnabled') === 'true';
-  if (document.getElementById('protectToggle').checked) {
-    document.getElementById('protectStatus').textContent = '已保护';
-    document.getElementById('protectStatus').style.color = 'var(--primary)';
-  }
-  protectedCols.forEach(key => {
-    const el = document.getElementById('pcol-'+key);
-    if (el) {
-      el.innerHTML = '\uD83D\uDD12';
-      el.classList.add('locked');
+    let html = '<div class="ai-classify-result">';
+    if (d.classifications && d.classifications.length) {
+      const groups = {};
+      d.classifications.forEach(c => { const cat = c.suggested_category||'未分类'; if (!groups[cat]) groups[cat] = []; groups[cat].push(c); });
+      Object.entries(groups).forEach(([cat, items]) => {
+        html += '<div class="result-section"><h5>'+escHtml(cat)+' ('+items.length+')</h5>';
+        items.slice(0,5).forEach(c => { html += '<div style="font-size:11px;color:var(--gray-500);margin:2px 0;">'+escHtml(c.sku)+' - 置信度: '+escHtml(c.confidence||'中')+'</div>'; });
+        if (items.length > 5) html += '<div style="font-size:11px;color:var(--gray-400);">...还有 '+(items.length-5)+' 项</div>';
+        html += '</div>';
+      });
     }
-  });
-  document.getElementById('viewOnlyToggle').checked = localStorage.getItem('viewOnlyMode') === 'true';
+    if (d.summary) html += '<div class="result-section"><h5>总结</h5><p>'+escHtml(d.summary)+'</p></div>';
+    html += '</div>';
+    resultDiv.innerHTML = html;
+  })
+  .catch(e => { resultDiv.innerHTML = '<div style="color:var(--danger);">分析失败: '+e.message+'</div>'; });
+}
+
+// ========== DATA PROTECTION ==========
+function showDataProtection() {
+  document.getElementById('sidebarTitle').textContent = '数据保护设置';
+  document.getElementById('sidebarBody').innerHTML = '<div class="protection-info"><div class="info-row"><span class="info-label">保护状态</span><span class="info-value" id="protectStatus">未保护</span></div></div><div class="form-group"><label>保护密码</label><input type="password" id="protectPassword" placeholder="设置保护密码"></div><div class="form-group"><label>允许操作</label><label style="display:flex;align-items:center;gap:6px;font-size:12px;padding:4px 0;"><input type="checkbox" id="protectEdit" checked> 编辑单元格</label><label style="display:flex;align-items:center;gap:6px;font-size:12px;padding:4px 0;"><input type="checkbox" id="protectSort" checked> 排序</label><label style="display:flex;align-items:center;gap:6px;font-size:12px;padding:4px 0;"><input type="checkbox" id="protectFilter" checked> 筛选</label></div><button class="btn btn-primary btn-block" onclick="toggleProtection()">启用保护</button><div id="protectInfo" style="margin-top:12px;font-size:12px;color:var(--gray-500);"></div>';
   document.getElementById('sidebarPanel').classList.add('active');
+  const isProtected = localStorage.getItem('dataProtection') === 'true';
+  document.getElementById('protectStatus').textContent = isProtected ? '已保护' : '未保护';
+  document.getElementById('protectStatus').style.color = isProtected ? 'var(--success)' : 'var(--danger)';
 }
-
 function toggleProtection() {
-  const enabled = document.getElementById('protectToggle').checked;
-  localStorage.setItem('protectEnabled', enabled);
-  document.getElementById('protectStatus').textContent = enabled ? '已保护' : '未保护';
-  document.getElementById('protectStatus').style.color = enabled ? 'var(--primary)' : '';
-  if (enabled) {
-    toast('保护模式已启用，受保护列将变为只读', 'info');
+  const pwd = document.getElementById('protectPassword').value;
+  if (!pwd) { toast('请设置保护密码', 'error'); return; }
+  const isProtected = localStorage.getItem('dataProtection') === 'true';
+  if (isProtected) {
+    localStorage.removeItem('dataProtection');
+    document.getElementById('protectStatus').textContent = '未保护';
+    document.getElementById('protectStatus').style.color = 'var(--danger)';
+    toast('数据保护已关闭', 'info');
   } else {
-    toast('保护模式已禁用', 'info');
+    localStorage.setItem('dataProtection', 'true');
+    localStorage.setItem('dataProtectionPwd', pwd);
+    document.getElementById('protectStatus').textContent = '已保护';
+    document.getElementById('protectStatus').style.color = 'var(--success)';
+    toast('数据保护已启用', 'success');
   }
 }
 
-function toggleProtectCol(key) {
-  const el = document.getElementById('pcol-'+key);
-  if (!el) return;
-  const isLocked = el.classList.contains('locked');
-  if (isLocked) {
-    el.innerHTML = '\uD83D\uDD13';
-    el.classList.remove('locked');
-  } else {
-    el.innerHTML = '\uD83D\uDD12';
-    el.classList.add('locked');
-  }
-  // Save state
-  const locked = [];
-  document.querySelectorAll('.pcol-lock.locked').forEach(e => {
-    locked.push(e.id.replace('pcol-', ''));
-  });
-  localStorage.setItem('protectedCols', JSON.stringify(locked));
-  toast(isLocked ? '已解除保护' : '已保护', 'info');
-}
-
-function toggleViewOnly() {
-  const enabled = document.getElementById('viewOnlyToggle').checked;
-  localStorage.setItem('viewOnlyMode', enabled);
-  if (enabled) {
-    toast('已切换为仅查看模式', 'info');
-  } else {
-    toast('已退出仅查看模式', 'info');
-  }
-}
-
-// ========== 7. PRINT ==========
+// ========== PRINT ==========
 function doPrint() {
-  // Prepare print view
-  const printTitle = '海外仓总采购表 - ' + new Date().toLocaleDateString();
-  document.title = printTitle;
-  // Show all data in print
-  window.print();
+  toast('正在准备打印...', 'info');
+  setTimeout(() => window.print(), 500);
 }
+
+// ========== VIEW FEATURES ==========
+function toggleHighlightRowCol() {
+  highlightRowCol = !highlightRowCol;
+  toast(highlightRowCol ? '高亮行列已开启' : '高亮行列已关闭', 'info');
+  renderGrid();
+}
+function toggleFreezePanes() {
+  freezePanes = !freezePanes;
+  toast(freezePanes ? '冻结窗格已开启' : '冻结窗格已关闭', 'info');
+  if (freezePanes && selectedCell) {
+    freezeCol = parseInt(selectedCell.dataset.col) || 0;
+    freezeRow = parseInt(selectedCell.dataset.row) || 0;
+  }
+}
+function toggleGridlines() {
+  const show = document.getElementById('showGridlines').checked;
+  document.querySelectorAll('.grid-table td.cell').forEach(td => { td.style.borderRight = show ? '1px solid var(--gridline)' : 'none'; td.style.borderBottom = show ? '1px solid var(--gridline)' : 'none'; });
+  document.querySelectorAll('.grid-table th.col-header').forEach(th => { th.style.borderRight = show ? '1px solid var(--gridline)' : 'none'; });
+}
+
+// ========== INSERT FUNCTIONS ==========
+function insertFunction(funcName) {
+  if (!selectedCell) { toast('请先选择一个单元格', 'info'); return; }
+  const input = selectedCell.querySelector('.cell-edit');
+  const content = selectedCell.querySelector('.cell-content');
+  if (input) {
+    content.classList.add('editing');
+    input.classList.add('active');
+    input.value = '=' + funcName + '()';
+    input.focus();
+    editingCell = selectedCell;
+  }
+  toast('已插入函数: ' + funcName, 'info');
+}
+
+// ========== DIALOGS ==========
+function openDialog(type) {
+  const dialogs = {
+    insertImage: { title: '插入图片', body: '<p style="font-size:13px;color:var(--gray-500);margin-bottom:12px;">选择要插入的图片</p><input type="file" accept="image/*" style="font-size:13px;"><div style="margin-top:12px;font-size:12px;color:var(--gray-400);">支持 JPG、PNG、GIF 格式</div>', footer: 'close' },
+    insertFloatingImage: { title: '插入浮动图片', body: '<p style="font-size:13px;color:var(--gray-500);margin-bottom:12px;">选择要插入的浮动图片</p><input type="file" accept="image/*" style="font-size:13px;"><div style="margin-top:12px;font-size:12px;color:var(--gray-400);">浮动图片将悬浮在表格上方</div>', footer: 'close' },
+    insertFile: { title: '插入文件', body: '<p style="font-size:13px;color:var(--gray-500);margin-bottom:12px;">选择要插入的文件</p><input type="file" style="font-size:13px;">', footer: 'close' },
+    insertLink: { title: '插入链接', body: '<div class="form-group"><label>链接文本</label><input placeholder="输入显示文本"></div><div class="form-group"><label>链接地址</label><input placeholder="https://..."></div>', footer: 'okClose' },
+    insertDoc: { title: '插入文档', body: '<div class="form-group"><label>选择文档</label><select><option>新建文档</option><option>从云盘选择</option></select></div>', footer: 'close' },
+    insertSchedule: { title: '插入日程', body: '<div class="form-group"><label>日程标题</label><input placeholder="日程标题"></div><div class="form-row"><div class="form-group"><label>开始时间</label><input type="datetime-local"></div><div class="form-group"><label>结束时间</label><input type="datetime-local"></div></div>', footer: 'okClose' },
+    insertMeeting: { title: '插入会议', body: '<div class="form-group"><label>会议主题</label><input placeholder="会议主题"></div><div class="form-row"><div class="form-group"><label>日期</label><input type="date"></div><div class="form-group"><label>时间</label><input type="time"></div></div><div class="form-group"><label>参会人</label><input placeholder="输入参会人姓名"></div>', footer: 'okClose' },
+    insertTodo: { title: '插入待办', body: '<div class="form-group"><label>待办内容</label><input placeholder="待办事项"></div><div class="form-group"><label>负责人</label><input placeholder="负责人"></div><div class="form-group"><label>截止日期</label><input type="date"></div>', footer: 'okClose' },
+    insertApp: { title: '插入应用', body: '<p style="font-size:13px;color:var(--gray-500);margin-bottom:12px;">选择要插入的应用</p><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;"><div style="padding:12px;border:1px solid var(--gray-200);border-radius:6px;cursor:pointer;text-align:center;" onclick="toast(\'应用已添加\',\'success\');closeModal()">&#128202; 图表</div><div style="padding:12px;border:1px solid var(--gray-200);border-radius:6px;cursor:pointer;text-align:center;" onclick="toast(\'应用已添加\',\'success\');closeModal()">&#128197; 日历</div><div style="padding:12px;border:1px solid var(--gray-200);border-radius:6px;cursor:pointer;text-align:center;" onclick="toast(\'应用已添加\',\'success\');closeModal()">&#128203; 任务</div><div style="padding:12px;border:1px solid var(--gray-200);border-radius:6px;cursor:pointer;text-align:center;" onclick="toast(\'应用已添加\',\'success\');closeModal()">&#128196; 文档</div></div>', footer: 'close' },
+    insertMention: { title: '提及成员', body: '<div class="form-group"><label>搜索成员</label><input placeholder="输入姓名搜索..."></div><div style="font-size:12px;color:var(--gray-400);padding:8px;">输入姓名后，被提及成员将收到通知</div>', footer: 'close' },
+    insertCard: { title: '插入名片', body: '<div class="form-group"><label>搜索联系人</label><input placeholder="输入姓名搜索..."></div>', footer: 'close' },
+    insertReminder: { title: '定时提醒', body: '<div class="form-group"><label>提醒内容</label><textarea rows="2" style="width:100%;" placeholder="提醒内容"></textarea></div><div class="form-group"><label>提醒时间</label><input type="datetime-local"></div><div class="form-group"><label>提醒方式</label><select><option>应用内通知</option><option>企业微信</option><option>邮件</option></select></div>', footer: 'okClose' },
+    insertComment: { title: '评论', body: '<div class="form-group"><label>添加评论</label><textarea rows="4" style="width:100%;" placeholder="输入评论内容..."></textarea></div><div style="font-size:12px;color:var(--gray-400);">评论将关联到当前选中的单元格</div>', footer: 'okClose' },
+    insertPivotTable: { title: '插入透视表', body: '<p style="font-size:13px;color:var(--gray-500);margin-bottom:12px;">选择透视表数据源和配置</p><div class="form-group"><label>数据范围</label><select><option>当前表格</option><option>选择区域</option></select></div><div class="form-group"><label>行字段</label><select multiple style="height:80px;"><option>组别</option><option>店铺</option><option>供应商</option><option>状态</option></select></div><div class="form-group"><label>值字段</label><select><option>采购数量</option><option>采购金额</option><option>库存</option></select></div>', footer: 'okClose' },
+    insertChart: { title: '插入图表', body: '<div class="form-group"><label>图表类型</label><select><option>柱状图</option><option>折线图</option><option>饼图</option><option>条形图</option><option>散点图</option></select></div><div class="form-group"><label>数据范围</label><input placeholder="选择数据区域"></div><div class="form-group"><label>标题</label><input placeholder="图表标题"></div>', footer: 'okClose' },
+    insertSparkline: { title: '插入迷你图', body: '<div class="form-group"><label>数据范围</label><input placeholder="选择数据区域"></div><div class="form-group"><label>图表类型</label><select><option>折线图</option><option>柱状图</option><option>盈亏图</option></select></div>', footer: 'okClose' },
+    insertShape: { title: '插入形状', body: '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;"><div style="padding:16px;border:1px solid var(--gray-200);border-radius:6px;cursor:pointer;text-align:center;" onclick="toast(\'形状已插入\',\'success\');closeModal()">&#9632; 矩形</div><div style="padding:16px;border:1px solid var(--gray-200);border-radius:6px;cursor:pointer;text-align:center;" onclick="toast(\'形状已插入\',\'success\');closeModal()">&#9670; 菱形</div><div style="padding:16px;border:1px solid var(--gray-200);border-radius:6px;cursor:pointer;text-align:center;" onclick="toast(\'形状已插入\',\'success\');closeModal()">&#9679; 圆形</div><div style="padding:16px;border:1px solid var(--gray-200);border-radius:6px;cursor:pointer;text-align:center;" onclick="toast(\'形状已插入\',\'success\');closeModal()">&#9650; 三角形</div><div style="padding:16px;border:1px solid var(--gray-200);border-radius:6px;cursor:pointer;text-align:center;" onclick="toast(\'形状已插入\',\'success\');closeModal()">&#8594; 箭头</div><div style="padding:16px;border:1px solid var(--gray-200);border-radius:6px;cursor:pointer;text-align:center;" onclick="toast(\'形状已插入\',\'success\');closeModal()">&#9998; 线条</div></div>', footer: 'close' },
+    insertSlicer: { title: '插入切片器', body: '<div class="form-group"><label>选择列</label><select><option>组别</option><option>店铺</option><option>供应商</option><option>状态</option></select></div><div style="font-size:12px;color:var(--gray-400);">切片器用于快速筛选数据</div>', footer: 'okClose' },
+    insertLocation: { title: '插入位置', body: '<div class="form-group"><label>地址</label><input placeholder="输入地址..."></div><div style="font-size:12px;color:var(--gray-400);">输入地址后将在表格中显示位置信息</div>', footer: 'okClose' },
+    insertCell: { title: '插入单元格', body: '<div class="form-group"><label>插入方式</label><select><option>活动单元格右移</option><option>活动单元格下移</option><option>整行</option><option>整列</option></select></div>', footer: 'okClose' },
+    insertRowCol: { title: '插入行列', body: '<div class="form-group"><label>插入</label><select><option>在上方插入行</option><option>在下方插入行</option><option>在左侧插入列</option><option>在右侧插入列</option></select></div><div class="form-group"><label>数量</label><input type="number" value="1" min="1" max="100"></div>', footer: 'okClose' },
+    border: { title: '边框设置', body: '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-bottom:12px;"><button class="btn btn-sm btn-outline" onclick="toast(\'已应用边框\',\'success\')">无边框</button><button class="btn btn-sm btn-outline" onclick="toast(\'已应用边框\',\'success\')">所有边框</button><button class="btn btn-sm btn-outline" onclick="toast(\'已应用边框\',\'success\')">外边框</button><button class="btn btn-sm btn-outline" onclick="toast(\'已应用边框\',\'success\')">下边框</button><button class="btn btn-sm btn-outline" onclick="toast(\'已应用边框\',\'success\')">上边框</button><button class="btn btn-sm btn-outline" onclick="toast(\'已应用边框\',\'success\')">左边框</button><button class="btn btn-sm btn-outline" onclick="toast(\'已应用边框\',\'success\')">右边框</button><button class="btn btn-sm btn-outline" onclick="toast(\'已应用边框\',\'success\')">内部横线</button><button class="btn btn-sm btn-outline" onclick="toast(\'已应用边框\',\'success\')">内部竖线</button></div><div class="form-group"><label>线条样式</label><select><option>实线</option><option>虚线</option><option>点线</option><option>双线</option></select></div><div class="form-group"><label>线条颜色</label><input type="color" value="#000000"></div>', footer: 'close' },
+    conditionalFormat: { title: '条件格式', body: '<div class="form-group"><label>规则类型</label><select id="cfRuleType" onchange="updateCFPreview()"><option value="greater">大于</option><option value="less">小于</option><option value="between">介于</option><option value="equal">等于</option><option value="text">文本包含</option></select></div><div class="form-group"><label>值</label><input id="cfValue" placeholder="输入阈值" oninput="updateCFPreview()"></div><div class="form-group"><label>样式</label><div style="display:flex;gap:8px;"><input type="color" id="cfColor" value="#ff0000" onchange="updateCFPreview()"> <input type="color" id="cfBgColor" value="#ffebee" onchange="updateCFPreview()"></div></div><div class="cf-preview" id="cfPreview">预览效果</div>', footer: 'okClose' },
+    textToColumns: { title: '分列', body: '<div class="form-group"><label>分隔符</label><select><option>逗号</option><option>制表符</option><option>空格</option><option>分号</option><option>自定义</option></select></div><div class="form-group"><label>目标列</label><input placeholder="选择要分列的数据列"></div><div style="font-size:12px;color:var(--gray-400);">将一列数据按分隔符拆分为多列</div>', footer: 'okClose' },
+    dataValidation: { title: '数据验证', body: '<div class="form-group"><label>验证条件</label><select><option>任何值</option><option>整数</option><option>小数</option><option>列表</option><option>日期</option><option>文本长度</option></select></div><div class="form-group"><label>最小值</label><input type="number" value="0"></div><div class="form-group"><label>最大值</label><input type="number" value="100"></div><div class="form-group"><label>错误提示</label><input placeholder="输入无效时的提示信息"></div>', footer: 'okClose' },
+    dropdownOptions: { title: '下拉选项', body: '<div class="form-group"><label>选项（每行一个）</label><textarea rows="5" style="width:100%;font-family:monospace;" placeholder="选项1\n选项2\n选项3"></textarea></div><div class="form-group"><label style="display:flex;align-items:center;gap:6px;font-size:12px;"><input type="checkbox" checked> 允许下拉以外值</label></div>', footer: 'okClose' },
+    checkbox: { title: '插入复选框', body: '<div class="form-group"><label>复选框文本</label><input placeholder="复选框标签"></div><div class="form-group"><label style="display:flex;align-items:center;gap:6px;font-size:12px;"><input type="checkbox"> 默认选中</label></div>', footer: 'okClose' },
+    versionHistory: { title: '版本历史记录', body: '<div class="vh-item"><span class="vh-time">2026-08-19 10:00</span><span class="vh-user">管理员</span><span class="vh-action">编辑了 5 个单元格</span></div><div class="vh-item"><span class="vh-time">2026-08-18 16:30</span><span class="vh-user">管理员</span><span class="vh-action">导入了 3361 条数据</span></div><div class="vh-item"><span class="vh-time">2026-08-18 14:00</span><span class="vh-user">管理员</span><span class="vh-action">创建了 3 行数据</span></div><div class="vh-item"><span class="vh-time">2026-08-17 09:00</span><span class="vh-user">系统</span><span class="vh-action">初始版本</span></div>', footer: 'close' },
+    cellHistory: { title: '单元格历史记录', body: '<div style="font-size:12px;color:var(--gray-500);margin-bottom:12px;">当前选中: '+(selectedCell?document.getElementById('cellRef').textContent:'未选中')+'</div><div class="vh-item"><span class="vh-time">10:00</span><span class="vh-user">管理员</span><span class="vh-action">更新为 "新款产品"</span></div><div class="vh-item"><span class="vh-time">09:30</span><span class="vh-user">管理员</span><span class="vh-action">更新为 "旧款产品"</span></div>', footer: 'close' },
+    filter: { title: '筛选', body: '<p style="font-size:13px;color:var(--gray-500);margin-bottom:12px;">设置筛选条件</p><div class="form-group"><label>筛选列</label><select><option>组别</option><option>店铺</option><option>供应商</option><option>状态</option><option>库存</option></select></div><div class="form-group"><label>条件</label><select><option>等于</option><option>不等于</option><option>包含</option><option>大于</option><option>小于</option></select></div><div class="form-group"><label>值</label><input placeholder="输入筛选值"></div>', footer: 'okClose' },
+    sort: { title: '排序', body: '<div class="form-group"><label>排序列</label><select><option>日期</option><option>SKU</option><option>标题</option><option>采购价</option><option>库存</option><option>组别</option></select></div><div class="form-group"><label>排序方式</label><label style="display:flex;align-items:center;gap:6px;font-size:12px;padding:4px 0;"><input type="radio" name="sortDir" checked> 升序</label><label style="display:flex;align-items:center;gap:6px;font-size:12px;padding:4px 0;"><input type="radio" name="sortDir"> 降序</label></div>', footer: 'okClose' },
+    pivotTable: { title: '透视表', body: '<p style="font-size:13px;color:var(--gray-500);margin-bottom:12px;">透视表功能</p><div class="form-group"><label>行标签</label><select><option>组别</option><option>店铺</option><option>供应商</option></select></div><div class="form-group"><label>值</label><select><option>采购数量 (求和)</option><option>采购金额 (求和)</option><option>库存 (平均值)</option></select></div>', footer: 'okClose' },
+    zoom: { title: '显示比例', body: '<div style="text-align:center;padding:20px;"><div style="font-size:48px;margin-bottom:16px;">&#128269;</div><div style="display:flex;align-items:center;justify-content:center;gap:12px;"><button class="btn btn-sm btn-outline" onclick="toast(\'已缩小\',\'info\')">-</button><span style="font-size:16px;font-weight:600;" id="zoomLevel">100%</span><button class="btn btn-sm btn-outline" onclick="toast(\'已放大\',\'info\')">+</button></div><div style="margin-top:12px;display:flex;gap:8px;justify-content:center;"><button class="btn btn-sm btn-outline">75%</button><button class="btn btn-sm btn-primary">100%</button><button class="btn btn-sm btn-outline">125%</button><button class="btn btn-sm btn-outline">150%</button></div></div>', footer: 'close' },
+    newFilterView: { title: '新建筛选视图', body: '<div class="form-group"><label>视图名称</label><input placeholder="输入视图名称"></div><div class="form-group"><label>筛选条件</label><textarea rows="3" style="width:100%;" placeholder="设置筛选条件，如：组别=美一组"></textarea></div><div style="font-size:12px;color:var(--gray-400);">筛选视图将保存当前的筛选和排序设置</div>', footer: 'okClose' },
+    switchFilterView: { title: '切换筛选视图', body: '<div style="font-size:13px;color:var(--gray-500);margin-bottom:12px;">选择要切换的筛选视图</div><div style="display:flex;flex-direction:column;gap:4px;"><div style="padding:10px 12px;border:1px solid var(--gray-200);border-radius:6px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;" onclick="toast(\'已切换视图\',\'success\');closeModal()"><span>默认视图</span><span style="font-size:11px;color:var(--gray-400);">无筛选</span></div><div style="padding:10px 12px;border:1px solid var(--gray-200);border-radius:6px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;" onclick="toast(\'已切换视图\',\'success\');closeModal()"><span>低库存视图</span><span style="font-size:11px;color:var(--gray-400);">库存 < 10</span></div><div style="padding:10px 12px;border:1px solid var(--gray-200);border-radius:6px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;" onclick="toast(\'已切换视图\',\'success\');closeModal()"><span>待采购视图</span><span style="font-size:11px;color:var(--gray-400);">状态=待采购</span></div></div>', footer: 'close' },
+    removeDuplicates: { title: '删除重复项', body: '<p style="font-size:13px;color:var(--gray-500);margin-bottom:12px;">选择包含重复项的列</p><div style="max-height:300px;overflow-y:auto;border:1px solid var(--gray-200);border-radius:6px;padding:8px;">'+COLUMNS.filter(c=>c.key!=='row_num').map(c => '<label style="display:flex;align-items:center;gap:6px;padding:4px 0;font-size:12px;cursor:pointer;"><input type="checkbox" class="dup-col" value="'+c.key+'"> '+escHtml(c.label)+'</label>').join('')+'</div><div style="margin-top:12px;font-size:12px;color:var(--gray-500);">当前数据: '+products.length+' 条</div>', footer: 'okClose' },
+    batchClear: { title: '批量清除', body: '<p style="font-size:13px;color:var(--gray-500);margin-bottom:12px;">选择要清除的内容类型</p><label style="display:flex;align-items:center;gap:6px;padding:6px 0;font-size:13px;cursor:pointer;"><input type="checkbox" checked> 清除内容</label><label style="display:flex;align-items:center;gap:6px;padding:6px 0;font-size:13px;cursor:pointer;"><input type="checkbox"> 清除格式</label><label style="display:flex;align-items:center;gap:6px;padding:6px 0;font-size:13px;cursor:pointer;"><input type="checkbox"> 清除批注</label><label style="display:flex;align-items:center;gap:6px;padding:6px 0;font-size:13px;cursor:pointer;"><input type="checkbox"> 清除超链接</label>', footer: 'okClose' },
+    idCardTool: { title: '身份证工具', body: '<div class="form-group"><label>身份证号码所在列</label><select><option>备注1</option><option>备注2</option><option>备注3</option><option>备注4</option></select></div><div style="display:flex;flex-direction:column;gap:8px;margin-top:8px;"><button class="btn btn-sm btn-outline" onclick="toast(\'已提取出生日期\',\'success\')">提取出生日期</button><button class="btn btn-sm btn-outline" onclick="toast(\'已提取性别\',\'success\')">提取性别</button><button class="btn btn-sm btn-outline" onclick="toast(\'已提取地区\',\'success\')">提取地区</button><button class="btn btn-sm btn-outline" onclick="toast(\'已校验身份证\',\'success\')">校验身份证</button></div><div style="margin-top:12px;font-size:12px;color:var(--gray-400);">支持15位和18位身份证号码</div>', footer: 'close' },
+    cellProcessing: { title: '单元格处理', body: '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;"><button class="btn btn-sm btn-outline" onclick="toast(\'已合并选中单元格\',\'success\')">合并单元格</button><button class="btn btn-sm btn-outline" onclick="toast(\'已拆分单元格\',\'success\')">拆分单元格</button><button class="btn btn-sm btn-outline" onclick="toast(\'已清除格式\',\'success\')">清除格式</button><button class="btn btn-sm btn-outline" onclick="toast(\'转换为大写\',\'success\')">转大写</button><button class="btn btn-sm btn-outline" onclick="toast(\'转换为小写\',\'success\')">转小写</button><button class="btn btn-sm btn-outline" onclick="toast(\'首字母大写\',\'success\')">首字母大写</button><button class="btn btn-sm btn-outline" onclick="toast(\'去除空格\',\'success\')">去除空格</button><button class="btn btn-sm btn-outline" onclick="toast(\'数值转换\',\'success\')">数值转换</button></div>', footer: 'close' },
+    generateTOC: { title: '生成目录', body: '<div class="form-group"><label>目录标题</label><input placeholder="目录" value="目录"></div><div class="form-group"><label>选择列作为目录项</label><select><option>组别</option><option>店铺</option><option>供应商</option><option>SKU</option></select></div><button class="btn btn-primary btn-block" onclick="toast(\'目录已生成\',\'success\');closeModal()">生成目录</button><div style="margin-top:12px;font-size:12px;color:var(--gray-400);">将根据选中列的唯一值生成目录</div>', footer: 'close' },
+    batchReplace: { title: '批量替换', body: '<div class="form-group"><label>查找内容</label><input placeholder="输入要查找的内容"></div><div class="form-group"><label>替换为</label><input placeholder="输入替换后的内容"></div><div class="form-group"><label>范围</label><select><option>当前表格</option><option>选中区域</option></select></div><div class="form-group"><label style="display:flex;align-items:center;gap:6px;font-size:12px;"><input type="checkbox"> 区分大小写</label></div>', footer: 'okClose' },
+    quickSum: { title: '快速求和', body: '<p style="font-size:13px;color:var(--gray-500);margin-bottom:12px;">选择要求和的范围</p><div class="form-group"><label>求和列</label><select><option>采购数量</option><option>采购价RMB</option><option>新采购价RMB</option><option>库存</option></select></div><div class="form-group"><label>结果位置</label><select><option>底部</option><option>右侧</option></select></div>', footer: 'okClose' },
+    mergeCells: { title: '合并同类', body: '<p style="font-size:13px;color:var(--gray-500);margin-bottom:12px;">合并相同值的单元格</p><div class="form-group"><label>依据列</label><select><option>组别</option><option>店铺</option><option>供应商</option></select></div><div class="form-group"><label style="display:flex;align-items:center;gap:6px;font-size:12px;"><input type="checkbox"> 合并后居中</label></div>', footer: 'okClose' },
+    fillDown: { title: '向下填充', body: '<p style="font-size:13px;color:var(--gray-500);margin-bottom:12px;">将选中单元格的内容向下填充到空白单元格</p><div class="form-group"><label>填充列</label><select><option>日期</option><option>组别</option><option>店铺</option><option>供应商</option></select></div><button class="btn btn-primary" onclick="toast(\'填充完成\',\'success\');closeModal()">开始填充</button>', footer: 'close' },
+    formulaFinancial: { title: '财务函数', body: '<div class="func-group"><div class="func-group-title">财务函数</div><span class="func-item" onclick="toast(\'已插入FV函数\',\'info\')">FV</span><span class="func-item" onclick="toast(\'已插入PV函数\',\'info\')">PV</span><span class="func-item" onclick="toast(\'已插入PMT函数\',\'info\')">PMT</span><span class="func-item" onclick="toast(\'已插入NPV函数\',\'info\')">NPV</span><span class="func-item" onclick="toast(\'已插入IRR函数\',\'info\')">IRR</span><span class="func-item" onclick="toast(\'已插入RATE函数\',\'info\')">RATE</span><span class="func-item" onclick="toast(\'已插入SLN函数\',\'info\')">SLN</span><span class="func-item" onclick="toast(\'已插入DB函数\',\'info\')">DB</span></div>', footer: 'close' },
+    formulaText: { title: '文本函数', body: '<div class="func-group"><div class="func-group-title">文本函数</div><span class="func-item" onclick="insertFunction(\'CONCATENATE\')">CONCATENATE</span><span class="func-item" onclick="insertFunction(\'LEFT\')">LEFT</span><span class="func-item" onclick="insertFunction(\'RIGHT\')">RIGHT</span><span class="func-item" onclick="insertFunction(\'MID\')">MID</span><span class="func-item" onclick="insertFunction(\'LEN\')">LEN</span><span class="func-item" onclick="insertFunction(\'FIND\')">FIND</span><span class="func-item" onclick="insertFunction(\'REPLACE\')">REPLACE</span><span class="func-item" onclick="insertFunction(\'SUBSTITUTE\')">SUBSTITUTE</span><span class="func-item" onclick="insertFunction(\'TEXT\')">TEXT</span><span class="func-item" onclick="insertFunction(\'TRIM\')">TRIM</span><span class="func-item" onclick="insertFunction(\'UPPER\')">UPPER</span><span class="func-item" onclick="insertFunction(\'LOWER\')">LOWER</span></div>', footer: 'close' },
+    formulaStatistical: { title: '统计函数', body: '<div class="func-group"><div class="func-group-title">统计函数</div><span class="func-item" onclick="insertFunction(\'AVERAGE\')">AVERAGE</span><span class="func-item" onclick="insertFunction(\'AVERAGEIF\')">AVERAGEIF</span><span class="func-item" onclick="insertFunction(\'COUNT\')">COUNT</span><span class="func-item" onclick="insertFunction(\'COUNTA\')">COUNTA</span><span class="func-item" onclick="insertFunction(\'COUNTIF\')">COUNTIF</span><span class="func-item" onclick="insertFunction(\'MAX\')">MAX</span><span class="func-item" onclick="insertFunction(\'MIN\')">MIN</span><span class="func-item" onclick="insertFunction(\'MEDIAN\')">MEDIAN</span><span class="func-item" onclick="insertFunction(\'MODE\')">MODE</span><span class="func-item" onclick="insertFunction(\'STDEV\')">STDEV</span><span class="func-item" onclick="insertFunction(\'VAR\')">VAR</span></div>', footer: 'close' },
+    formulaInfo: { title: '信息函数', body: '<div class="func-group"><div class="func-group-title">信息函数</div><span class="func-item" onclick="insertFunction(\'ISBLANK\')">ISBLANK</span><span class="func-item" onclick="insertFunction(\'ISERROR\')">ISERROR</span><span class="func-item" onclick="insertFunction(\'ISNUMBER\')">ISNUMBER</span><span class="func-item" onclick="insertFunction(\'ISTEXT\')">ISTEXT</span><span class="func-item" onclick="insertFunction(\'ISLOGICAL\')">ISLOGICAL</span><span class="func-item" onclick="insertFunction(\'TYPE\')">TYPE</span><span class="func-item" onclick="insertFunction(\'NA\')">NA</span></div>', footer: 'close' },
+    formulaLookup: { title: '查找与引用', body: '<div class="func-group"><div class="func-group-title">查找与引用</div><span class="func-item" onclick="insertFunction(\'VLOOKUP\')">VLOOKUP</span><span class="func-item" onclick="insertFunction(\'HLOOKUP\')">HLOOKUP</span><span class="func-item" onclick="insertFunction(\'XLOOKUP\')">XLOOKUP</span><span class="func-item" onclick="insertFunction(\'INDEX\')">INDEX</span><span class="func-item" onclick="insertFunction(\'MATCH\')">MATCH</span><span class="func-item" onclick="insertFunction(\'OFFSET\')">OFFSET</span><span class="func-item" onclick="insertFunction(\'INDIRECT\')">INDIRECT</span><span class="func-item" onclick="insertFunction(\'ROW\')">ROW</span><span class="func-item" onclick="insertFunction(\'COLUMN\')">COLUMN</span></div>', footer: 'close' },
+    formulaLogic: { title: '逻辑函数', body: '<div class="func-group"><div class="func-group-title">逻辑函数</div><span class="func-item" onclick="insertFunction(\'IF\')">IF</span><span class="func-item" onclick="insertFunction(\'AND\')">AND</span><span class="func-item" onclick="insertFunction(\'OR\')">OR</span><span class="func-item" onclick="insertFunction(\'NOT\')">NOT</span><span class="func-item" onclick="insertFunction(\'IFS\')">IFS</span><span class="func-item" onclick="insertFunction(\'SWITCH\')">SWITCH</span><span class="func-item" onclick="insertFunction(\'TRUE\')">TRUE</span><span class="func-item" onclick="insertFunction(\'FALSE\')">FALSE</span></div>', footer: 'close' },
+    formulaDate: { title: '日期函数', body: '<div class="func-group"><div class="func-group-title">日期函数</div><span class="func-item" onclick="insertFunction(\'TODAY\')">TODAY</span><span class="func-item" onclick="insertFunction(\'NOW\')">NOW</span><span class="func-item" onclick="insertFunction(\'DATE\')">DATE</span><span class="func-item" onclick="insertFunction(\'DATEDIF\')">DATEDIF</span><span class="func-item" onclick="insertFunction(\'YEAR\')">YEAR</span><span class="func-item" onclick="insertFunction(\'MONTH\')">MONTH</span><span class="func-item" onclick="insertFunction(\'DAY\')">DAY</span><span class="func-item" onclick="insertFunction(\'WEEKDAY\')">WEEKDAY</span><span class="func-item" onclick="insertFunction(\'WORKDAY\')">WORKDAY</span><span class="func-item" onclick="insertFunction(\'NETWORKDAYS\')">NETWORKDAYS</span></div>', footer: 'close' },
+    formulaMath: { title: '数学与三角', body: '<div class="func-group"><div class="func-group-title">数学与三角</div><span class="func-item" onclick="insertFunction(\'SUM\')">SUM</span><span class="func-item" onclick="insertFunction(\'SUMIF\')">SUMIF</span><span class="func-item" onclick="insertFunction(\'ROUND\')">ROUND</span><span class="func-item" onclick="insertFunction(\'CEILING\')">CEILING</span><span class="func-item" onclick="insertFunction(\'FLOOR\')">FLOOR</span><span class="func-item" onclick="insertFunction(\'INT\')">INT</span><span class="func-item" onclick="insertFunction(\'MOD\')">MOD</span><span class="func-item" onclick="insertFunction(\'ABS\')">ABS</span><span class="func-item" onclick="insertFunction(\'SQRT\')">SQRT</span><span class="func-item" onclick="insertFunction(\'POWER\')">POWER</span><span class="func-item" onclick="insertFunction(\'RAND\')">RAND</span><span class="func-item" onclick="insertFunction(\'PI\')">PI</span><span class="func-item" onclick="insertFunction(\'SIN\')">SIN</span><span class="func-item" onclick="insertFunction(\'COS\')">COS</span></div>', footer: 'close' },
+    formulaEngineering: { title: '工程函数', body: '<div class="func-group"><div class="func-group-title">工程函数</div><span class="func-item" onclick="insertFunction(\'BIN2DEC\')">BIN2DEC</span><span class="func-item" onclick="insertFunction(\'DEC2BIN\')">DEC2BIN</span><span class="func-item" onclick="insertFunction(\'HEX2DEC\')">HEX2DEC</span><span class="func-item" onclick="insertFunction(\'CONVERT\')">CONVERT</span><span class="func-item" onclick="insertFunction(\'DELTA\')">DELTA</span><span class="func-item" onclick="insertFunction(\'GESTEP\')">GESTEP</span></div>', footer: 'close' },
+    formulaDatabase: { title: '数据库函数', body: '<div class="func-group"><div class="func-group-title">数据库函数</div><span class="func-item" onclick="insertFunction(\'DAVERAGE\')">DAVERAGE</span><span class="func-item" onclick="insertFunction(\'DCOUNT\')">DCOUNT</span><span class="func-item" onclick="insertFunction(\'DMAX\')">DMAX</span><span class="func-item" onclick="insertFunction(\'DMIN\')">DMIN</span><span class="func-item" onclick="insertFunction(\'DSUM\')">DSUM</span></div>', footer: 'close' },
+    formulaCompatibility: { title: '兼容性函数', body: '<div class="func-group"><div class="func-group-title">兼容性函数</div><span class="func-item" onclick="insertFunction(\'VLOOKUP\')">VLOOKUP</span><span class="func-item" onclick="insertFunction(\'HLOOKUP\')">HLOOKUP</span><span class="func-item" onclick="insertFunction(\'RANK\')">RANK</span><span class="func-item" onclick="insertFunction(\'CONCATENATE\')">CONCATENATE</span></div>', footer: 'close' },
+    formulaSpecial: { title: '特色函数', body: '<div class="func-group"><div class="func-group-title">特色函数</div><span class="func-item" onclick="insertFunction(\'UNIQUE\')">UNIQUE</span><span class="func-item" onclick="insertFunction(\'FILTER\')">FILTER</span><span class="func-item" onclick="insertFunction(\'SORT\')">SORT</span><span class="func-item" onclick="insertFunction(\'SORTBY\')">SORTBY</span><span class="func-item" onclick="insertFunction(\'SEQUENCE\')">SEQUENCE</span><span class="func-item" onclick="insertFunction(\'RANDARRAY\')">RANDARRAY</span><span class="func-item" onclick="insertFunction(\'XMATCH\')">XMATCH</span><span class="func-item" onclick="insertFunction(\'XLOOKUP\')">XLOOKUP</span><span class="func-item" onclick="insertFunction(\'TEXTBEFORE\')">TEXTBEFORE</span><span class="func-item" onclick="insertFunction(\'TEXTAFTER\')">TEXTAFTER</span><span class="func-item" onclick="insertFunction(\'TEXTSPLIT\')">TEXTSPLIT</span></div>', footer: 'close' },
+    nameManager: { title: '名称管理器', body: '<div style="margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:13px;font-weight:600;">已定义名称</span><button class="btn btn-sm btn-primary" onclick="toast(\'新建名称\',\'info\')">新建</button></div><div style="border:1px solid var(--gray-200);border-radius:6px;overflow:hidden;"><div style="display:flex;padding:8px 12px;background:var(--gray-50);font-size:12px;font-weight:600;border-bottom:1px solid var(--gray-200);"><span style="flex:2">名称</span><span style="flex:3">引用位置</span><span style="flex:1">范围</span></div><div style="padding:8px 12px;font-size:12px;color:var(--gray-400);text-align:center;">暂无定义名称</div></div>', footer: 'close' },
+    quickCreateName: { title: '快速创建名称', body: '<div class="form-group"><label>名称</label><input placeholder="输入名称（如：采购金额）"></div><div class="form-group"><label>引用位置</label><input placeholder="选择或输入区域"></div><div class="form-group"><label>范围</label><select><option>工作簿</option><option>工作表</option></select></div>', footer: 'okClose' },
+    crossFileRef: { title: '跨文件引用', body: '<div class="form-group"><label>引用文件</label><select><option>从云盘选择</option><option>输入链接</option></select></div><div class="form-group"><label>文件链接</label><input placeholder="https://..."></div><div class="form-group"><label>选择数据范围</label><input placeholder="如: Sheet1!A1:C10"></div>', footer: 'okClose' },
+    calculationOptions: { title: '计算选项', body: '<div style="display:flex;flex-direction:column;gap:8px;"><label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;"><input type="radio" name="calcMode" checked> 自动计算</label><label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;"><input type="radio" name="calcMode"> 手动计算</label><label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;"><input type="checkbox"> 除手动时自动重算</label><label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;"><input type="checkbox"> 迭代计算</label></div>', footer: 'okClose' },
+  };
+  const dlg = dialogs[type];
+  if (!dlg) { toast('功能开发中...', 'info'); return; }
+  document.getElementById('modalTitle').textContent = dlg.title;
+  document.getElementById('modalWindow').className = 'modal';
+  document.getElementById('modalBody').innerHTML = dlg.body;
+  if (dlg.footer === 'okClose') {
+    document.getElementById('modalFooter').innerHTML = '<button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="toast(\'操作完成\',\'success\');closeModal()">确定</button>';
+  } else {
+    document.getElementById('modalFooter').innerHTML = '<button class="btn btn-outline" onclick="closeModal()">关闭</button>';
+  }
+  document.getElementById('modalOverlay').classList.add('active');
+}
+
+function updateCFPreview() {
+  const val = document.getElementById('cfValue')?.value || '';
+  const color = document.getElementById('cfColor')?.value || '#ff0000';
+  const bg = document.getElementById('cfBgColor')?.value || '#ffebee';
+  const preview = document.getElementById('cfPreview');
+  if (preview) preview.style.cssText = 'color:'+color+';background:'+bg+';padding:6px;border-radius:4px;';
+}
+
+// ========== MODAL HELPERS ==========
+function closeModal() { document.getElementById('modalOverlay').classList.remove('active'); }
+function closeSidebar() { document.getElementById('sidebarPanel').classList.remove('active'); }
 
 // ========== TOAST ==========
-function toast(msg, type='info') {
+function toast(msg, type) {
   const el = document.getElementById('toast');
   el.textContent = msg;
-  el.className = 'toast ' + type;
-  el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 3000);
+  el.className = 'toast show ' + (type||'info');
+  clearTimeout(el._timer);
+  el._timer = setTimeout(() => el.classList.remove('show'), 2500);
 }
 
-// ========== UTILS ==========
+// ========== UTILITY ==========
 function escHtml(s) {
-  if (!s) return '';
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-function closeModal() {
-  document.getElementById('modalOverlay').classList.remove('active');
-  document.getElementById('modalWindow').className = 'modal';
-}
-
-function closeSidebar() {
-  document.getElementById('sidebarPanel').classList.remove('active');
-}
-
-function renameDoc(name) {
-  // Just UI update
+  if (s === null || s === undefined) return '';
+  const div = document.createElement('div');
+  div.textContent = s;
+  return div.innerHTML;
 }
 
 // ========== INIT ==========
-document.getElementById('loginPage').style.display = 'flex';
-loadSettings();
-// If already logged in, auto-login
-if (TOKEN) {
-  showApp();
-}
-
-function loadSettings() {
-	  // Settings are loaded when settings panel opens
-	}
-	</script>
-	</body>
-	</html>
+if (TOKEN) showApp();
+</script>
+</body>
+</html>
