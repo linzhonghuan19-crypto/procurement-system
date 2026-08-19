@@ -15,7 +15,7 @@ load_dotenv()
 
 from database import init_db, get_db, User
 from auth import get_password_hash
-from routes import auth, products, orders, ai, wecom
+from routes import auth, products, orders, ai, wecom, collect, dashboard
 
 app = FastAPI(title="海外仓采购管理系统", version="1.0.0")
 
@@ -33,6 +33,8 @@ app.include_router(products.router)
 app.include_router(orders.router)
 app.include_router(ai.router)
 app.include_router(wecom.router)
+app.include_router(collect.router)
+app.include_router(dashboard.router)
 
 
 @app.on_event("startup")
