@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -36,7 +36,7 @@
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", "Helvetica Neue", Arial, sans-serif; font-size: 13px; color: var(--gray-800); background: #fff; overflow: hidden; height: 100vh; user-select: none; }
-input, textarea, select { font-family: inherit; font-size: 13px; }
+input, textarea, select, button { font-family: inherit; font-size: 13px; }
 a { color: var(--primary); text-decoration: none; }
 
 /* ===== LOGIN ===== */
@@ -48,11 +48,17 @@ a { color: var(--primary); text-decoration: none; }
 .form-group label { display: block; font-size: 12px; font-weight: 500; color: var(--gray-600); margin-bottom: 4px; }
 .form-group input { width: 100%; padding: 10px 12px; border: 1px solid var(--gray-200); border-radius: 8px; font-size: 14px; }
 .form-group input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(74,108,247,0.1); }
+.form-group select { width: 100%; padding: 8px 10px; border: 1px solid var(--gray-200); border-radius: 6px; font-size: 13px; background: #fff; }
+.form-group textarea { width: 100%; padding: 8px 10px; border: 1px solid var(--gray-200); border-radius: 6px; font-size: 13px; resize: vertical; font-family: inherit; }
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 18px; border-radius: 6px; font-weight: 500; font-size: 13px; border: none; cursor: pointer; transition: all 0.15s; }
 .btn-primary { background: var(--primary); color: #fff; }
 .btn-primary:hover { background: var(--primary-hover); }
 .btn-outline { background: transparent; border: 1px solid var(--gray-200); color: var(--gray-600); }
 .btn-outline:hover { background: var(--gray-50); border-color: var(--gray-300); }
+.btn-success { background: var(--success); color: #fff; }
+.btn-success:hover { background: #16a34a; }
+.btn-danger { background: var(--danger); color: #fff; }
+.btn-danger:hover { background: #dc2626; }
 .btn-sm { padding: 4px 10px; font-size: 12px; }
 .btn-block { width: 100%; padding: 10px; }
 .btn-link { background: none; border: none; color: var(--primary); cursor: pointer; font-size: 12px; padding: 0; }
@@ -66,22 +72,44 @@ a { color: var(--primary); text-decoration: none; }
 .spreadsheet-app.active { display: flex; }
 
 /* ===== TOOLBAR ===== */
-.toolbar { display: flex; align-items: center; height: var(--toolbar-h); padding: 0 12px; border-bottom: 1px solid var(--gray-200); background: #fff; gap: 4px; flex-shrink: 0; }
-.toolbar .doc-title { font-size: 15px; font-weight: 500; color: var(--gray-800); padding: 4px 8px; border-radius: 4px; cursor: default; }
+.toolbar { display: flex; align-items: center; height: var(--toolbar-h); padding: 0 12px; border-bottom: 1px solid var(--gray-200); background: #fff; gap: 4px; flex-shrink: 0; overflow-x: auto; }
+.toolbar .doc-title { font-size: 15px; font-weight: 500; color: var(--gray-800); padding: 4px 8px; border-radius: 4px; cursor: default; white-space: nowrap; }
 .toolbar .doc-title:hover { background: var(--gray-100); }
 .toolbar .doc-title input { display: none; border: none; font-size: 15px; font-weight: 500; outline: none; background: var(--gray-100); padding: 2px 4px; border-radius: 2px; }
 .toolbar .doc-title.editing input { display: inline; }
 .toolbar .doc-title.editing span { display: none; }
 .toolbar .star { color: var(--gray-300); cursor: pointer; font-size: 16px; padding: 4px; }
-.toolbar .star:hover { color: var(--warning); }
-.toolbar-sep { width: 1px; height: 24px; background: var(--gray-200); margin: 0 4px; }
-.toolbar-group { display: flex; align-items: center; gap: 2px; }
+.toolbar .star:hover, .toolbar .star.active { color: var(--warning); }
+.toolbar-sep { width: 1px; height: 24px; background: var(--gray-200); margin: 0 4px; flex-shrink: 0; }
+.toolbar-group { display: flex; align-items: center; gap: 2px; flex-shrink: 0; }
 .toolbar-btn { padding: 4px 8px; border-radius: 4px; cursor: pointer; color: var(--gray-600); font-size: 13px; border: none; background: none; display: flex; align-items: center; gap: 4px; white-space: nowrap; }
 .toolbar-btn:hover { background: var(--gray-100); }
 .toolbar-btn b { font-weight: 600; }
-.toolbar-right { margin-left: auto; display: flex; align-items: center; gap: 4px; }
+.toolbar-btn.active { background: var(--primary-light); color: var(--primary); }
+.toolbar-right { margin-left: auto; display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
 .user-avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 12px; cursor: pointer; }
 .user-avatar:hover { opacity: 0.8; }
+
+/* Toolbar formatting selects */
+.toolbar select { padding: 2px 4px; border: 1px solid var(--gray-200); border-radius: 4px; font-size: 12px; background: #fff; cursor: pointer; height: 26px; }
+.toolbar select:hover { border-color: var(--gray-300); }
+.toolbar select:focus { outline: none; border-color: var(--primary); }
+.toolbar .color-picker-wrap { position: relative; display: inline-flex; }
+.toolbar .color-picker-wrap input[type="color"] { position: absolute; opacity: 0; width: 100%; height: 100%; cursor: pointer; top: 0; left: 0; }
+.toolbar .border-btn { position: relative; }
+
+/* ===== FORMATTING TOOLBAR ROW ===== */
+.format-toolbar { display: flex; align-items: center; height: 36px; padding: 0 12px; border-bottom: 1px solid var(--gray-200); background: #fff; gap: 4px; flex-shrink: 0; overflow-x: auto; }
+.format-toolbar .toolbar-btn { font-size: 13px; padding: 4px 6px; min-width: 28px; justify-content: center; }
+.format-toolbar .toolbar-btn.bold { font-weight: 700; }
+.format-toolbar .toolbar-btn.italic { font-style: italic; }
+.format-toolbar .toolbar-btn.underline { text-decoration: underline; }
+.format-toolbar-sep { width: 1px; height: 20px; background: var(--gray-200); margin: 0 4px; flex-shrink: 0; }
+
+/* ===== ADVANCED TOOLBAR ===== */
+.adv-toolbar { display: flex; align-items: center; height: 34px; padding: 0 12px; border-bottom: 1px solid var(--gray-200); background: var(--gray-50); gap: 2px; flex-shrink: 0; overflow-x: auto; }
+.adv-toolbar .toolbar-btn { font-size: 12px; padding: 3px 8px; color: var(--gray-500); }
+.adv-toolbar .toolbar-btn:hover { color: var(--gray-700); background: var(--gray-100); }
 
 /* ===== FORMULA BAR ===== */
 .formula-bar { display: flex; align-items: center; height: var(--formula-h); border-bottom: 1px solid var(--gray-200); background: #fff; flex-shrink: 0; }
@@ -89,12 +117,20 @@ a { color: var(--primary); text-decoration: none; }
 .formula-bar .fx { padding: 0 8px; color: var(--gray-400); font-size: 12px; font-style: italic; }
 .formula-bar .formula-input { flex: 1; height: 100%; border: none; outline: none; padding: 0 8px; font-size: 13px; }
 
+/* ===== FILTER TOOLBAR ===== */
+.filter-toolbar { display: flex; align-items: center; gap: 8px; padding: 4px 12px; border-bottom: 1px solid var(--gray-200); background: #fff; flex-shrink: 0; min-height: 36px; }
+.filter-toolbar .search-input { flex: 1; max-width: 300px; padding: 4px 10px; border: 1px solid var(--gray-200); border-radius: 16px; font-size: 12px; outline: none; }
+.filter-toolbar .search-input:focus { border-color: var(--primary); }
+.filter-toolbar .filter-tag { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; background: var(--primary-light); color: var(--primary); border-radius: 12px; font-size: 11px; cursor: pointer; }
+.filter-toolbar .filter-tag .remove { font-size: 14px; line-height: 1; cursor: pointer; }
+.filter-toolbar .filter-tag .remove:hover { color: var(--danger); }
+.filter-toolbar .filter-count { font-size: 11px; color: var(--gray-500); margin-left: auto; white-space: nowrap; }
+
 /* ===== GRID ===== */
-.grid-container { flex: 1; overflow: auto; position: relative; }
+.grid-container { flex: 1; overflow: auto; overflow-y: auto; position: relative; min-height: 0; }
 .grid-scroll { min-width: 100%; }
 .grid-table { border-collapse: collapse; width: max-content; }
 
-/* Header row (column letters) */
 .grid-table th.col-header { 
   background: var(--header-bg); 
   border-right: 1px solid var(--gridline); 
@@ -129,8 +165,10 @@ a { color: var(--primary); text-decoration: none; }
   display: inline-block; vertical-align: middle;
 }
 .grid-table th.col-header .filter-icon:hover { opacity: 1; }
+.grid-table th.col-header .sort-indicator { display: inline-block; font-size: 10px; margin-left: 2px; opacity: 0.5; vertical-align: middle; }
+.grid-table th.col-header .sort-indicator.active { opacity: 1; }
+.grid-table th.col-header.sorted { background: var(--selected-bg) !important; }
 
-/* Row number column */
 .grid-table td.row-num { 
   background: var(--header-bg); 
   border-right: 1px solid var(--gray-300); 
@@ -149,7 +187,6 @@ a { color: var(--primary); text-decoration: none; }
 }
 .grid-table td.row-num.selected-row { background: var(--selected-bg); color: var(--selected-border); font-weight: 600; }
 
-/* Data cells */
 .grid-table td.cell { 
   border-right: 1px solid var(--gridline); 
   border-bottom: 1px solid var(--gridline); 
@@ -195,21 +232,21 @@ a { color: var(--primary); text-decoration: none; }
 .grid-table td.cell .cell-content .status-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 4px; vertical-align: middle; }
 .grid-table td.cell .cell-content .img-thumb { width: 24px; height: 24px; object-fit: cover; border-radius: 2px; vertical-align: middle; cursor: pointer; }
 .grid-table td.cell .cell-content .img-thumb:hover { transform: scale(1.2); }
+.grid-table td.cell .cell-content .cell-link { color: var(--primary); cursor: pointer; font-size: 12px; }
+.grid-table td.cell .cell-content .cell-link:hover { text-decoration: underline; }
 
-/* Status colors */
 .status-pending { color: #b45309; }
 .status-ordered { color: #1e40af; }
 .status-transit { color: #6d28d9; }
 .status-warehoused { color: #065f46; }
 .status-discontinued { color: var(--gray-400); }
 
-/* Zebra */
 .grid-table tr:nth-child(even) td.cell { background: #fafafa; }
 .grid-table tr:nth-child(even) td.row-num { background: var(--header-bg); }
 .grid-table tr:hover td.cell { background: #f5f8ff; }
 .grid-table tr:hover td.row-num { background: #e8ecf4; }
 
-/* ===== BOTTOM BAR ===== */
+/* ===== STATUS BAR ===== */
 .status-bar { 
   display: flex; 
   align-items: center; 
@@ -252,6 +289,7 @@ a { color: var(--primary); text-decoration: none; }
 .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 1000; align-items: center; justify-content: center; }
 .modal-overlay.active { display: flex; }
 .modal { background: #fff; border-radius: 12px; width: 90%; max-width: 700px; max-height: 85vh; overflow: auto; box-shadow: 0 8px 32px rgba(0,0,0,0.12); }
+.modal-wide { max-width: 900px; }
 .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--gray-200); }
 .modal-header h3 { font-size: 15px; font-weight: 600; }
 .modal-close { background: none; border: none; font-size: 20px; color: var(--gray-400); padding: 4px; cursor: pointer; }
@@ -260,36 +298,151 @@ a { color: var(--primary); text-decoration: none; }
 .modal-footer { padding: 12px 20px; border-top: 1px solid var(--gray-200); display: flex; justify-content: flex-end; gap: 8px; }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+.form-row-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; }
 
 /* ===== DROPDOWN ===== */
 .dropdown { position: relative; display: inline-block; }
 .dropdown-menu { display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid var(--gray-200); border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.1); z-index: 100; min-width: 180px; padding: 4px; }
 .dropdown-menu.show { display: block; }
+.dropdown-menu.dropdown-left { right: auto; left: 0; }
 .dropdown-item { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 13px; color: var(--gray-700); }
 .dropdown-item:hover { background: var(--gray-50); }
+.dropdown-item .item-icon { width: 20px; text-align: center; font-size: 14px; }
 .dropdown-sep { height: 1px; background: var(--gray-200); margin: 4px 0; }
 
-/* ===== FILTER DROPDOWN ===== */
-.filter-dropdown { position: absolute; top: 100%; left: 0; background: #fff; border: 1px solid var(--gray-200); border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.1); z-index: 100; padding: 12px; min-width: 200px; }
-.filter-dropdown h4 { font-size: 12px; color: var(--gray-500); margin-bottom: 8px; font-weight: 500; }
-.filter-dropdown label { display: flex; align-items: center; gap: 6px; padding: 4px 0; font-size: 12px; cursor: pointer; }
-.filter-dropdown label input { cursor: pointer; }
-.filter-dropdown .filter-actions { display: flex; gap: 8px; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--gray-200); }
+/* ===== COLUMN FILTER POPUP ===== */
+.col-filter-popup { position: fixed; background: #fff; border: 1px solid var(--gray-200); border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); z-index: 1000; min-width: 220px; max-width: 320px; max-height: 360px; display: flex; flex-direction: column; }
+.col-filter-popup .popup-header { padding: 8px 12px; border-bottom: 1px solid var(--gray-200); font-size: 12px; font-weight: 600; color: var(--gray-700); display: flex; justify-content: space-between; align-items: center; }
+.col-filter-popup .popup-header .clear-btn { font-size: 11px; color: var(--primary); cursor: pointer; }
+.col-filter-popup .popup-search { padding: 6px 12px; border-bottom: 1px solid var(--gray-200); }
+.col-filter-popup .popup-search input { width: 100%; padding: 4px 8px; border: 1px solid var(--gray-200); border-radius: 4px; font-size: 12px; outline: none; }
+.col-filter-popup .popup-list { overflow-y: auto; flex: 1; padding: 4px 0; }
+.col-filter-popup .popup-list label { display: flex; align-items: center; gap: 6px; padding: 4px 12px; font-size: 12px; cursor: pointer; }
+.col-filter-popup .popup-list label:hover { background: var(--gray-50); }
+.col-filter-popup .popup-list label input { cursor: pointer; }
+.col-filter-popup .popup-footer { padding: 8px 12px; border-top: 1px solid var(--gray-200); display: flex; gap: 8px; justify-content: flex-end; }
+
+/* ===== SIDEBAR PANEL ===== */
+.sidebar-panel { display: none; position: fixed; right: 0; top: 0; bottom: 0; width: 420px; background: #fff; box-shadow: -4px 0 24px rgba(0,0,0,0.1); z-index: 200; flex-direction: column; }
+.sidebar-panel.active { display: flex; }
+.sidebar-panel .panel-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--gray-200); }
+.sidebar-panel .panel-header h3 { font-size: 15px; }
+.sidebar-panel .panel-body { flex: 1; overflow: auto; padding: 20px; }
+.sidebar-panel .panel-body .form-group { margin-bottom: 20px; }
+.sidebar-panel .panel-body .form-group label { font-size: 12px; font-weight: 600; color: var(--gray-600); margin-bottom: 6px; display: block; }
+.sidebar-panel .panel-body .form-group input, .sidebar-panel .panel-body .form-group textarea { width: 100%; padding: 8px 10px; border: 1px solid var(--gray-200); border-radius: 6px; font-size: 13px; }
+.sidebar-panel .panel-body .form-group textarea { font-family: monospace; }
 
 /* ===== LOADING ===== */
 .loading { display: inline-block; width: 14px; height: 14px; border: 2px solid var(--gray-200); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.6s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ===== SETTINGS PANEL ===== */
-.settings-panel { display: none; position: fixed; right: 0; top: 0; bottom: 0; width: 360px; background: #fff; box-shadow: -4px 0 24px rgba(0,0,0,0.1); z-index: 200; flex-direction: column; }
-.settings-panel.active { display: flex; }
-.settings-panel .panel-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--gray-200); }
-.settings-panel .panel-header h3 { font-size: 15px; }
-.settings-panel .panel-body { flex: 1; overflow: auto; padding: 20px; }
-.settings-panel .panel-body .form-group { margin-bottom: 20px; }
-.settings-panel .panel-body .form-group label { font-size: 12px; font-weight: 600; color: var(--gray-600); margin-bottom: 6px; display: block; }
-.settings-panel .panel-body .form-group input, .settings-panel .panel-body .form-group textarea { width: 100%; padding: 8px 10px; border: 1px solid var(--gray-200); border-radius: 6px; font-size: 13px; }
-.settings-panel .panel-body .form-group textarea { font-family: monospace; }
+/* ===== DASHBOARD ===== */
+.dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+.dashboard-card { background: #fff; border: 1px solid var(--gray-200); border-radius: 8px; padding: 16px; }
+.dashboard-card h4 { font-size: 13px; color: var(--gray-600); margin-bottom: 8px; font-weight: 500; }
+.dashboard-card .stat-value { font-size: 28px; font-weight: 700; color: var(--gray-800); }
+.dashboard-card .stat-label { font-size: 11px; color: var(--gray-400); margin-top: 2px; }
+.dashboard-card .stat-row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 12px; }
+.dashboard-card .stat-row .stat-name { color: var(--gray-600); }
+.dashboard-card .stat-row .stat-val { font-weight: 500; }
+.dashboard-card .stat-row.danger .stat-val { color: var(--danger); }
+.dashboard-card .chart-container { width: 100%; height: 180px; }
+
+/* ===== COLLECT FORM ===== */
+.collect-form-preview { background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 8px; padding: 20px; margin-top: 12px; }
+.collect-form-preview .cf-field { margin-bottom: 12px; }
+.collect-form-preview .cf-field label { display: block; font-size: 12px; font-weight: 500; color: var(--gray-600); margin-bottom: 4px; }
+.collect-form-preview .cf-field input { width: 100%; padding: 8px 10px; border: 1px solid var(--gray-200); border-radius: 6px; font-size: 13px; }
+
+/* ===== DATA GROUPING ===== */
+.group-selector { margin-bottom: 16px; }
+.group-selector select { padding: 6px 10px; border: 1px solid var(--gray-200); border-radius: 6px; font-size: 13px; }
+.group-list { }
+.group-item { border: 1px solid var(--gray-200); border-radius: 8px; margin-bottom: 8px; overflow: hidden; }
+.group-item .group-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; cursor: pointer; background: var(--gray-50); }
+.group-item .group-header:hover { background: var(--gray-100); }
+.group-item .group-header .group-name { font-weight: 600; font-size: 13px; }
+.group-item .group-header .group-stats { font-size: 11px; color: var(--gray-500); }
+.group-item .group-body { display: none; padding: 8px 14px; border-top: 1px solid var(--gray-200); }
+.group-item .group-body.open { display: block; }
+.group-item .group-body table { width: 100%; font-size: 12px; border-collapse: collapse; }
+.group-item .group-body table th { text-align: left; padding: 4px 6px; color: var(--gray-500); font-weight: 500; border-bottom: 1px solid var(--gray-200); }
+.group-item .group-body table td { padding: 4px 6px; border-bottom: 1px solid var(--gray-100); }
+
+/* ===== NOTIFICATION SETTINGS ===== */
+.notif-toggle { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; }
+.notif-toggle .toggle-label { font-size: 13px; }
+.switch { position: relative; width: 40px; height: 22px; display: inline-block; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.switch .slider { position: absolute; cursor: pointer; inset: 0; background: var(--gray-300); border-radius: 22px; transition: 0.3s; }
+.switch .slider:before { content: ""; position: absolute; height: 18px; width: 18px; left: 2px; bottom: 2px; background: #fff; border-radius: 50%; transition: 0.3s; }
+.switch input:checked + .slider { background: var(--primary); }
+.switch input:checked + .slider:before { transform: translateX(18px); }
+
+/* ===== AI CLASSIFICATION ===== */
+.ai-classify-result { background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 8px; padding: 16px; margin-top: 12px; }
+.ai-classify-result .result-section { margin-bottom: 12px; }
+.ai-classify-result .result-section h5 { font-size: 12px; color: var(--gray-600); font-weight: 600; margin-bottom: 6px; }
+.ai-classify-result .result-section p { font-size: 13px; line-height: 1.6; }
+.ai-classify-result .result-bar { display: flex; align-items: center; gap: 8px; margin: 4px 0; }
+.ai-classify-result .result-bar .bar-label { width: 80px; font-size: 12px; text-align: right; }
+.ai-classify-result .result-bar .bar-track { flex: 1; height: 16px; background: var(--gray-200); border-radius: 8px; overflow: hidden; }
+.ai-classify-result .result-bar .bar-fill { height: 100%; background: var(--primary); border-radius: 8px; transition: width 0.5s; }
+.ai-classify-result .result-bar .bar-val { width: 50px; font-size: 11px; color: var(--gray-500); }
+
+/* ===== DATA PROTECTION ===== */
+.protection-info { padding: 12px; background: var(--gray-50); border-radius: 6px; margin-bottom: 12px; }
+.protection-info .info-row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 12px; }
+.protection-info .info-row .info-label { color: var(--gray-500); }
+.protection-info .info-row .info-value { font-weight: 500; }
+.protection-col-list { margin-top: 12px; }
+.protection-col-list .pcol-item { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--gray-100); font-size: 12px; }
+.protection-col-list .pcol-item .pcol-name { color: var(--gray-600); }
+.protection-col-list .pcol-item .pcol-lock { cursor: pointer; color: var(--gray-400); }
+.protection-col-list .pcol-item .pcol-lock.locked { color: var(--primary); }
+
+/* ===== PRINT STYLES ===== */
+@media print {
+  body { overflow: visible !important; background: #fff; }
+  .toolbar, .format-toolbar, .adv-toolbar, .formula-bar, .filter-toolbar, .status-bar, .modal-overlay, .sidebar-panel, .toast { display: none !important; }
+  .grid-container { overflow: visible !important; }
+  .grid-table th.col-header { position: static !important; }
+  .grid-table td.row-num { position: static !important; }
+  .grid-table td.cell { break-inside: avoid; }
+  .spreadsheet-app.active { display: block !important; height: auto; }
+  #gridView { display: block !important; }
+  #ordersView, #aiView { display: none !important; }
+}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--gray-50); }
+::-webkit-scrollbar-thumb { background: var(--gray-300); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gray-400); }
+
+/* ===== MISC ===== */
+.text-center { text-align: center; }
+.text-muted { color: var(--gray-500); }
+.mt-8 { margin-top: 8px; }
+.mb-8 { margin-bottom: 8px; }
+.mb-16 { margin-bottom: 16px; }
+.flex { display: flex; }
+.flex-1 { flex: 1; }
+.gap-8 { gap: 8px; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.tag { display: inline-block; padding: 1px 6px; border-radius: 4px; font-size: 11px; font-weight: 500; }
+.tag-success { background: #d1fae5; color: #065f46; }
+.tag-warning { background: #fef3c7; color: #92400e; }
+.tag-danger { background: #fee2e2; color: #991b1b; }
+.tag-info { background: #dbeafe; color: #1e40af; }
+.tag-primary { background: var(--primary-light); color: var(--primary); }
+
+/* ===== SPINNER OVERLAY ===== */
+.spinner-overlay { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.7); z-index: 9998; align-items: center; justify-content: center; }
+.spinner-overlay.active { display: flex; }
+.spinner { width: 36px; height: 36px; border: 3px solid var(--gray-200); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.6s linear infinite; }
 </style>
 </head>
 <body>
@@ -297,7 +450,7 @@ a { color: var(--primary); text-decoration: none; }
 <!-- ===== LOGIN ===== -->
 <div class="login-page" id="loginPage">
   <div class="login-card">
-    <h1>📊 海外仓总采购表</h1>
+    <h1>海外仓总采购表</h1>
     <p class="subtitle">企业级采购管理 · 在线协作表格</p>
     <div id="loginForm">
       <div class="form-group">
@@ -306,7 +459,7 @@ a { color: var(--primary); text-decoration: none; }
       </div>
       <div class="form-group">
         <label>密码</label>
-        <input type="password" id="loginPassword" placeholder="输入密码" value="admin123">
+        <input type="password" id="loginPassword" placeholder="输入密码" value="admin123" onkeydown="if(event.key==='Enter')doLogin()">
       </div>
       <button class="btn btn-primary btn-block" onclick="doLogin()">登录</button>
       <p style="margin-top:12px;text-align:center;font-size:12px;color:var(--gray-500);">
@@ -324,7 +477,7 @@ a { color: var(--primary); text-decoration: none; }
       </div>
       <div class="form-group">
         <label>密码</label>
-        <input type="password" id="regPassword" placeholder="设置密码">
+        <input type="password" id="regPassword" placeholder="设置密码" onkeydown="if(event.key==='Enter')doRegister()">
       </div>
       <button class="btn btn-primary btn-block" onclick="doRegister()">注册</button>
       <p style="margin-top:12px;text-align:center;font-size:12px;color:var(--gray-500);">
@@ -337,31 +490,112 @@ a { color: var(--primary); text-decoration: none; }
 <!-- ===== SPREADSHEET ===== -->
 <div class="spreadsheet-app" id="app">
   
-  <!-- Toolbar -->
-  <div class="toolbar">
+  <!-- Main Toolbar -->
+  <div class="toolbar" id="mainToolbar">
     <div class="doc-title" id="docTitle">
-      <span>📊 海外仓总采购表</span>
+      <span>海外仓总采购表</span>
       <input type="text" value="海外仓总采购表" onblur="renameDoc(this.value)">
     </div>
-    <span class="star" title="标记星标">☆</span>
+    <span class="star" id="starBtn" title="标记星标" onclick="toggleStar()">&#9734;</span>
     <div class="toolbar-sep"></div>
     <div class="toolbar-group">
-      <button class="toolbar-btn" onclick="switchView('products')" title="产品列表"><b>📋</b> 产品</button>
-      <button class="toolbar-btn" onclick="switchView('orders')" title="采购单"><b>📄</b> 采购单</button>
-      <button class="toolbar-btn" onclick="switchView('ai')" title="AI分析"><b>🤖</b> AI</button>
+      <button class="toolbar-btn" onclick="switchView('products')" title="产品列表"><b>&#128203;</b> 产品</button>
+      <button class="toolbar-btn" onclick="switchView('orders')" title="采购单"><b>&#128196;</b> 采购单</button>
+      <button class="toolbar-btn" onclick="switchView('ai')" title="AI分析"><b>&#129302;</b> AI</button>
     </div>
     <div class="toolbar-sep"></div>
     <div class="toolbar-group">
       <button class="toolbar-btn" onclick="showCreateProduct()" title="新增产品"><b>+</b> 新增</button>
-      <button class="toolbar-btn" onclick="showImport()" title="导入"><b>↑</b> 导入</button>
-      <button class="toolbar-btn" onclick="refreshData()" title="刷新"><b>🔄</b></button>
+      <button class="toolbar-btn" onclick="showImport()" title="导入"><b>&#8593;</b> 导入</button>
+      <button class="toolbar-btn" onclick="refreshData()" title="刷新"><b>&#8635;</b></button>
     </div>
     <div class="toolbar-right">
       <div class="toolbar-group">
-        <button class="toolbar-btn" onclick="openSettings()" style="color:var(--gray-400)">⚙️</button>
+        <button class="toolbar-btn" onclick="openSettings()" title="设置" style="color:var(--gray-400);font-size:16px;">&#9881;</button>
       </div>
-      <div class="user-avatar" id="userAvatar" onclick="toggleUserMenu()" title="用户菜单">管</div>
+      <div class="dropdown" id="userMenuDropdown">
+        <div class="user-avatar" id="userAvatar" onclick="toggleUserMenu()" title="用户菜单">管</div>
+        <div class="dropdown-menu" id="userMenu">
+          <div class="dropdown-item" onclick="openSettings()"><span class="item-icon">&#9881;</span> 设置</div>
+          <div class="dropdown-sep"></div>
+          <div class="dropdown-item" onclick="doLogout()"><span class="item-icon">&#128682;</span> 退出登录</div>
+        </div>
+      </div>
     </div>
+  </div>
+
+  <!-- Formatting Toolbar -->
+  <div class="format-toolbar" id="formatToolbar">
+    <select id="fontSelect" onchange="applyFormat('fontName',this.value)" title="字体">
+      <option value="Arial">Arial</option>
+      <option value="Helvetica">Helvetica</option>
+      <option value="Times New Roman">Times New Roman</option>
+      <option value="Courier New">Courier New</option>
+      <option value="Georgia">Georgia</option>
+      <option value="Verdana">Verdana</option>
+      <option value="Microsoft YaHei">微软雅黑</option>
+      <option value="SimSun">宋体</option>
+    </select>
+    <select id="fontSizeSelect" onchange="applyFormat('fontSize',this.value)" title="字号">
+      <option value="9">9</option>
+      <option value="10">10</option>
+      <option value="11">11</option>
+      <option value="12">12</option>
+      <option value="13" selected>13</option>
+      <option value="14">14</option>
+      <option value="16">16</option>
+      <option value="18">18</option>
+      <option value="20">20</option>
+      <option value="24">24</option>
+    </select>
+    <div class="format-toolbar-sep"></div>
+    <button class="toolbar-btn bold" onclick="applyFormat('bold')" title="加粗"><b>B</b></button>
+    <button class="toolbar-btn italic" onclick="applyFormat('italic')" title="斜体"><i>I</i></button>
+    <button class="toolbar-btn underline" onclick="applyFormat('underline')" title="下划线"><u>U</u></button>
+    <div class="format-toolbar-sep"></div>
+    <div class="toolbar-group">
+      <div class="color-picker-wrap">
+        <button class="toolbar-btn" onclick="this.nextElementSibling.click()" title="文字颜色" style="border-bottom:3px solid #000;">A</button>
+        <input type="color" onchange="applyFormat('textColor',this.value)" value="#000000">
+      </div>
+      <div class="color-picker-wrap">
+        <button class="toolbar-btn" onclick="this.nextElementSibling.click()" title="填充颜色" style="background:#ffff00;padding:4px 8px;">&#9632;</button>
+        <input type="color" onchange="applyFormat('fillColor',this.value)" value="#ffff00">
+      </div>
+    </div>
+    <div class="format-toolbar-sep"></div>
+    <div class="toolbar-group">
+      <button class="toolbar-btn" onclick="applyFormat('border')" title="边框">&#9632;</button>
+      <button class="toolbar-btn" onclick="applyFormat('merge')" title="合并单元格">&#9644;</button>
+    </div>
+    <div class="format-toolbar-sep"></div>
+    <div class="toolbar-group">
+      <button class="toolbar-btn" onclick="applyFormat('alignLeft')" title="左对齐">&#8467;</button>
+      <button class="toolbar-btn" onclick="applyFormat('alignCenter')" title="居中">&#8801;</button>
+      <button class="toolbar-btn" onclick="applyFormat('alignRight')" title="右对齐">&#8473;</button>
+    </div>
+    <div class="format-toolbar-sep"></div>
+    <select onchange="applyFormat('numberFormat',this.value)" title="数字格式" style="width:80px;">
+      <option value="auto">自动</option>
+      <option value="number">数字</option>
+      <option value="currency">货币</option>
+      <option value="percent">百分比</option>
+      <option value="text">文本</option>
+    </select>
+    <div class="format-toolbar-sep"></div>
+    <button class="toolbar-btn" onclick="applyFormat('decreaseIndent')" title="减少缩进">&#8592;</button>
+    <button class="toolbar-btn" onclick="applyFormat('increaseIndent')" title="增加缩进">&#8594;</button>
+  </div>
+
+  <!-- Advanced Toolbar -->
+  <div class="adv-toolbar" id="advToolbar">
+    <button class="toolbar-btn" onclick="showDashboard()" title="生成仪表盘">&#128202; 生成仪表盘</button>
+    <button class="toolbar-btn" onclick="showCollectForm()" title="收集表">&#128203; 收集表</button>
+    <button class="toolbar-btn" onclick="showDataGrouping()" title="数据分组">&#128451; 数据分组</button>
+    <button class="toolbar-btn" onclick="showNotificationSettings()" title="自动化通知">&#128276; 自动化通知</button>
+    <button class="toolbar-btn" onclick="showAIClassify()" title="AI分类总结">&#129302; AI分类总结</button>
+    <button class="toolbar-btn" onclick="showDataProtection()" title="数据保护">&#128274; 数据保护</button>
+    <button class="toolbar-btn" onclick="doPrint()" title="打印">&#128424; 打印</button>
   </div>
 
   <!-- Formula Bar -->
@@ -371,10 +605,17 @@ a { color: var(--primary); text-decoration: none; }
     <input class="formula-input" id="formulaInput" placeholder="输入值或公式..." readonly>
   </div>
 
-  <!-- View Switcher (hidden by default, shows non-table views) -->
-  <div id="viewContainer" style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
-    <!-- Grid View (default) -->
-    <div id="gridView" style="flex:1;display:flex;flex-direction:column;">
+  <!-- View Container -->
+  <div id="viewContainer" style="flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0;">
+    <!-- Filter Toolbar -->
+    <div class="filter-toolbar" id="filterToolbar">
+      <input class="search-input" id="searchInput" placeholder="搜索全部列..." oninput="applyFilters()">
+      <div id="filterTags" style="display:flex;gap:4px;flex-wrap:wrap;"></div>
+      <span class="filter-count" id="filterCount">显示 0/0 条</span>
+    </div>
+
+    <!-- Grid View -->
+    <div id="gridView" style="flex:1;display:flex;flex-direction:column;min-height:0;">
       <div class="grid-container" id="gridContainer">
         <div class="grid-scroll" id="gridScroll">
           <table class="grid-table" id="gridTable">
@@ -385,9 +626,9 @@ a { color: var(--primary); text-decoration: none; }
       </div>
     </div>
 
-    <!-- Orders View (hidden) -->
+    <!-- Orders View -->
     <div id="ordersView" style="display:none;flex:1;overflow:auto;padding:20px;">
-      <div style="margin-bottom:12px;display:flex;align-items:center;gap:8px;">
+      <div style="margin-bottom:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
         <select onchange="loadOrders()" id="orderFilter" style="padding:4px 8px;border:1px solid var(--gray-200);border-radius:4px;">
           <option value="">全部状态</option>
           <option value="待审核">待审核</option>
@@ -397,20 +638,21 @@ a { color: var(--primary); text-decoration: none; }
           <option value="已取消">已取消</option>
         </select>
         <button class="btn btn-primary btn-sm" onclick="showCreateOrder()">+ 新建采购单</button>
+        <span id="orderCount" style="font-size:12px;color:var(--gray-500);"></span>
       </div>
-      <div id="ordersList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;"></div>
+      <div id="ordersList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;"></div>
     </div>
 
-    <!-- AI View (hidden) -->
+    <!-- AI View -->
     <div id="aiView" style="display:none;flex:1;overflow:auto;padding:20px;">
       <div style="background:#fff;border:1px solid var(--gray-200);border-radius:8px;padding:20px;">
-        <h3 style="font-size:15px;margin-bottom:12px;">🤖 AI 智能分析</h3>
+        <h3 style="font-size:15px;margin-bottom:12px;">AI 智能分析</h3>
         <div style="display:flex;gap:8px;margin-bottom:12px;">
-          <input type="text" id="aiQuery" placeholder="输入问题，如：分析低库存商品、建议采购优先级..." style="flex:1;padding:8px 12px;border:1px solid var(--gray-200);border-radius:6px;" onkeydown="if(event.key==='Enter') aiAnalyze()">
+          <input type="text" id="aiQuery" placeholder="输入问题，如：分析低库存商品、建议采购优先级..." style="flex:1;padding:8px 12px;border:1px solid var(--gray-200);border-radius:6px;" onkeydown="if(event.key==='Enter')aiAnalyze()">
           <button class="btn btn-primary" onclick="aiAnalyze()">分析</button>
           <button class="btn btn-outline" onclick="aiSuggestOrder()">建议采购单</button>
         </div>
-        <div id="aiResponse" style="padding:16px;background:var(--gray-50);border-radius:6px;font-size:13px;line-height:1.6;white-space:pre-wrap;min-height:60px;">💡 输入问题开始分析，或点击"建议采购单"自动生成补货建议</div>
+        <div id="aiResponse" style="padding:16px;background:var(--gray-50);border-radius:6px;font-size:13px;line-height:1.6;white-space:pre-wrap;min-height:60px;">输入问题开始分析，或点击"建议采购单"自动生成补货建议</div>
       </div>
     </div>
   </div>
@@ -418,7 +660,7 @@ a { color: var(--primary); text-decoration: none; }
   <!-- Status Bar -->
   <div class="status-bar">
     <div class="sheet-tabs">
-      <span class="sheet-tab active">总表</span>
+      <span class="sheet-tab active" onclick="switchView('products')">总表</span>
       <span class="sheet-tab" onclick="switchView('orders')">采购单</span>
       <span class="sheet-tab" onclick="switchView('ai')">AI分析</span>
     </div>
@@ -430,97 +672,81 @@ a { color: var(--primary); text-decoration: none; }
   </div>
 </div>
 
-<!-- ===== MODAL ===== -->
+<!-- ===== MAIN MODAL ===== -->
 <div class="modal-overlay" id="modalOverlay">
-  <div class="modal">
+  <div class="modal" id="modalWindow">
     <div class="modal-header">
       <h3 id="modalTitle">标题</h3>
-      <button class="modal-close" onclick="closeModal()">×</button>
+      <button class="modal-close" onclick="closeModal()">x</button>
     </div>
     <div class="modal-body" id="modalBody"></div>
     <div class="modal-footer" id="modalFooter"></div>
   </div>
 </div>
 
-<!-- ===== SETTINGS PANEL ===== -->
-<div class="settings-panel" id="settingsPanel">
+<!-- ===== SIDEBAR PANEL ===== -->
+<div class="sidebar-panel" id="sidebarPanel">
   <div class="panel-header">
-    <h3>⚙️ 设置</h3>
-    <button class="modal-close" onclick="closeSettings()">×</button>
+    <h3 id="sidebarTitle">面板</h3>
+    <button class="modal-close" onclick="closeSidebar()">x</button>
   </div>
-  <div class="panel-body">
-    <div class="form-group">
-      <label>OpenAI API Key</label>
-      <input type="password" id="settingApiKey" placeholder="sk-...">
-      <div style="font-size:11px;color:var(--gray-400);margin-top:4px;">配置后启用AI高级分析</div>
-    </div>
-    <div class="form-group">
-      <label>API Base 地址</label>
-      <input type="text" id="settingApiBase" placeholder="https://api.openai.com/v1" value="https://api.openai.com/v1">
-    </div>
-    <div class="form-group">
-      <label>企业微信 Webhook</label>
-      <input type="text" id="settingWebhook" placeholder="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=...">
-    </div>
-    <button class="btn btn-primary btn-block" onclick="saveSettings()">保存设置</button>
-    <hr style="margin:20px 0;border:none;border-top:1px solid var(--gray-200);">
-    <div class="form-group">
-      <label>当前用户</label>
-      <div style="display:flex;align-items:center;gap:8px;padding:8px 0;">
-        <span class="user-avatar" id="settingsAvatar">管</span>
-        <span id="settingsUserName">管理员</span>
-        <span style="font-size:11px;color:var(--gray-400);" id="settingsUserRole">admin</span>
-      </div>
-    </div>
-    <button class="btn btn-outline btn-block" onclick="doLogout()">退出登录</button>
-  </div>
+  <div class="panel-body" id="sidebarBody"></div>
 </div>
 
 <!-- ===== TOAST ===== -->
 <div class="toast" id="toast"></div>
+
+<!-- ===== SPINNER ===== -->
+<div class="spinner-overlay" id="spinnerOverlay"><div class="spinner"></div></div>
 
 <script>
 // ========== STATE ==========
 let TOKEN = localStorage.getItem('token') || '';
 let USER = JSON.parse(localStorage.getItem('user') || '{}');
 let products = [];
+let filteredProducts = [];
 let orders = [];
 let currentView = 'products';
 let selectedCell = null;
 let editingCell = null;
 let colWidths = {};
 let sortState = {};
+let columnFilters = {};
+let searchQuery = '';
+let activeFilterPopup = null;
+let isStarred = localStorage.getItem('docStarred') === 'true';
+let cellStyles = {}; // { 'row_col': { bold:true, italic:true, ... } }
 
-// Column definitions matching the uploaded Excel headers
-	const COLUMNS = [
-	  { key: 'row_num', label: '#', width: 50, editable: false },
-	  { key: 'date', label: '日期', width: 80, editable: true },
-	  { key: 'attribute', label: '属性', width: 70, editable: true },
-	  { key: 'category', label: '组别', width: 80, editable: true },
-	  { key: 'store', label: '店铺', width: 80, editable: true },
-	  { key: 'mercadolibre_link', label: '美客多产品链接', width: 180, editable: true, type: 'link' },
-	  { key: 'purchase_link', label: '原采购链接', width: 180, editable: true, type: 'link' },
-	  { key: 'sku', label: 'SKU', width: 140, editable: true },
-	  { key: 'product_name', label: '标题', width: 220, editable: true },
-	  { key: 'product_attributes', label: '产品属性', width: 120, editable: true },
-	  { key: 'purchase_remarks', label: '采购备注', width: 120, editable: true },
-	  { key: 'purchase_quantity', label: '采购数量', width: 80, editable: true, type: 'number' },
-	  { key: 'warehouse_remarks', label: '仓库备注', width: 120, editable: true },
-	  { key: 'order_number', label: '订单号', width: 160, editable: true },
-	  { key: 'purchase_price', label: '采购价RMB', width: 100, editable: true, type: 'number' },
-	  { key: 'new_purchase_price', label: '新采购价RMB', width: 100, editable: true, type: 'number' },
-	  { key: 'new_purchase_link', label: '新采购链接', width: 180, editable: true, type: 'link' },
-	  { key: 'supplier', label: '供应商', width: 140, editable: true },
-	  { key: 'image_url', label: '图片', width: 70, editable: true, type: 'image' },
-	  { key: 'stock_quantity', label: '库存', width: 70, editable: true, type: 'number' },
-	  { key: 'remark1', label: '备注1', width: 120, editable: true },
-	  { key: 'remark2', label: '备注2', width: 120, editable: true },
-	  { key: 'remark3', label: '备注3', width: 120, editable: true },
-	  { key: 'remark4', label: '备注4', width: 120, editable: true },
-	  { key: 'length', label: '长', width: 70, editable: true, type: 'number' },
-	  { key: 'width', label: '宽', width: 70, editable: true, type: 'number' },
-	  { key: 'height', label: '高', width: 70, editable: true, type: 'number' },
-	];
+// Column definitions matching the product schema
+const COLUMNS = [
+  { key: 'row_num', label: '#', width: 50, editable: false },
+  { key: 'date', label: '日期', width: 80, editable: true },
+  { key: 'attribute', label: '属性', width: 70, editable: true },
+  { key: 'category', label: '组别', width: 80, editable: true },
+  { key: 'store', label: '店铺', width: 80, editable: true },
+  { key: 'mercadolibre_link', label: '美客多产品链接', width: 180, editable: true, type: 'link' },
+  { key: 'purchase_link', label: '原采购链接', width: 180, editable: true, type: 'link' },
+  { key: 'sku', label: 'SKU', width: 140, editable: true },
+  { key: 'product_name', label: '标题', width: 220, editable: true },
+  { key: 'product_attributes', label: '产品属性', width: 120, editable: true },
+  { key: 'purchase_remarks', label: '采购备注', width: 120, editable: true },
+  { key: 'purchase_quantity', label: '采购数量', width: 80, editable: true, type: 'number' },
+  { key: 'warehouse_remarks', label: '仓库备注', width: 120, editable: true },
+  { key: 'order_number', label: '订单号', width: 160, editable: true },
+  { key: 'purchase_price', label: '采购价RMB', width: 100, editable: true, type: 'number' },
+  { key: 'new_purchase_price', label: '新采购价RMB', width: 100, editable: true, type: 'number' },
+  { key: 'new_purchase_link', label: '新采购链接', width: 180, editable: true, type: 'link' },
+  { key: 'supplier', label: '供应商', width: 140, editable: true },
+  { key: 'image_url', label: '图片', width: 70, editable: true, type: 'image' },
+  { key: 'stock_quantity', label: '库存', width: 70, editable: true, type: 'number' },
+  { key: 'remark1', label: '备注1', width: 120, editable: true },
+  { key: 'remark2', label: '备注2', width: 120, editable: true },
+  { key: 'remark3', label: '备注3', width: 120, editable: true },
+  { key: 'remark4', label: '备注4', width: 120, editable: true },
+  { key: 'length', label: '长', width: 70, editable: true, type: 'number' },
+  { key: 'width', label: '宽', width: 70, editable: true, type: 'number' },
+  { key: 'height', label: '高', width: 70, editable: true, type: 'number' },
+];
 
 // ========== AUTH ==========
 function doLogin() {
@@ -552,14 +778,14 @@ function doLogout() {
   TOKEN = ''; USER = {};
   document.getElementById('app').classList.remove('active');
   document.getElementById('loginPage').style.display = 'flex';
-  closeSettings();
+  closeSidebar();
 }
 
 function showRegister() { document.getElementById('loginForm').style.display='none'; document.getElementById('registerForm').style.display='block'; }
 function showLogin() { document.getElementById('loginForm').style.display='block'; document.getElementById('registerForm').style.display='none'; }
 
 function authHeaders() {
-  return TOKEN ? {'Authorization': `Bearer ${TOKEN}`, 'Content-Type': 'application/json'} : {'Content-Type': 'application/json'};
+  return TOKEN ? {'Authorization': 'Bearer '+TOKEN, 'Content-Type': 'application/json'} : {'Content-Type': 'application/json'};
 }
 
 // ========== APP ==========
@@ -567,23 +793,41 @@ function showApp() {
   document.getElementById('loginPage').style.display = 'none';
   document.getElementById('app').classList.add('active');
   const n = USER.display_name || USER.username;
-  document.getElementById('userAvatar').textContent = n[0];
-  document.getElementById('settingsAvatar').textContent = n[0];
-  document.getElementById('settingsUserName').textContent = n;
-  document.getElementById('settingsUserRole').textContent = USER.role;
+  document.getElementById('userAvatar').textContent = n ? n[0] : 'U';
   document.getElementById('userStatus').textContent = n;
+  if (isStarred) document.getElementById('starBtn').innerHTML = '&#9733;';
   loadData();
 }
+
+function toggleStar() {
+  isStarred = !isStarred;
+  document.getElementById('starBtn').innerHTML = isStarred ? '&#9733;' : '&#9734;';
+  localStorage.setItem('docStarred', isStarred);
+  toast(isStarred ? '已标记星标' : '已取消星标', 'info');
+}
+
+function toggleUserMenu() {
+  const menu = document.getElementById('userMenu');
+  menu.classList.toggle('show');
+}
+
+// Close user menu on outside click
+document.addEventListener('click', function(e) {
+  const dd = document.getElementById('userMenuDropdown');
+  if (dd && !dd.contains(e.target)) {
+    document.getElementById('userMenu').classList.remove('show');
+  }
+});
 
 // ========== DATA ==========
 async function loadData() {
   try {
     document.getElementById('lastSync').textContent = '同步中...';
-    const data = await api(`/api/products?page_size=200`);
+    const data = await api('/api/products?page_size=10000');
     products = data.items;
     document.getElementById('rowCount').textContent = products.length;
-    renderGrid();
-    document.getElementById('lastSync').textContent = `最后更新: ${new Date().toLocaleTimeString()}`;
+    applyFilters();
+    document.getElementById('lastSync').textContent = '最后更新: '+new Date().toLocaleTimeString();
   } catch(e) {
     toast('加载失败: '+e.message, 'error');
     document.getElementById('lastSync').textContent = '同步失败';
@@ -592,6 +836,7 @@ async function loadData() {
 
 function refreshData() { loadData(); }
 
+// ========== API ==========
 async function api(url, method='GET', body=null) {
   const opts = {method, headers: authHeaders()};
   if (body) opts.body = JSON.stringify(body);
@@ -611,66 +856,228 @@ async function api(url, method='GET', body=null) {
   return data;
 }
 
+// ========== FILTERING & SORTING ==========
+function applyFilters() {
+  searchQuery = document.getElementById('searchInput').value.toLowerCase().trim();
+  let result = [...products];
+  if (searchQuery) {
+    const searchableCols = COLUMNS.filter(c => c.key !== 'row_num' && c.key !== 'image_url');
+    result = result.filter(p => {
+      return searchableCols.some(col => {
+        const val = p[col.key];
+        return val !== null && val !== undefined && String(val).toLowerCase().includes(searchQuery);
+      });
+    });
+  }
+  Object.keys(columnFilters).forEach(colKey => {
+    const selectedValues = columnFilters[colKey];
+    if (selectedValues && selectedValues.size > 0) {
+      result = result.filter(p => {
+        const val = String(p[colKey] || '').trim();
+        return selectedValues.has(val);
+      });
+    }
+  });
+  const sortKey = Object.keys(sortState).find(k => sortState[k] !== null);
+  if (sortKey) {
+    const dir = sortState[sortKey] === 'asc' ? 1 : -1;
+    result.sort((a, b) => {
+      const va = a[sortKey] !== null && a[sortKey] !== undefined ? a[sortKey] : '';
+      const vb = b[sortKey] !== null && b[sortKey] !== undefined ? b[sortKey] : '';
+      if (typeof va === 'number' && typeof vb === 'number') return (va - vb) * dir;
+      return String(va).localeCompare(String(vb), 'zh-CN') * dir;
+    });
+  }
+  filteredProducts = result;
+  updateFilterTags();
+  renderGrid();
+  document.getElementById('filterCount').textContent = '显示 '+result.length+'/'+products.length+' 条';
+}
+
+function toggleSort(colKey) {
+  if (sortState[colKey] === 'asc') {
+    sortState[colKey] = 'desc';
+  } else if (sortState[colKey] === 'desc') {
+    sortState[colKey] = null;
+  } else {
+    Object.keys(sortState).forEach(k => sortState[k] = null);
+    sortState[colKey] = 'asc';
+  }
+  applyFilters();
+}
+
+function showColumnFilter(colIdx, event) {
+  event.stopPropagation();
+  closeFilterPopup();
+  const col = COLUMNS[colIdx];
+  if (col.key === 'row_num') return;
+  const valueSet = new Set();
+  products.forEach(p => {
+    const val = String(p[col.key] || '').trim();
+    valueSet.add(val || '(空白)');
+  });
+  const values = Array.from(valueSet).sort();
+  const selectedSet = columnFilters[col.key] || new Set();
+  const popup = document.createElement('div');
+  popup.className = 'col-filter-popup';
+  popup.id = 'activeFilterPopup';
+  popup.innerHTML = `
+    <div class="popup-header">
+      <span>筛选: ${col.label}</span>
+      <span class="clear-btn" onclick="clearColumnFilter('${col.key}')">清除</span>
+    </div>
+    <div class="popup-search">
+      <input type="text" placeholder="搜索..." oninput="filterPopupList(this.value)" onkeydown="event.stopPropagation()">
+    </div>
+    <div class="popup-list" id="popupList">
+      <label><input type="checkbox" onchange="toggleSelectAll(this)" ${selectedSet.size === 0 || selectedSet.size === values.length ? 'checked' : ''}> 全选 (${values.length})</label>
+      ${values.map(v => '<label><input type="checkbox" value="'+escHtml(v)+'" '+(selectedSet.has(v)||selectedSet.size===0?'checked':'')+' onchange="onFilterCheckChange(\''+col.key+'\', this)"> '+escHtml(v)+'</label>').join('')}
+    </div>
+    <div class="popup-footer">
+      <button class="btn btn-sm btn-outline" onclick="closeFilterPopup()">取消</button>
+      <button class="btn btn-sm btn-primary" onclick="confirmFilter('${col.key}')">确定</button>
+    </div>
+  `;
+  document.body.appendChild(popup);
+  const th = document.querySelectorAll('.col-header')[colIdx];
+  if (th) {
+    const rect = th.getBoundingClientRect();
+    popup.style.left = Math.min(rect.left, window.innerWidth - 330) + 'px';
+    popup.style.top = (rect.bottom + 4) + 'px';
+  }
+  popup._colKey = col.key;
+  popup._values = values;
+  activeFilterPopup = popup;
+  setTimeout(() => { document.addEventListener('click', closeFilterPopup, { once: true }); }, 10);
+}
+
+function closeFilterPopup() {
+  if (activeFilterPopup) { activeFilterPopup.remove(); activeFilterPopup = null; }
+}
+
+function filterPopupList(query) {
+  const list = document.getElementById('popupList');
+  if (!list) return;
+  const labels = list.querySelectorAll('label');
+  const q = query.toLowerCase();
+  labels.forEach(label => { label.style.display = label.textContent.toLowerCase().includes(q) ? '' : 'none'; });
+}
+
+function toggleSelectAll(checkbox) {
+  const list = document.getElementById('popupList');
+  const checkboxes = list.querySelectorAll('input[type="checkbox"]:not(:first-child)');
+  checkboxes.forEach(cb => cb.checked = checkbox.checked);
+}
+
+function onFilterCheckChange(colKey, checkbox) {
+  const list = document.getElementById('popupList');
+  const allCbs = list.querySelectorAll('input[type="checkbox"]:not(:first-child):not([style*="display: none"])');
+  const checkedCbs = list.querySelectorAll('input[type="checkbox"]:not(:first-child):checked:not([style*="display: none"])');
+  const selectAll = list.querySelector('input[type="checkbox"]:first-child');
+  if (selectAll) selectAll.checked = allCbs.length === checkedCbs.length;
+}
+
+function confirmFilter(colKey) {
+  const list = document.getElementById('popupList');
+  const checkedCbs = list.querySelectorAll('input[type="checkbox"]:checked:not(:first-child)');
+  const selectAll = list.querySelector('input[type="checkbox"]:first-child');
+  if (selectAll && selectAll.checked) {
+    delete columnFilters[colKey];
+  } else {
+    const selected = new Set();
+    checkedCbs.forEach(cb => {
+      let val = cb.value;
+      if (val === '(空白)') val = '';
+      selected.add(val);
+    });
+    if (selected.size === 0) delete columnFilters[colKey];
+    else columnFilters[colKey] = selected;
+  }
+  closeFilterPopup();
+  applyFilters();
+}
+
+function clearColumnFilter(colKey) {
+  closeFilterPopup();
+  delete columnFilters[colKey];
+  applyFilters();
+}
+
+function updateFilterTags() {
+  const container = document.getElementById('filterTags');
+  let html = '';
+  Object.keys(columnFilters).forEach(colKey => {
+    const col = COLUMNS.find(c => c.key === colKey);
+    if (col && columnFilters[colKey].size > 0) {
+      html += '<span class="filter-tag">'+col.label+': '+columnFilters[colKey].size+'项 <span class="remove" onclick="clearColumnFilter(\''+colKey+'\')">x</span></span>';
+    }
+  });
+  container.innerHTML = html;
+}
+
 // ========== GRID ==========
 function renderGrid() {
   const header = document.getElementById('gridHeader');
   const body = document.getElementById('gridBody');
-
-  // Build header
   let hHtml = '<tr>';
   COLUMNS.forEach((col, i) => {
-    hHtml += `<th class="col-header" style="min-width:${col.width}px;max-width:${col.width}px;width:${col.width}px;position:relative;">
-      ${col.label}
-      <span class="filter-icon" onclick="showFilter(${i})" title="筛选">▼</span>
-      <span class="resize-handle" onmousedown="startResize(event, ${i})"></span>
-    </th>`;
+    const sortDir = sortState[col.key];
+    let sortArrow = '';
+    if (sortDir === 'asc') sortArrow = ' \u25B2';
+    else if (sortDir === 'desc') sortArrow = ' \u25BC';
+    const sortedCls = sortDir ? 'sorted' : '';
+    hHtml += '<th class="col-header '+sortedCls+'" style="min-width:'+col.width+'px;max-width:'+col.width+'px;width:'+col.width+'px;position:relative;cursor:pointer;" onclick="toggleSort(\''+col.key+'\')" title="点击排序">'
+      + col.label + '<span class="sort-indicator">'+sortArrow+'</span>'
+      + '<span class="filter-icon" onclick="event.stopPropagation();showColumnFilter('+i+', event)" title="筛选">\u25BC</span>'
+      + '<span class="resize-handle" onmousedown="startResize(event, '+i+')"></span>'
+      + '</th>';
   });
   hHtml += '</tr>';
   header.innerHTML = hHtml;
 
-  // Build body
-  if (!products.length) {
-    body.innerHTML = `<tr><td colspan="${COLUMNS.length}" style="text-align:center;padding:40px;color:var(--gray-400);">暂无数据，点击工具栏"新增"添加产品</td></tr>`;
+  const data = filteredProducts;
+  if (!data.length) {
+    body.innerHTML = '<tr><td colspan="'+COLUMNS.length+'" style="text-align:center;padding:40px;color:var(--gray-400);">'+(products.length?'没有匹配的数据，请调整筛选条件':'暂无数据，点击工具栏"新增"添加产品')+'</td></tr>';
     return;
   }
 
   let bHtml = '';
-  products.forEach((p, rowIdx) => {
+  data.forEach((p, rowIdx) => {
     bHtml += '<tr>';
     COLUMNS.forEach((col, colIdx) => {
       if (col.key === 'row_num') {
-        bHtml += `<td class="row-num">${rowIdx + 1}</td>`;
+        bHtml += '<td class="row-num">'+(rowIdx+1)+'</td>';
         return;
       }
       let val = p[col.key];
       let cls = 'cell';
       let content = '';
-
       if (val === null || val === undefined || val === '') {
-	        content = '';
-	      } else if (col.key === 'status') {
-	        const statusMap = {'待采购':'pending','已下单':'ordered','在途':'transit','已入库':'warehoused','停售':'discontinued'};
-	        const sc = statusMap[val] || 'pending';
-	        content = `<span class="status-dot" style="background:${sc==='pending'?'#f59e0b':sc==='ordered'?'#3b82f6':sc==='transit'?'#8b5cf6':sc==='warehoused'?'#22c55e':'#9ca3af'}"></span><span class="status-${sc}">${escHtml(val)}</span>`;
-	      } else if (col.key === 'image_url') {
-	        content = val ? `<img src="${escHtml(val)}" class="img-thumb" onerror="this.style.display='none'">` : '';
-	      } else if (col.type === 'link' && val) {
-	        content = `<a href="${escHtml(val)}" target="_blank" class="cell-link">${val.length > 30 ? val.slice(0,30)+'...' : val}</a>`;
-	      } else if (col.type === 'number') {
-	        const num = Number(val);
-	        if (Number.isInteger(num) && Math.abs(num) < 100000) {
-	          content = `<span class="cell-content num">${num}</span>`;
-	        } else {
-	          content = `<span class="cell-content num">${num.toFixed(2)}</span>`;
-	        }
-	      } else {
+        content = '';
+      } else if (col.key === 'status') {
+        const statusMap = {'待采购':'pending','已下单':'ordered','在途':'transit','已入库':'warehoused','停售':'discontinued'};
+        const sc = statusMap[val] || 'pending';
+        const scColors = {'pending':'#f59e0b','ordered':'#3b82f6','transit':'#8b5cf6','warehoused':'#22c55e','discontinued':'#9ca3af'};
+        content = '<span class="status-dot" style="background:'+(scColors[sc]||'#f59e0b')+'"></span><span class="status-'+sc+'">'+escHtml(val)+'</span>';
+      } else if (col.key === 'image_url') {
+        content = val ? '<img src="'+escHtml(val)+'" class="img-thumb" onerror="this.style.display=\'none\'">' : '';
+      } else if (col.type === 'link' && val) {
+        const display = val.length > 35 ? val.slice(0,35)+'...' : val;
+        content = '<a href="'+escHtml(val)+'" target="_blank" class="cell-link">'+escHtml(display)+'</a>';
+      } else if (col.type === 'number') {
+        const num = Number(val);
+        if (Number.isInteger(num) && Math.abs(num) < 100000) {
+          content = '<span class="cell-content num">'+num+'</span>';
+        } else {
+          content = '<span class="cell-content num">'+num.toFixed(2)+'</span>';
+        }
+      } else {
         content = escHtml(String(val));
       }
-
-      bHtml += `<td class="${cls}" data-row="${rowIdx}" data-col="${colIdx}" data-key="${col.key}" data-id="${p.id}" onclick="selectCell(this)">
-        <div class="cell-content${col.type==='number'?' num':''}">${content}</div>
-        <input class="cell-edit" onblur="finishEdit(this)" onkeydown="if(event.key==='Enter')this.blur();if(event.key==='Escape'){this.value=this.dataset.old;this.blur()}">
-      </td>`;
+      bHtml += '<td class="'+cls+'" data-row="'+rowIdx+'" data-col="'+colIdx+'" data-key="'+col.key+'" data-id="'+(p.id||'')+'" onclick="selectCell(this)" ondblclick="startEdit(this)">'
+        + '<div class="cell-content'+(col.type==='number'?' num':'')+'">'+content+'</div>'
+        + '<input class="cell-edit" onblur="finishEdit(this)" onkeydown="if(event.key===\'Enter\')this.blur();if(event.key===\'Escape\'){this.value=this.dataset.old;this.blur()}">'
+        + '</td>';
     });
     bHtml += '</tr>';
   });
@@ -683,7 +1090,7 @@ function selectCell(el) {
   el.classList.add('selected');
   const row = parseInt(el.dataset.row) + 1;
   const col = String.fromCharCode(65 + parseInt(el.dataset.col));
-  document.getElementById('cellRef').textContent = `${col}${row}`;
+  document.getElementById('cellRef').textContent = col + row;
   const content = el.querySelector('.cell-content');
   document.getElementById('formulaInput').value = content ? content.textContent.trim() : '';
 }
@@ -694,7 +1101,6 @@ function startEdit(el) {
   const content = el.querySelector('.cell-content');
   const key = el.dataset.key;
   if (!editInput || !key || !COLUMNS.find(c=>c.key===key)?.editable) return;
-  
   editInput.value = content.textContent.trim();
   editInput.dataset.old = editInput.value;
   content.classList.add('editing');
@@ -714,21 +1120,37 @@ document.addEventListener('keydown', e => {
     e.preventDefault();
     const col = parseInt(selectedCell.dataset.col);
     const row = parseInt(selectedCell.dataset.row);
-    const next = document.querySelector(`td[data-row="${row}"][data-col="${col+1}"]`);
+    const next = document.querySelector('td[data-row="'+row+'"][data-col="'+(col+1)+'"]');
     if (next) { selectCell(next); if (editingCell) startEdit(next); }
   }
   if (e.key === 'ArrowDown' && selectedCell) {
     e.preventDefault();
     const col = parseInt(selectedCell.dataset.col);
     const row = parseInt(selectedCell.dataset.row);
-    const next = document.querySelector(`td[data-row="${row+1}"][data-col="${col}"]`);
+    const next = document.querySelector('td[data-row="'+(row+1)+'"][data-col="'+col+'"]');
     if (next) selectCell(next);
   }
   if (e.key === 'ArrowUp' && selectedCell) {
     e.preventDefault();
     const col = parseInt(selectedCell.dataset.col);
     const row = parseInt(selectedCell.dataset.row);
-    const next = document.querySelector(`td[data-row="${row-1}"][data-col="${col}"]`);
+    const next = document.querySelector('td[data-row="'+(row-1)+'"][data-col="'+col+'"]');
+    if (next) selectCell(next);
+  }
+  if (e.key === 'ArrowLeft' && selectedCell) {
+    e.preventDefault();
+    const col = parseInt(selectedCell.dataset.col);
+    const row = parseInt(selectedCell.dataset.row);
+    if (col > 0) {
+      const next = document.querySelector('td[data-row="'+row+'"][data-col="'+(col-1)+'"]');
+      if (next) selectCell(next);
+    }
+  }
+  if (e.key === 'ArrowRight' && selectedCell) {
+    e.preventDefault();
+    const col = parseInt(selectedCell.dataset.col);
+    const row = parseInt(selectedCell.dataset.row);
+    const next = document.querySelector('td[data-row="'+row+'"][data-col="'+(col+1)+'"]');
     if (next) selectCell(next);
   }
 });
@@ -739,20 +1161,23 @@ function finishEdit(input) {
   const newVal = input.value;
   input.classList.remove('active');
   content.classList.remove('editing');
+  const cell = editingCell;
   editingCell = null;
-  
   if (newVal !== input.dataset.old) {
-    const id = parseInt(editingCell.dataset.id);
-    const key = editingCell.dataset.key;
-    const field = key;
+    const id = parseInt(cell.dataset.id);
+    const key = cell.dataset.key;
     let val = newVal;
     const col = COLUMNS.find(c => c.key === key);
     if (col && col.type === 'number') val = parseFloat(val) || 0;
+    if (id) {
+      quickEdit(id, key, val);
+    }
     if (key === 'status') {
-      quickEdit(id, field, val);
-      content.innerHTML = `<span class="status-dot" style="background:${val==='待采购'?'#f59e0b':val==='已下单'?'#3b82f6':val==='在途'?'#8b5cf6':val==='已入库'?'#22c55e':'#9ca3af'}"></span>${val}`;
+      const statusMap = {'待采购':'pending','已下单':'ordered','在途':'transit','已入库':'warehoused','停售':'discontinued'};
+      const sc = statusMap[val] || 'pending';
+      const scColors = {'pending':'#f59e0b','ordered':'#3b82f6','transit':'#8b5cf6','warehoused':'#22c55e','discontinued':'#9ca3af'};
+      content.innerHTML = '<span class="status-dot" style="background:'+(scColors[sc]||'#f59e0b')+'"></span><span class="status-'+sc+'">'+escHtml(val)+'</span>';
     } else {
-      quickEdit(id, field, val);
       content.textContent = val;
     }
   }
@@ -760,8 +1185,8 @@ function finishEdit(input) {
 
 async function quickEdit(id, field, value) {
   try {
-    await api(`/api/products/${id}`, 'PUT', {[field]: value});
-    document.getElementById('lastSync').textContent = `已保存 ${new Date().toLocaleTimeString()}`;
+    await api('/api/products/'+id, 'PUT', {[field]: value});
+    document.getElementById('lastSync').textContent = '已保存 '+new Date().toLocaleTimeString();
   } catch(e) {
     toast('保存失败: '+e.message, 'error');
   }
@@ -786,8 +1211,7 @@ function doResize(e) {
   th.style.minWidth = newW + 'px';
   th.style.maxWidth = newW + 'px';
   COLUMNS[resizeCol].width = newW;
-  // Update all cells in this column
-  document.querySelectorAll(`td[data-col="${resizeCol}"]`).forEach(td => {
+  document.querySelectorAll('td[data-col="'+resizeCol+'"]').forEach(td => {
     td.style.minWidth = newW + 'px';
     td.style.maxWidth = newW + 'px';
     td.style.width = newW + 'px';
@@ -797,6 +1221,64 @@ function stopResize() {
   resizeCol = null;
   document.removeEventListener('mousemove', doResize);
   document.removeEventListener('mouseup', stopResize);
+}
+
+// ========== FORMATTING ==========
+function applyFormat(type, value) {
+  if (!selectedCell) { toast('请先选择一个单元格', 'info'); return; }
+  const row = selectedCell.dataset.row;
+  const col = selectedCell.dataset.col;
+  const key = row + '_' + col;
+  if (!cellStyles[key]) cellStyles[key] = {};
+  const cellContent = selectedCell.querySelector('.cell-content');
+  switch(type) {
+    case 'bold':
+      cellStyles[key].bold = !cellStyles[key].bold;
+      cellContent.style.fontWeight = cellStyles[key].bold ? '700' : 'normal';
+      break;
+    case 'italic':
+      cellStyles[key].italic = !cellStyles[key].italic;
+      cellContent.style.fontStyle = cellStyles[key].italic ? 'italic' : 'normal';
+      break;
+    case 'underline':
+      cellStyles[key].underline = !cellStyles[key].underline;
+      cellContent.style.textDecoration = cellStyles[key].underline ? 'underline' : 'none';
+      break;
+    case 'fontName':
+      cellStyles[key].fontName = value;
+      cellContent.style.fontFamily = value;
+      break;
+    case 'fontSize':
+      cellStyles[key].fontSize = value;
+      cellContent.style.fontSize = value + 'px';
+      break;
+    case 'textColor':
+      cellStyles[key].textColor = value;
+      cellContent.style.color = value;
+      break;
+    case 'fillColor':
+      cellStyles[key].fillColor = value;
+      selectedCell.style.backgroundColor = value;
+      break;
+    case 'alignLeft':
+      cellStyles[key].align = 'left';
+      cellContent.style.textAlign = 'left';
+      break;
+    case 'alignCenter':
+      cellStyles[key].align = 'center';
+      cellContent.style.textAlign = 'center';
+      break;
+    case 'alignRight':
+      cellStyles[key].align = 'right';
+      cellContent.style.textAlign = 'right';
+      break;
+    case 'border':
+      selectedCell.style.border = '1px solid #000';
+      break;
+    case 'numberFormat':
+      cellStyles[key].numberFormat = value;
+      break;
+  }
 }
 
 // ========== VIEW SWITCH ==========
@@ -815,119 +1297,161 @@ function switchView(view) {
 
 // ========== PRODUCT CRUD ==========
 function showCreateProduct() {
-	  document.getElementById('modalTitle').textContent = '新增产品';
-	  document.getElementById('modalBody').innerHTML = `
-	    <div class="form-row">
-	      <div class="form-group"><label>SKU *</label><input id="f_sku" placeholder="必填，唯一标识"></div>
-	      <div class="form-group"><label>标题 *</label><input id="f_name" placeholder="必填"></div>
-	    </div>
-	    <div class="form-row-3">
-	      <div class="form-group"><label>日期</label><input id="f_date" placeholder="如：46093"></div>
-	      <div class="form-group"><label>属性</label><input id="f_attribute" placeholder="如：补货"></div>
-	      <div class="form-group"><label>组别</label><input id="f_category" placeholder="如：美一组"></div>
-	    </div>
-	    <div class="form-row-3">
-	      <div class="form-group"><label>店铺</label><input id="f_store" placeholder="如：B7店"></div>
-	      <div class="form-group"><label>产品属性</label><input id="f_product_attr" placeholder="如：笔记本15.6寸"></div>
-	      <div class="form-group"><label>供应商</label><input id="f_supplier" placeholder="供应商名称"></div>
-	    </div>
-	    <div class="form-row-3">
-	      <div class="form-group"><label>采购价RMB</label><input id="f_purchase_price" type="number" step="0.01" value="0"></div>
-	      <div class="form-group"><label>新采购价RMB</label><input id="f_new_price" type="number" step="0.01" value="0"></div>
-	      <div class="form-group"><label>采购数量</label><input id="f_purchase_qty" type="number" value="0"></div>
-	    </div>
-	    <div class="form-row-3">
-	      <div class="form-group"><label>库存</label><input id="f_stock" type="number" value="0"></div>
-	      <div class="form-group"><label>订单号</label><input id="f_order" placeholder="采购订单号"></div>
-	      <div class="form-group"><label>长/宽/高</label><div style="display:flex;gap:4px;"><input id="f_length" type="number" step="0.1" placeholder="长" style="flex:1"><input id="f_width" type="number" step="0.1" placeholder="宽" style="flex:1"><input id="f_height" type="number" step="0.1" placeholder="高" style="flex:1"></div></div>
-	    </div>
-	    <div class="form-group"><label>美客多产品链接</label><input id="f_mercadolibre" placeholder="https://..."></div>
-	    <div class="form-group"><label>原采购链接</label><input id="f_link" placeholder="https://detail.1688.com/..."></div>
-	    <div class="form-group"><label>新采购链接</label><input id="f_new_link" placeholder="https://..."></div>
-	    <div class="form-group"><label>图片URL</label><input id="f_img" placeholder="https://..."></div>
-	    <div class="form-row">
-	      <div class="form-group"><label>采购备注</label><textarea id="f_purchase_remarks" rows="2" style="width:100%"></textarea></div>
-	      <div class="form-group"><label>仓库备注</label><textarea id="f_warehouse_remarks" rows="2" style="width:100%"></textarea></div>
-	    </div>
-	    <div class="form-row-3">
-	      <div class="form-group"><label>备注1</label><input id="f_remark1"></div>
-	      <div class="form-group"><label>备注2</label><input id="f_remark2"></div>
-	      <div class="form-group"><label>备注3</label><input id="f_remark3"></div>
-	    </div>
-	    <div class="form-group"><label>备注4</label><input id="f_remark4"></div>
-	  `;
-	  document.getElementById('modalFooter').innerHTML = `
-	    <button class="btn btn-outline" onclick="closeModal()">取消</button>
-	    <button class="btn btn-primary" onclick="submitCreateProduct()">创建</button>
-	  `;
-	  document.getElementById('modalOverlay').classList.add('active');
-	}
+  document.getElementById('modalTitle').textContent = '新增产品';
+  document.getElementById('modalBody').innerHTML = `
+    <div class="form-row">
+      <div class="form-group"><label>SKU *</label><input id="f_sku" placeholder="必填，唯一标识"></div>
+      <div class="form-group"><label>标题 *</label><input id="f_name" placeholder="必填"></div>
+    </div>
+    <div class="form-row-3">
+      <div class="form-group"><label>日期</label><input id="f_date" placeholder="如：46093"></div>
+      <div class="form-group"><label>属性</label><input id="f_attribute" placeholder="如：补货"></div>
+      <div class="form-group"><label>组别</label><input id="f_category" placeholder="如：美一组"></div>
+    </div>
+    <div class="form-row-3">
+      <div class="form-group"><label>店铺</label><input id="f_store" placeholder="如：B7店"></div>
+      <div class="form-group"><label>产品属性</label><input id="f_product_attr" placeholder="如：笔记本15.6寸"></div>
+      <div class="form-group"><label>供应商</label><input id="f_supplier" placeholder="供应商名称"></div>
+    </div>
+    <div class="form-row-3">
+      <div class="form-group"><label>采购价RMB</label><input id="f_purchase_price" type="number" step="0.01" value="0"></div>
+      <div class="form-group"><label>新采购价RMB</label><input id="f_new_price" type="number" step="0.01" value="0"></div>
+      <div class="form-group"><label>采购数量</label><input id="f_purchase_qty" type="number" value="0"></div>
+    </div>
+    <div class="form-row-3">
+      <div class="form-group"><label>库存</label><input id="f_stock" type="number" value="0"></div>
+      <div class="form-group"><label>订单号</label><input id="f_order" placeholder="采购订单号"></div>
+      <div class="form-group"><label>长/宽/高</label><div style="display:flex;gap:4px;"><input id="f_length" type="number" step="0.1" placeholder="长" style="flex:1"><input id="f_width" type="number" step="0.1" placeholder="宽" style="flex:1"><input id="f_height" type="number" step="0.1" placeholder="高" style="flex:1"></div></div>
+    </div>
+    <div class="form-group"><label>美客多产品链接</label><input id="f_mercadolibre" placeholder="https://..."></div>
+    <div class="form-group"><label>原采购链接</label><input id="f_link" placeholder="https://detail.1688.com/..."></div>
+    <div class="form-group"><label>新采购链接</label><input id="f_new_link" placeholder="https://..."></div>
+    <div class="form-group"><label>图片URL</label><input id="f_img" placeholder="https://..."></div>
+    <div class="form-row">
+      <div class="form-group"><label>采购备注</label><textarea id="f_purchase_remarks" rows="2" style="width:100%"></textarea></div>
+      <div class="form-group"><label>仓库备注</label><textarea id="f_warehouse_remarks" rows="2" style="width:100%"></textarea></div>
+    </div>
+    <div class="form-row-3">
+      <div class="form-group"><label>备注1</label><input id="f_remark1"></div>
+      <div class="form-group"><label>备注2</label><input id="f_remark2"></div>
+      <div class="form-group"><label>备注3</label><input id="f_remark3"></div>
+    </div>
+    <div class="form-group"><label>备注4</label><input id="f_remark4"></div>
+  `;
+  document.getElementById('modalFooter').innerHTML = '<button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="submitCreateProduct()">创建</button>';
+  document.getElementById('modalOverlay').classList.add('active');
+}
 
 async function submitCreateProduct() {
-	  const d = {
-	    sku: document.getElementById('f_sku').value,
-	    product_name: document.getElementById('f_name').value,
-	    date: document.getElementById('f_date').value,
-	    attribute: document.getElementById('f_attribute').value,
-	    category: document.getElementById('f_category').value,
-	    store: document.getElementById('f_store').value,
-	    product_attributes: document.getElementById('f_product_attr').value,
-	    supplier: document.getElementById('f_supplier').value,
-	    purchase_price: parseFloat(document.getElementById('f_purchase_price').value) || 0,
-	    new_purchase_price: parseFloat(document.getElementById('f_new_price').value) || 0,
-	    purchase_quantity: parseInt(document.getElementById('f_purchase_qty').value) || 0,
-	    stock_quantity: parseInt(document.getElementById('f_stock').value) || 0,
-	    order_number: document.getElementById('f_order').value,
-	    length: parseFloat(document.getElementById('f_length').value) || 0,
-	    width: parseFloat(document.getElementById('f_width').value) || 0,
-	    height: parseFloat(document.getElementById('f_height').value) || 0,
-	    mercadolibre_link: document.getElementById('f_mercadolibre').value,
-	    purchase_link: document.getElementById('f_link').value,
-	    new_purchase_link: document.getElementById('f_new_link').value,
-	    image_url: document.getElementById('f_img').value,
-	    purchase_remarks: document.getElementById('f_purchase_remarks').value,
-	    warehouse_remarks: document.getElementById('f_warehouse_remarks').value,
-	    remark1: document.getElementById('f_remark1').value,
-	    remark2: document.getElementById('f_remark2').value,
-	    remark3: document.getElementById('f_remark3').value,
-	    remark4: document.getElementById('f_remark4').value,
-	  };
-	  if (!d.sku || !d.product_name) { toast('SKU和标题为必填', 'error'); return; }
-	  try {
-	    await api('/api/products', 'POST', d);
-	    toast('创建成功', 'success');
-	    closeModal();
-	    loadData();
-	  } catch(e) { toast(e.message, 'error'); }
-	}
+  const d = {
+    sku: document.getElementById('f_sku').value,
+    product_name: document.getElementById('f_name').value,
+    date: document.getElementById('f_date').value,
+    attribute: document.getElementById('f_attribute').value,
+    category: document.getElementById('f_category').value,
+    store: document.getElementById('f_store').value,
+    product_attributes: document.getElementById('f_product_attr').value,
+    supplier: document.getElementById('f_supplier').value,
+    purchase_price: parseFloat(document.getElementById('f_purchase_price').value) || 0,
+    new_purchase_price: parseFloat(document.getElementById('f_new_price').value) || 0,
+    purchase_quantity: parseInt(document.getElementById('f_purchase_qty').value) || 0,
+    stock_quantity: parseInt(document.getElementById('f_stock').value) || 0,
+    order_number: document.getElementById('f_order').value,
+    length: parseFloat(document.getElementById('f_length').value) || 0,
+    width: parseFloat(document.getElementById('f_width').value) || 0,
+    height: parseFloat(document.getElementById('f_height').value) || 0,
+    mercadolibre_link: document.getElementById('f_mercadolibre').value,
+    purchase_link: document.getElementById('f_link').value,
+    new_purchase_link: document.getElementById('f_new_link').value,
+    image_url: document.getElementById('f_img').value,
+    purchase_remarks: document.getElementById('f_purchase_remarks').value,
+    warehouse_remarks: document.getElementById('f_warehouse_remarks').value,
+    remark1: document.getElementById('f_remark1').value,
+    remark2: document.getElementById('f_remark2').value,
+    remark3: document.getElementById('f_remark3').value,
+    remark4: document.getElementById('f_remark4').value,
+  };
+  if (!d.sku || !d.product_name) { toast('SKU和标题为必填', 'error'); return; }
+  try {
+    await api('/api/products', 'POST', d);
+    toast('创建成功', 'success');
+    closeModal();
+    loadData();
+  } catch(e) { toast(e.message, 'error'); }
+}
 
 // ========== ORDERS ==========
 async function loadOrders() {
   try {
     const status = document.getElementById('orderFilter').value;
-    const data = await api(`/api/orders?page_size=50&status=${encodeURIComponent(status)}`);
+    const data = await api('/api/orders?page_size=50&status='+encodeURIComponent(status));
     const list = document.getElementById('ordersList');
+    document.getElementById('orderCount').textContent = '共 '+data.total+' 条';
     if (!data.items.length) {
       list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--gray-400);">暂无采购单</div>';
       return;
     }
-    list.innerHTML = data.items.map(o => `
-      <div style="background:#fff;border:1px solid var(--gray-200);border-radius:8px;padding:16px;">
-        <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-          <span style="font-weight:600;font-size:14px;">${o.order_number}</span>
-          <span style="font-size:12px;padding:2px 8px;border-radius:10px;background:${o.status==='待审核'?'#fef3c7':o.status==='已批准'?'#dbeafe':'#d1fae5'};color:${o.status==='待审核'?'#92400e':o.status==='已批准'?'#1e40af':'#065f46'}">${o.status}</span>
+    const statusColors = {'待审核':'#fef3c7','已批准':'#dbeafe','已下单':'#e0e7ff','已收货':'#d1fae5','已取消':'#f3f4f6'};
+    const statusTextColors = {'待审核':'#92400e','已批准':'#1e40af','已下单':'#3730a3','已收货':'#065f46','已取消':'#6b7280'};
+    list.innerHTML = data.items.map(o => {
+      const sc = statusColors[o.status] || '#f3f4f6';
+      const stc = statusTextColors[o.status] || '#6b7280';
+      return '<div style="background:#fff;border:1px solid var(--gray-200);border-radius:8px;padding:16px;cursor:pointer;" onclick="showOrderDetail('+o.id+')">'
+        + '<div style="display:flex;justify-content:space-between;margin-bottom:8px;">'
+        + '<span style="font-weight:600;font-size:14px;">'+escHtml(o.order_number)+'</span>'
+        + '<span style="font-size:12px;padding:2px 8px;border-radius:10px;background:'+sc+';color:'+stc+'">'+escHtml(o.status)+'</span>'
+        + '</div>'
+        + '<div style="font-size:12px;color:var(--gray-500);">'
+        + '<div>供应商: '+(o.supplier||'-')+'</div>'
+        + '<div>金额: \u00A5'+o.total_amount.toFixed(2)+'</div>'
+        + '<div>商品数: '+o.item_count+' 项</div>'
+        + '<div>'+(o.created_by||'')+' | '+(o.created_at?new Date(o.created_at).toLocaleDateString():'')+'</div>'
+        + '</div></div>';
+    }).join('');
+  } catch(e) {
+    document.getElementById('ordersList').innerHTML = '<div style="text-align:center;padding:40px;color:var(--danger);">加载失败: '+e.message+'</div>';
+  }
+}
+
+function showOrderDetail(orderId) {
+  document.getElementById('modalTitle').textContent = '采购单详情';
+  document.getElementById('modalBody').innerHTML = '<div class="text-center text-muted" style="padding:20px;"><span class="loading"></span> 加载中...</div>';
+  document.getElementById('modalFooter').innerHTML = '<button class="btn btn-outline" onclick="closeModal()">关闭</button>';
+  document.getElementById('modalOverlay').classList.add('active');
+  api('/api/orders/'+orderId).then(data => {
+    const statusColors = {'待审核':'#fef3c7','已批准':'#dbeafe','已下单':'#e0e7ff','已收货':'#d1fae5','已取消':'#f3f4f6'};
+    const statusTextColors = {'待审核':'#92400e','已批准':'#1e40af','已下单':'#3730a3','已收货':'#065f46','已取消':'#6b7280'};
+    const sc = statusColors[data.status] || '#f3f4f6';
+    const stc = statusTextColors[data.status] || '#6b7280';
+    document.getElementById('modalBody').innerHTML = `
+      <div style="margin-bottom:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <span style="font-size:16px;font-weight:600;">${escHtml(data.order_number)}</span>
+          <span class="tag" style="background:${sc};color:${stc}">${escHtml(data.status)}</span>
         </div>
         <div style="font-size:12px;color:var(--gray-500);">
-          <div>供应商: ${o.supplier || '-'}</div>
-          <div>金额: ¥${o.total_amount.toFixed(2)}</div>
-          <div>商品数: ${o.item_count} 项</div>
-          <div>${o.created_by} | ${new Date(o.created_at).toLocaleDateString()}</div>
+          <div>供应商: ${escHtml(data.supplier||'-')}</div>
+          <div>总金额: \u00A5${data.total_amount.toFixed(2)}</div>
+          <div>运费: \u00A5${(data.shipping_cost||0).toFixed(2)}</div>
+          <div>创建人: ${escHtml(data.created_by||'-')}</div>
+          <div>创建时间: ${data.created_at?new Date(data.created_at).toLocaleString():'-'}</div>
+          <div>备注: ${escHtml(data.notes||'-')}</div>
         </div>
       </div>
-    `).join('');
-  } catch(e) {
-    document.getElementById('ordersList').innerHTML = '<div style="text-align:center;padding:40px;color:var(--danger);">加载失败</div>';
-  }
+      <h4 style="font-size:13px;margin-bottom:8px;color:var(--gray-600);">商品明细</h4>
+      <table style="width:100%;font-size:12px;border-collapse:collapse;">
+        <thead><tr style="background:var(--gray-50);">
+          <th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--gray-200);">SKU</th>
+          <th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--gray-200);">名称</th>
+          <th style="text-align:right;padding:6px 8px;border-bottom:1px solid var(--gray-200);">数量</th>
+          <th style="text-align:right;padding:6px 8px;border-bottom:1px solid var(--gray-200);">单价</th>
+          <th style="text-align:right;padding:6px 8px;border-bottom:1px solid var(--gray-200);">小计</th>
+        </tr></thead>
+        <tbody>${(data.items||[]).map(i => '<tr><td style="padding:6px 8px;border-bottom:1px solid var(--gray-100);">'+escHtml(i.sku)+'</td><td style="padding:6px 8px;border-bottom:1px solid var(--gray-100);">'+escHtml(i.product_name)+'</td><td style="padding:6px 8px;border-bottom:1px solid var(--gray-100);text-align:right;">'+i.quantity+'</td><td style="padding:6px 8px;border-bottom:1px solid var(--gray-100);text-align:right;">\u00A5'+i.unit_price.toFixed(2)+'</td><td style="padding:6px 8px;border-bottom:1px solid var(--gray-100);text-align:right;">\u00A5'+i.total_price.toFixed(2)+'</td></tr>').join('')}</tbody>
+      </table>`;
+  }).catch(e => {
+    document.getElementById('modalBody').innerHTML = '<div class="text-center text-muted" style="padding:20px;">加载失败: '+e.message+'</div>';
+  });
 }
 
 function showCreateOrder() {
@@ -941,15 +1465,12 @@ function showCreateOrder() {
         <input placeholder="SKU" class="oi-sku" style="padding:6px 8px;border:1px solid var(--gray-200);border-radius:4px;">
         <input type="number" placeholder="数量" class="oi-qty" style="width:80px;padding:6px 8px;border:1px solid var(--gray-200);border-radius:4px;" value="1">
         <input type="number" step="0.01" placeholder="单价" class="oi-price" style="width:100px;padding:6px 8px;border:1px solid var(--gray-200);border-radius:4px;" value="0">
-        <button class="btn btn-sm" style="background:var(--danger);color:#fff;border:none;padding:6px 10px;border-radius:4px;cursor:pointer;" onclick="this.parentElement.remove()">×</button>
+        <button class="btn btn-sm" style="background:var(--danger);color:#fff;border:none;padding:6px 10px;border-radius:4px;cursor:pointer;" onclick="this.parentElement.remove()">x</button>
       </div>
     </div>
     <button class="btn btn-sm btn-outline" onclick="addOrderItem()" style="margin-top:4px;">+ 添加一行</button>
   `;
-  document.getElementById('modalFooter').innerHTML = `
-    <button class="btn btn-outline" onclick="closeModal()">取消</button>
-    <button class="btn btn-primary" onclick="submitCreateOrder()">创建采购单</button>
-  `;
+  document.getElementById('modalFooter').innerHTML = '<button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="submitCreateOrder()">创建采购单</button>';
   document.getElementById('modalOverlay').classList.add('active');
 }
 
@@ -957,12 +1478,7 @@ function addOrderItem() {
   const div = document.createElement('div');
   div.className = 'form-row';
   div.style.marginBottom = '6px';
-  div.innerHTML = `
-    <input placeholder="SKU" class="oi-sku" style="padding:6px 8px;border:1px solid var(--gray-200);border-radius:4px;">
-    <input type="number" placeholder="数量" class="oi-qty" style="width:80px;padding:6px 8px;border:1px solid var(--gray-200);border-radius:4px;" value="1">
-    <input type="number" step="0.01" placeholder="单价" class="oi-price" style="width:100px;padding:6px 8px;border:1px solid var(--gray-200);border-radius:4px;" value="0">
-    <button class="btn btn-sm" style="background:var(--danger);color:#fff;border:none;padding:6px 10px;border-radius:4px;cursor:pointer;" onclick="this.parentElement.remove()">×</button>
-  `;
+  div.innerHTML = '<input placeholder="SKU" class="oi-sku" style="padding:6px 8px;border:1px solid var(--gray-200);border-radius:4px;"><input type="number" placeholder="数量" class="oi-qty" style="width:80px;padding:6px 8px;border:1px solid var(--gray-200);border-radius:4px;" value="1"><input type="number" step="0.01" placeholder="单价" class="oi-price" style="width:100px;padding:6px 8px;border:1px solid var(--gray-200);border-radius:4px;" value="0"><button class="btn btn-sm" style="background:var(--danger);color:#fff;border:none;padding:6px 10px;border-radius:4px;cursor:pointer;" onclick="this.parentElement.remove()">x</button>';
   document.getElementById('orderItems').appendChild(div);
 }
 
@@ -1003,9 +1519,9 @@ async function aiSuggestOrder() {
   document.getElementById('aiResponse').innerHTML = '<span class="loading"></span> 生成建议中...';
   try {
     const d = await api('/api/ai/suggest-order', 'POST');
-    let html = '💡 AI采购建议\n\n';
+    let html = 'AI采购建议\n\n';
     if (d.items && d.items.length) {
-      d.items.forEach(i => { html += `- ${i.sku}: 建议采购 ${i.suggested_quantity} 个\n  理由: ${i.reason || '库存不足'}\n`; });
+      d.items.forEach(i => { html += '- '+i.sku+': 建议采购 '+i.suggested_quantity+' 个\n  理由: '+(i.reason||'库存不足')+'\n'; });
     } else html += d.message || '暂无建议';
     document.getElementById('aiResponse').innerHTML = html;
   } catch(e) { document.getElementById('aiResponse').innerHTML = '生成失败: '+e.message; }
@@ -1026,10 +1542,7 @@ function showImport() {
       <div style="margin-top:8px;font-size:12px;color:var(--gray-400);">支持字段: date, attribute, category, store, mercadolibre_link, purchase_link, sku, product_name, product_attributes, purchase_remarks, purchase_quantity, warehouse_remarks, order_number, purchase_price, new_purchase_price, new_purchase_link, supplier, image_url, stock_quantity, remark1-4, length, width, height</div>
     </div>
   `;
-  document.getElementById('modalFooter').innerHTML = `
-    <button class="btn btn-outline" onclick="closeModal()">取消</button>
-    <button class="btn btn-primary" onclick="submitImport()">导入JSON</button>
-  `;
+  document.getElementById('modalFooter').innerHTML = '<button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="submitImport()">导入JSON</button>';
   document.getElementById('modalOverlay').classList.add('active');
 }
 
@@ -1041,7 +1554,7 @@ async function uploadExcel() {
   try {
     const resp = await fetch('/api/products/upload-excel', {
       method: 'POST',
-      headers: {'Authorization': `Bearer ${TOKEN}`},
+      headers: {'Authorization': 'Bearer '+TOKEN},
       body: formData,
     });
     const data = await resp.json();
@@ -1066,8 +1579,40 @@ async function submitImport() {
 }
 
 // ========== SETTINGS ==========
-function openSettings() { document.getElementById('settingsPanel').classList.add('active'); }
-function closeSettings() { document.getElementById('settingsPanel').classList.remove('active'); }
+function openSettings() {
+  closeSidebar();
+  document.getElementById('sidebarTitle').textContent = '设置';
+  document.getElementById('sidebarBody').innerHTML = `
+    <div class="form-group">
+      <label>OpenAI API Key</label>
+      <input type="password" id="settingApiKey" placeholder="sk-...">
+      <div style="font-size:11px;color:var(--gray-400);margin-top:4px;">配置后启用AI高级分析</div>
+    </div>
+    <div class="form-group">
+      <label>API Base 地址</label>
+      <input type="text" id="settingApiBase" placeholder="https://api.openai.com/v1" value="https://api.openai.com/v1">
+    </div>
+    <div class="form-group">
+      <label>企业微信 Webhook</label>
+      <input type="text" id="settingWebhook" placeholder="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=...">
+    </div>
+    <button class="btn btn-primary btn-block" onclick="saveSettings()">保存设置</button>
+    <hr style="margin:20px 0;border:none;border-top:1px solid var(--gray-200);">
+    <div class="form-group">
+      <label>当前用户</label>
+      <div style="display:flex;align-items:center;gap:8px;padding:8px 0;">
+        <span class="user-avatar" style="cursor:default;">${(USER.display_name||USER.username||'U')[0]}</span>
+        <span>${USER.display_name||USER.username||'未知'}</span>
+        <span style="font-size:11px;color:var(--gray-400);">${USER.role||''}</span>
+      </div>
+    </div>
+    <button class="btn btn-outline btn-block" onclick="doLogout()">退出登录</button>
+  `;
+  document.getElementById('settingApiKey').value = localStorage.getItem('OPENAI_API_KEY') || '';
+  document.getElementById('settingApiBase').value = localStorage.getItem('OPENAI_API_BASE') || 'https://api.openai.com/v1';
+  document.getElementById('settingWebhook').value = localStorage.getItem('WECOM_WEBHOOK_URL') || '';
+  document.getElementById('sidebarPanel').classList.add('active');
+}
 
 function saveSettings() {
   const k = document.getElementById('settingApiKey').value;
@@ -1079,55 +1624,544 @@ function saveSettings() {
   toast('设置已保存', 'success');
 }
 
-function loadSettings() {
-  document.getElementById('settingApiKey').value = localStorage.getItem('OPENAI_API_KEY') || '';
-  document.getElementById('settingApiBase').value = localStorage.getItem('OPENAI_API_BASE') || 'https://api.openai.com/v1';
-  document.getElementById('settingWebhook').value = localStorage.getItem('WECOM_WEBHOOK_URL') || '';
-}
+// ========== 1. GENERATE DASHBOARD ==========
+function showDashboard() {
+  document.getElementById('modalTitle').textContent = '生成仪表盘';
+  document.getElementById('modalWindow').className = 'modal modal-wide';
+  document.getElementById('modalBody').innerHTML = '<div class="text-center text-muted" style="padding:20px;"><span class="loading"></span> 生成仪表盘中...</div>';
+  document.getElementById('modalFooter').innerHTML = '<button class="btn btn-outline" onclick="closeModal()">关闭</button>';
+  document.getElementById('modalOverlay').classList.add('active');
 
-// ========== FILTER ==========
-function showFilter(colIdx) {
-  // Simple filter by status/category
-  const col = COLUMNS[colIdx];
-  if (col.key === 'status') {
-    const vals = [...new Set(products.map(p => p.status))];
-    // Just show a quick switch
-    const current = document.getElementById('statusFilter')?.value || '';
-    const newVal = current === '待采购' ? '' : '待采购';
-    // Simple toggle
-    if (col.key === 'status') {
-      if (!document.getElementById('statusFilter')) {
-        const input = document.createElement('input');
-        input.id = 'statusFilter';
-        input.type = 'hidden';
-        input.value = '待采购';
-        document.body.appendChild(input);
-      }
-      const f = document.getElementById('statusFilter');
-      f.value = f.value ? '' : '待采购';
-      filterByStatus(f.value);
+  // Build dashboard after a short delay to allow rendering
+  setTimeout(() => {
+    const total = products.length;
+    // Category distribution
+    const catMap = {};
+    const statusMap = {};
+    let lowStock = [];
+    let totalPurchaseQty = 0;
+    let totalPurchasePrice = 0;
+    products.forEach(p => {
+      const cat = p.category || '(未分类)';
+      catMap[cat] = (catMap[cat] || 0) + 1;
+      const st = p.status || '待采购';
+      statusMap[st] = (statusMap[st] || 0) + 1;
+      if (p.stock_quantity < 10) lowStock.push(p);
+      totalPurchaseQty += (p.purchase_quantity || 0);
+      totalPurchasePrice += (p.purchase_price || 0);
+    });
+
+    // Generate pie chart SVG for categories
+    const catEntries = Object.entries(catMap).sort((a,b) => b[1]-a[1]);
+    const pieColors = ['#4a6cf7','#22c55e','#f59e0b','#ef4444','#8b5cf6','#ec4899','#14b8a6','#f97316','#6366f1','#84cc16'];
+    const totalCat = catEntries.reduce((s, e) => s+e[1], 0);
+    let pieSvg = '';
+    if (totalCat > 0) {
+      let cumulative = 0;
+      const slices = catEntries.map((e, i) => {
+        const pct = e[1] / totalCat;
+        const startAngle = cumulative * 360;
+        cumulative += pct;
+        const endAngle = cumulative * 360;
+        const r = 70;
+        const cx = 100, cy = 100;
+        const sRad = (startAngle - 90) * Math.PI / 180;
+        const eRad = (endAngle - 90) * Math.PI / 180;
+        const x1 = cx + r * Math.cos(sRad);
+        const y1 = cy + r * Math.sin(sRad);
+        const x2 = cx + r * Math.cos(eRad);
+        const y2 = cy + r * Math.sin(eRad);
+        const large = (endAngle - startAngle) > 180 ? 1 : 0;
+        const color = pieColors[i % pieColors.length];
+        return '<path d="M'+cx+' '+cy+' L'+x1+' '+y1+' A'+r+' '+r+' 0 '+large+' 1 '+x2+' '+y2+' Z" fill="'+color+'" stroke="#fff" stroke-width="1"/>';
+      });
+      pieSvg = '<svg width="200" height="200" viewBox="0 0 200 200">'+slices.join('')+'</svg>';
     }
-  }
+
+    // Bar chart for status
+    const statusEntries = Object.entries(statusMap).sort((a,b) => b[1]-a[1]);
+    const barColors = {'待采购':'#f59e0b','已下单':'#3b82f6','在途':'#8b5cf6','已入库':'#22c55e','停售':'#9ca3af'};
+    const maxStatus = Math.max(...statusEntries.map(e => e[1]), 1);
+    let barSvg = '<svg width="300" height="160" viewBox="0 0 300 160">';
+    statusEntries.forEach((e, i) => {
+      const barH = (e[1] / maxStatus) * 100;
+      const x = 20 + i * 60;
+      const color = barColors[e[0]] || '#4a6cf7';
+      barSvg += '<rect x="'+x+'" y="'+(140-barH)+'" width="40" height="'+barH+'" fill="'+color+'" rx="3"/>';
+      barSvg += '<text x="'+(x+20)+'" y="150" text-anchor="middle" font-size="9" fill="#666">'+e[0]+'</text>';
+      barSvg += '<text x="'+(x+20)+'" y="'+(140-barH-4)+'" text-anchor="middle" font-size="10" fill="#333" font-weight="600">'+e[1]+'</text>';
+    });
+    barSvg += '</svg>';
+
+    // Low stock items
+    const lowStockHtml = lowStock.slice(0, 10).map(p =>
+      '<div class="stat-row danger"><span class="stat-name">'+escHtml(p.sku)+' - '+escHtml(p.product_name)+'</span><span class="stat-val">库存: '+(p.stock_quantity||0)+'</span></div>'
+    ).join('');
+
+    const body = document.getElementById('modalBody');
+    body.innerHTML = `
+      <div class="dashboard-grid">
+        <div class="dashboard-card">
+          <h4>产品总数</h4>
+          <div class="stat-value">${total}</div>
+          <div class="stat-label">总采购量: ${totalPurchaseQty} | 总采购金额: \u00A5${totalPurchasePrice.toFixed(2)}</div>
+        </div>
+        <div class="dashboard-card">
+          <h4>最近活动</h4>
+          <div style="font-size:12px;color:var(--gray-500);margin-top:8px;">
+            <div>最后更新: ${new Date().toLocaleString()}</div>
+            <div style="margin-top:4px;">低库存商品: <span style="color:var(--danger);font-weight:600;">${lowStock.length}</span> 个</div>
+            <div style="margin-top:4px;">${products.length > 0 ? '数据加载于: '+new Date().toLocaleDateString() : '暂无数据'}</div>
+          </div>
+        </div>
+        <div class="dashboard-card">
+          <h4>产品分类分布</h4>
+          <div class="chart-container" style="display:flex;align-items:center;gap:12px;">
+            ${pieSvg}
+            <div style="font-size:11px;flex:1;">
+              ${catEntries.slice(0,8).map((e,i) => '<div style="display:flex;align-items:center;gap:4px;margin:2px 0;"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:'+pieColors[i%pieColors.length]+';"></span> '+escHtml(e[0])+' ('+e[1]+')</div>').join('')}
+            </div>
+          </div>
+        </div>
+        <div class="dashboard-card">
+          <h4>产品状态分布</h4>
+          <div class="chart-container">${barSvg}</div>
+        </div>
+      </div>
+      <div class="dashboard-card">
+        <h4>低库存预警 (库存 &lt; 10)</h4>
+        ${lowStock.length > 0 ? lowStockHtml : '<div style="font-size:12px;color:var(--gray-400);padding:8px 0;">暂无低库存商品</div>'}
+        ${lowStock.length > 10 ? '<div style="font-size:11px;color:var(--gray-400);margin-top:4px;">...还有 '+(lowStock.length-10)+' 个</div>' : ''}
+      </div>
+      <div class="dashboard-card" style="margin-top:12px;">
+        <h4>采购价格分布</h4>
+        ${(() => {
+          const prices = products.filter(p => p.purchase_price > 0).map(p => p.purchase_price);
+          if (prices.length === 0) return '<div style="font-size:12px;color:var(--gray-400);padding:8px 0;">暂无价格数据</div>';
+          const avg = prices.reduce((a,b)=>a+b,0)/prices.length;
+          const min = Math.min(...prices);
+          const max = Math.max(...prices);
+          return '<div style="font-size:12px;color:var(--gray-500);">'
+            + '<div class="stat-row"><span class="stat-name">平均采购价</span><span class="stat-val">\u00A5'+avg.toFixed(2)+'</span></div>'
+            + '<div class="stat-row"><span class="stat-name">最低采购价</span><span class="stat-val">\u00A5'+min.toFixed(2)+'</span></div>'
+            + '<div class="stat-row"><span class="stat-name">最高采购价</span><span class="stat-val">\u00A5'+max.toFixed(2)+'</span></div>'
+            + '<div class="stat-row"><span class="stat-name">有价格商品数</span><span class="stat-val">'+prices.length+'</span></div>'
+            + '</div>';
+        })()}
+      </div>
+    `;
+  }, 100);
 }
 
-function filterByStatus(status) {
-  if (!status) {
-    loadData();
+// ========== 2. COLLECT FORM ==========
+function showCollectForm() {
+  document.getElementById('modalTitle').textContent = '收集表';
+  document.getElementById('modalWindow').className = 'modal';
+  const cols = COLUMNS.filter(c => c.key !== 'row_num' && c.key !== 'image_url');
+  document.getElementById('modalBody').innerHTML = `
+    <p style="font-size:12px;color:var(--gray-500);margin-bottom:12px;">选择要包含在收集表中的字段，生成可分享的收集链接。</p>
+    <div style="max-height:300px;overflow-y:auto;border:1px solid var(--gray-200);border-radius:6px;padding:8px;">
+      ${cols.map(c => '<label style="display:flex;align-items:center;gap:6px;padding:4px 0;font-size:12px;cursor:pointer;"><input type="checkbox" class="cf-col" value="'+c.key+'" checked> '+escHtml(c.label)+'</label>').join('')}
+    </div>
+    <div class="collect-form-preview" id="collectFormPreview" style="margin-top:12px;">
+      <h4 style="font-size:13px;margin-bottom:8px;">表单预览</h4>
+      ${cols.slice(0,5).map(c => '<div class="cf-field"><label>'+escHtml(c.label)+'</label><input placeholder="请输入'+escHtml(c.label)+'..." readonly></div>').join('')}
+      <div style="font-size:11px;color:var(--gray-400);margin-top:8px;">选择上方字段后预览将更新</div>
+    </div>
+    <div style="margin-top:12px;">
+      <label style="display:flex;align-items:center;gap:6px;font-size:12px;"><input type="checkbox" id="cfEmbedToggle"> 生成嵌入代码</label>
+      <div id="cfEmbedCode" style="display:none;margin-top:8px;">
+        <textarea id="cfEmbedTextarea" rows="3" style="width:100%;font-family:monospace;font-size:11px;padding:8px;border:1px solid var(--gray-200);border-radius:6px;" readonly></textarea>
+        <button class="btn btn-sm btn-outline mt-8" onclick="copyEmbedCode()">复制代码</button>
+      </div>
+    </div>
+  `;
+  document.getElementById('modalFooter').innerHTML = '<button class="btn btn-outline" onclick="closeModal()">关闭</button><button class="btn btn-primary" onclick="generateCollectLink()">生成收集链接</button>';
+  document.getElementById('modalOverlay').classList.add('active');
+
+  // Add event listeners for checkbox changes
+  setTimeout(() => {
+    document.querySelectorAll('.cf-col').forEach(cb => {
+      cb.addEventListener('change', updateCollectFormPreview);
+    });
+    document.getElementById('cfEmbedToggle').addEventListener('change', function() {
+      document.getElementById('cfEmbedCode').style.display = this.checked ? 'block' : 'none';
+    });
+  }, 50);
+}
+
+function updateCollectFormPreview() {
+  const checked = document.querySelectorAll('.cf-col:checked');
+  const preview = document.getElementById('collectFormPreview');
+  if (checked.length === 0) {
+    preview.innerHTML = '<div style="font-size:12px;color:var(--gray-400);padding:20px;text-align:center;">请至少选择一个字段</div>';
     return;
   }
-  // Filter products client-side
-  const filtered = products.filter(p => p.status === status);
-  const oldProducts = products;
-  products = filtered;
-  renderGrid();
-  products = oldProducts;
+  let html = '<h4 style="font-size:13px;margin-bottom:8px;">表单预览</h4>';
+  checked.forEach(cb => {
+    const col = COLUMNS.find(c => c.key === cb.value);
+    if (col) html += '<div class="cf-field"><label>'+escHtml(col.label)+'</label><input placeholder="请输入'+escHtml(col.label)+'..." readonly></div>';
+  });
+  html += '<button class="btn btn-primary btn-block" style="margin-top:12px;" disabled>提交</button>';
+  preview.innerHTML = html;
+}
+
+function generateCollectLink() {
+  const checked = document.querySelectorAll('.cf-col:checked');
+  if (checked.length === 0) { toast('请至少选择一个字段', 'error'); return; }
+  const fields = Array.from(checked).map(cb => cb.value);
+  const baseUrl = window.location.origin;
+  const link = baseUrl + '/collect?fields=' + fields.join(',');
+  // Update embed code
+  const embedTextarea = document.getElementById('cfEmbedTextarea');
+  if (embedTextarea) {
+    embedTextarea.value = '<iframe src="'+link+'" width="100%" height="600" frameborder="0"></iframe>';
+  }
+  toast('收集链接已生成: '+link, 'success');
+  // Show the link
+  const preview = document.getElementById('collectFormPreview');
+  const linkDiv = document.createElement('div');
+  linkDiv.style.cssText = 'margin-top:8px;padding:8px;background:var(--gray-50);border-radius:4px;word-break:break-all;font-size:12px;';
+  linkDiv.innerHTML = '<div style="font-weight:500;margin-bottom:4px;">收集链接:</div><a href="'+link+'" target="_blank">'+link+'</a>';
+  preview.appendChild(linkDiv);
+}
+
+function copyEmbedCode() {
+  const ta = document.getElementById('cfEmbedTextarea');
+  if (ta) { ta.select(); document.execCommand('copy'); toast('已复制嵌入代码', 'success'); }
+}
+
+// ========== 3. DATA GROUPING ==========
+function showDataGrouping() {
+  document.getElementById('modalTitle').textContent = '数据分组';
+  document.getElementById('modalWindow').className = 'modal modal-wide';
+  const groupCols = ['category','attribute','store','supplier'];
+  document.getElementById('modalBody').innerHTML = `
+    <div class="group-selector">
+      <label style="font-size:12px;color:var(--gray-600);margin-right:8px;">分组依据:</label>
+      <select id="groupBySelect" onchange="renderGroups()">
+        <option value="category">组别</option>
+        <option value="attribute">属性</option>
+        <option value="store">店铺</option>
+        <option value="supplier">供应商</option>
+      </select>
+    </div>
+    <div id="groupResults" style="max-height:500px;overflow-y:auto;"><div class="text-center text-muted" style="padding:20px;"><span class="loading"></span> 加载中...</div></div>
+  `;
+  document.getElementById('modalFooter').innerHTML = '<button class="btn btn-outline" onclick="closeModal()">关闭</button>';
+  document.getElementById('modalOverlay').classList.add('active');
+  setTimeout(renderGroups, 50);
+}
+
+function renderGroups() {
+  const groupBy = document.getElementById('groupBySelect').value;
+  const groups = {};
+  products.forEach(p => {
+    const key = p[groupBy] || '(未设置)';
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(p);
+  });
+  const container = document.getElementById('groupResults');
+  const entries = Object.entries(groups).sort((a,b) => b[1].length - a[1].length);
+  container.innerHTML = entries.map(([key, items]) => {
+    const totalQty = items.reduce((s, p) => s + (p.purchase_quantity||0), 0);
+    const totalPrice = items.reduce((s, p) => s + (p.purchase_price||0), 0);
+    return '<div class="group-item">'
+      + '<div class="group-header" onclick="this.nextElementSibling.classList.toggle(\'open\')">'
+      + '<span class="group-name">'+escHtml(key)+'</span>'
+      + '<span class="group-stats">'+items.length+' 项 | 采购量: '+totalQty+' | 金额: \u00A5'+totalPrice.toFixed(2)+'</span>'
+      + '</div>'
+      + '<div class="group-body">'
+      + '<table><thead><tr><th>SKU</th><th>标题</th><th>采购量</th><th>采购价</th><th>库存</th><th>状态</th></tr></thead><tbody>'
+      + items.slice(0, 20).map(p => '<tr><td>'+escHtml(p.sku||'')+'</td><td>'+escHtml(p.product_name||'')+'</td><td>'+(p.purchase_quantity||0)+'</td><td>\u00A5'+(p.purchase_price||0).toFixed(2)+'</td><td>'+(p.stock_quantity||0)+'</td><td>'+escHtml(p.status||'')+'</td></tr>').join('')
+      + '</tbody></table>'
+      + (items.length > 20 ? '<div style="font-size:11px;color:var(--gray-400);padding:8px 0;text-align:center;">还有 '+(items.length-20)+' 项...</div>' : '')
+      + '</div></div>';
+  }).join('');
+}
+
+// ========== 4. AUTOMATION NOTIFICATIONS ==========
+function showNotificationSettings() {
+  document.getElementById('sidebarTitle').textContent = '自动化通知设置';
+  document.getElementById('sidebarBody').innerHTML = `
+    <div class="form-group">
+      <label>低库存阈值</label>
+      <input type="number" id="notifLowStockThreshold" value="10" min="1">
+    </div>
+    <div class="notif-toggle">
+      <span class="toggle-label">低库存告警</span>
+      <label class="switch">
+        <input type="checkbox" id="notifLowStockEnabled" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+    <div class="form-group">
+      <label>Webhook URL (企业微信)</label>
+      <input type="text" id="notifWebhookUrl" placeholder="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=...">
+      <div style="font-size:11px;color:var(--gray-400);margin-top:4px;">当触发告警时，通过此Webhook发送通知</div>
+    </div>
+    <div class="form-group">
+      <label>通知频率</label>
+      <select id="notifFrequency">
+        <option value="always">每次触发</option>
+        <option value="hourly">每小时一次</option>
+        <option value="daily" selected>每天一次</option>
+      </select>
+    </div>
+    <button class="btn btn-primary btn-block" onclick="saveNotificationSettings()">保存设置</button>
+    <button class="btn btn-outline btn-block" onclick="testNotification()" style="margin-top:8px;">测试通知</button>
+    <div id="notifTestResult" style="margin-top:12px;font-size:12px;color:var(--gray-500);"></div>
+  `;
+  // Load saved settings
+  const settings = JSON.parse(localStorage.getItem('notifSettings') || '{}');
+  document.getElementById('notifLowStockThreshold').value = settings.lowStockThreshold || 10;
+  document.getElementById('notifLowStockEnabled').checked = settings.lowStockEnabled !== false;
+  document.getElementById('notifWebhookUrl').value = settings.webhookUrl || localStorage.getItem('WECOM_WEBHOOK_URL') || '';
+  document.getElementById('notifFrequency').value = settings.frequency || 'daily';
+  document.getElementById('sidebarPanel').classList.add('active');
+}
+
+function saveNotificationSettings() {
+  const settings = {
+    lowStockThreshold: parseInt(document.getElementById('notifLowStockThreshold').value) || 10,
+    lowStockEnabled: document.getElementById('notifLowStockEnabled').checked,
+    webhookUrl: document.getElementById('notifWebhookUrl').value,
+    frequency: document.getElementById('notifFrequency').value,
+  };
+  localStorage.setItem('notifSettings', JSON.stringify(settings));
+  if (settings.webhookUrl) localStorage.setItem('WECOM_WEBHOOK_URL', settings.webhookUrl);
+  toast('通知设置已保存', 'success');
+}
+
+function testNotification() {
+  const result = document.getElementById('notifTestResult');
+  result.innerHTML = '<span class="loading"></span> 发送测试通知...';
+  const webhookUrl = document.getElementById('notifWebhookUrl').value;
+  if (!webhookUrl) {
+    result.innerHTML = '<span style="color:var(--danger);">请先配置Webhook URL</span>';
+    return;
+  }
+  // Simulate notification test
+  setTimeout(() => {
+    const lowStock = products.filter(p => p.stock_quantity < 10);
+    const msg = {
+      msgtype: 'markdown',
+      markdown: {
+        content: '### 采购系统测试通知\n\n测试消息 - 自动通知功能正常\n\n当前低库存商品: '+lowStock.length+' 个\n\n发送时间: '+new Date().toLocaleString()
+      }
+    };
+    // Try to send via webhook
+    fetch(webhookUrl, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(msg)})
+    .then(r => r.json())
+    .then(d => {
+      result.innerHTML = '<span style="color:var(--success);">测试通知发送成功!</span>';
+    })
+    .catch(e => {
+      result.innerHTML = '<span style="color:var(--warning);">无法直接发送到企业微信(可能跨域)，但配置已保存。实际使用时将由服务器端发送。</span>';
+    });
+  }, 500);
+}
+
+// ========== 5. AI CLASSIFICATION & SUMMARY ==========
+function showAIClassify() {
+  document.getElementById('modalTitle').textContent = 'AI分类总结';
+  document.getElementById('modalWindow').className = 'modal modal-wide';
+  const classifyCols = ['category','attribute','store','supplier','status'];
+  document.getElementById('modalBody').innerHTML = `
+    <div class="form-group">
+      <label>选择要分析的列</label>
+      <select id="classifyColumn" onchange="updateClassifyPreview()">
+        ${classifyCols.map(c => '<option value="'+c+'">'+(COLUMNS.find(col=>col.key===c)?.label||c)+'</option>').join('')}
+      </select>
+    </div>
+    <div id="classifyPreview" style="font-size:12px;color:var(--gray-500);margin-bottom:12px;">
+      选择上方列后，点击"开始分析"按钮使用AI进行数据分类总结。
+    </div>
+    <div id="classifyResult"></div>
+  `;
+  document.getElementById('modalFooter').innerHTML = '<button class="btn btn-outline" onclick="closeModal()">关闭</button><button class="btn btn-primary" onclick="runAIClassify()">开始分析</button>';
+  document.getElementById('modalOverlay').classList.add('active');
+  updateClassifyPreview();
+}
+
+function updateClassifyPreview() {
+  const colKey = document.getElementById('classifyColumn').value;
+  const values = new Set();
+  products.forEach(p => {
+    const v = p[colKey];
+    if (v) values.add(v);
+  });
+  document.getElementById('classifyPreview').innerHTML = '列: '+(COLUMNS.find(c=>c.key===colKey)?.label||colKey)+' | 唯一值: '+values.size+' 个 | 总数据: '+products.length+' 条';
+}
+
+function runAIClassify() {
+  const colKey = document.getElementById('classifyColumn').value;
+  const colLabel = COLUMNS.find(c=>c.key===colKey)?.label||colKey;
+  const resultDiv = document.getElementById('classifyResult');
+  resultDiv.innerHTML = '<div class="text-center text-muted" style="padding:20px;"><span class="loading"></span> AI分析中...</div>';
+
+  // Build distribution data
+  const dist = {};
+  products.forEach(p => {
+    const v = p[colKey] || '(未设置)';
+    dist[v] = (dist[v] || 0) + 1;
+  });
+  const entries = Object.entries(dist).sort((a,b) => b[1]-a[1]);
+  const total = products.length;
+
+  // Try AI analysis first
+  const query = '分析采购数据中「'+colLabel+'」列的分类分布，共'+total+'条数据，包含以下分类：'+entries.map(e=>e[0]+'('+e[1]+'条)').join('，')+'。请给出分类总结、统计见解和建议。';
+  api('/api/ai/analyze', 'POST', {query})
+  .then(d => {
+    const aiReply = d.reply || '暂无分析结果';
+    // Show distribution + AI analysis
+    const maxVal = Math.max(...entries.map(e=>e[1]), 1);
+    resultDiv.innerHTML = `
+      <div class="ai-classify-result">
+        <div class="result-section">
+          <h5>分类分布 - ${colLabel}</h5>
+          ${entries.slice(0,15).map(e => {
+            const pct = (e[1]/total*100).toFixed(1);
+            const barW = (e[1]/maxVal*100).toFixed(0);
+            return '<div class="result-bar"><span class="bar-label">'+escHtml(e[0])+'</span><div class="bar-track"><div class="bar-fill" style="width:'+barW+'%"></div></div><span class="bar-val">'+e[1]+' ('+pct+'%)</span></div>';
+          }).join('')}
+          ${entries.length > 15 ? '<div style="font-size:11px;color:var(--gray-400);margin-top:4px;">...还有 '+(entries.length-15)+' 个分类未显示</div>' : ''}
+        </div>
+        <div class="result-section">
+          <h5>AI分析总结</h5>
+          <p>${aiReply}</p>
+        </div>
+      </div>
+    `;
+  })
+  .catch(() => {
+    // Fallback: show local analysis
+    resultDiv.innerHTML = `
+      <div class="ai-classify-result">
+        <div class="result-section">
+          <h5>分类分布 - ${colLabel}</h5>
+          ${entries.slice(0,15).map(e => {
+            const pct = (e[1]/total*100).toFixed(1);
+            return '<div class="stat-row"><span class="stat-name">'+escHtml(e[0])+'</span><span class="stat-val">'+e[1]+' ('+pct+'%)</span></div>';
+          }).join('')}
+          ${entries.length > 15 ? '<div style="font-size:11px;color:var(--gray-400);margin-top:4px;">...还有 '+(entries.length-15)+' 个分类</div>' : ''}
+        </div>
+        <div class="result-section">
+          <h5>统计摘要</h5>
+          <p>共 ${total} 条数据，包含 ${entries.length} 个分类。如需AI深入分析，请配置OpenAI API Key后重试。</p>
+        </div>
+      </div>
+    `;
+  });
+}
+
+// ========== 6. DATA PROTECTION ==========
+function showDataProtection() {
+  document.getElementById('sidebarTitle').textContent = '数据保护';
+  document.getElementById('sidebarBody').innerHTML = `
+    <div class="protection-info">
+      <div class="info-row"><span class="info-label">当前用户</span><span class="info-value">${USER.display_name||USER.username||'未知'}</span></div>
+      <div class="info-row"><span class="info-label">角色</span><span class="info-value">${USER.role||'未知'}</span></div>
+      <div class="info-row"><span class="info-label">保护状态</span><span class="info-value" id="protectStatus">未保护</span></div>
+    </div>
+    <div class="notif-toggle">
+      <span class="toggle-label">启用保护模式</span>
+      <label class="switch">
+        <input type="checkbox" id="protectToggle" onchange="toggleProtection()">
+        <span class="slider"></span>
+      </label>
+    </div>
+    <div style="font-size:12px;color:var(--gray-500);margin:12px 0;">选择需要保护的列（开启保护后，这些列将变为只读）</div>
+    <div class="protection-col-list" id="protectionColList">
+      ${COLUMNS.filter(c => c.editable && c.key !== 'row_num').map(c =>
+        '<div class="pcol-item"><span class="pcol-name">'+escHtml(c.label)+'</span><span class="pcol-lock" id="pcol-'+c.key+'" onclick="toggleProtectCol(\''+c.key+'\')">\uD83D\uDD13</span></div>'
+      ).join('')}
+    </div>
+    <div class="form-group" style="margin-top:16px;">
+      <label>查看模式</label>
+      <div class="notif-toggle">
+        <span class="toggle-label">仅查看模式（禁止编辑）</span>
+        <label class="switch">
+          <input type="checkbox" id="viewOnlyToggle" onchange="toggleViewOnly()">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+  `;
+  // Load saved protection state
+  const protectedCols = JSON.parse(localStorage.getItem('protectedCols') || '[]');
+  document.getElementById('protectToggle').checked = localStorage.getItem('protectEnabled') === 'true';
+  if (document.getElementById('protectToggle').checked) {
+    document.getElementById('protectStatus').textContent = '已保护';
+    document.getElementById('protectStatus').style.color = 'var(--primary)';
+  }
+  protectedCols.forEach(key => {
+    const el = document.getElementById('pcol-'+key);
+    if (el) {
+      el.innerHTML = '\uD83D\uDD12';
+      el.classList.add('locked');
+    }
+  });
+  document.getElementById('viewOnlyToggle').checked = localStorage.getItem('viewOnlyMode') === 'true';
+  document.getElementById('sidebarPanel').classList.add('active');
+}
+
+function toggleProtection() {
+  const enabled = document.getElementById('protectToggle').checked;
+  localStorage.setItem('protectEnabled', enabled);
+  document.getElementById('protectStatus').textContent = enabled ? '已保护' : '未保护';
+  document.getElementById('protectStatus').style.color = enabled ? 'var(--primary)' : '';
+  if (enabled) {
+    toast('保护模式已启用，受保护列将变为只读', 'info');
+  } else {
+    toast('保护模式已禁用', 'info');
+  }
+}
+
+function toggleProtectCol(key) {
+  const el = document.getElementById('pcol-'+key);
+  if (!el) return;
+  const isLocked = el.classList.contains('locked');
+  if (isLocked) {
+    el.innerHTML = '\uD83D\uDD13';
+    el.classList.remove('locked');
+  } else {
+    el.innerHTML = '\uD83D\uDD12';
+    el.classList.add('locked');
+  }
+  // Save state
+  const locked = [];
+  document.querySelectorAll('.pcol-lock.locked').forEach(e => {
+    locked.push(e.id.replace('pcol-', ''));
+  });
+  localStorage.setItem('protectedCols', JSON.stringify(locked));
+  toast(isLocked ? '已解除保护' : '已保护', 'info');
+}
+
+function toggleViewOnly() {
+  const enabled = document.getElementById('viewOnlyToggle').checked;
+  localStorage.setItem('viewOnlyMode', enabled);
+  if (enabled) {
+    toast('已切换为仅查看模式', 'info');
+  } else {
+    toast('已退出仅查看模式', 'info');
+  }
+}
+
+// ========== 7. PRINT ==========
+function doPrint() {
+  // Prepare print view
+  const printTitle = '海外仓总采购表 - ' + new Date().toLocaleDateString();
+  document.title = printTitle;
+  // Show all data in print
+  window.print();
 }
 
 // ========== TOAST ==========
 function toast(msg, type='info') {
   const el = document.getElementById('toast');
   el.textContent = msg;
-  el.className = `toast ${type}`;
+  el.className = 'toast ' + type;
   el.classList.add('show');
   setTimeout(() => el.classList.remove('show'), 3000);
 }
@@ -1140,6 +2174,11 @@ function escHtml(s) {
 
 function closeModal() {
   document.getElementById('modalOverlay').classList.remove('active');
+  document.getElementById('modalWindow').className = 'modal';
+}
+
+function closeSidebar() {
+  document.getElementById('sidebarPanel').classList.remove('active');
 }
 
 function renameDoc(name) {
@@ -1147,9 +2186,16 @@ function renameDoc(name) {
 }
 
 // ========== INIT ==========
-// Always show login page first
 document.getElementById('loginPage').style.display = 'flex';
 loadSettings();
-</script>
-</body>
-</html>
+// If already logged in, auto-login
+if (TOKEN) {
+  showApp();
+}
+
+function loadSettings() {
+	  // Settings are loaded when settings panel opens
+	}
+	</script>
+	</body>
+	</html>
