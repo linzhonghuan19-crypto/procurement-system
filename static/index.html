@@ -316,10 +316,23 @@ a { color: var(--primary); text-decoration: none; }
 .dropdown-item .item-icon { width: 20px; text-align: center; font-size: 14px; }
 .dropdown-sep { height: 1px; background: var(--gray-200); margin: 4px 0; }
 
-/* ===== CELL DROPDOWN (edit mode) ===== */
-.cell-select-edit { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 2px solid var(--primary); border-radius: 0; background: #fff; font-size: 13px; padding: 0 4px; outline: none; z-index: 5; cursor: default; }
-.cell-select-edit.active { display: block; }
-.cell-select-edit option { padding: 4px; }
+/* ===== CELL DROPDOWN PANEL ===== */
+.cell-dd-indicator { display: inline-block; margin-left: 4px; font-size: 9px; color: var(--gray-400); opacity: 0.6; pointer-events: none; }
+.cell-content .cell-dd-indicator { float: right; }
+.cell-dropping { cursor: pointer !important; }
+.cell-dropping .cell-content { padding-right: 18px; }
+.cell-dropdown-overlay { display: none; position: fixed; inset: 0; z-index: 999; background: transparent; }
+.cell-dropdown-overlay.active { display: block; }
+.cell-dropdown-panel { display: none; position: fixed; z-index: 1000; background: #fff; border: 1px solid var(--gray-200); border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); min-width: 180px; max-width: 300px; max-height: 280px; overflow-y: auto; padding: 4px; }
+.cell-dropdown-panel.active { display: block; }
+.cell-dropdown-panel .dd-option { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: 4px; cursor: pointer; font-size: 13px; color: var(--gray-700); transition: background 0.1s; }
+.cell-dropdown-panel .dd-option:hover { background: var(--gray-50); }
+.cell-dropdown-panel .dd-option .dd-color-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.cell-dropdown-panel .dd-option .dd-check { width: 16px; flex-shrink: 0; text-align: center; font-size: 12px; color: var(--primary); visibility: hidden; }
+.cell-dropdown-panel .dd-option .dd-check.checked { visibility: visible; }
+.cell-dropdown-panel .dd-option .dd-label { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cell-dropdown-panel .dd-option-custom { border-top: 1px solid var(--gray-100); margin-top: 4px; padding-top: 8px; color: var(--gray-500); font-style: italic; }
+.cell-dropdown-panel .dd-option-custom .dd-label { font-style: italic; }
 
 /* ===== COLUMN FILTER POPUP ===== */
 .col-filter-popup { position: fixed; background: #fff; border: 1px solid var(--gray-200); border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); z-index: 1000; min-width: 220px; max-width: 320px; max-height: 360px; display: flex; flex-direction: column; }
@@ -864,6 +877,10 @@ a { color: var(--primary); text-decoration: none; }
   <div class="panel-body" id="sidebarBody"></div>
 </div>
 
+<!-- ===== CELL DROPDOWN PANEL ===== -->
+<div class="cell-dropdown-overlay" id="ddOverlay" onclick="hideDropdownPanel()"></div>
+<div class="cell-dropdown-panel" id="ddPanel"></div>
+
 <!-- ===== TOAST ===== -->
 <div class="toast" id="toast"></div>
 
@@ -936,6 +953,9 @@ function persistDropdownOptions() {
   localStorage.setItem('columnDropdowns', JSON.stringify(columnDropdowns));
 }
 loadDropdownOptions();
+
+// Color palette for dropdown options
+const DROPDOWN_COLORS = ['#4A90E2','#50C878','#FF8C00','#FFD700','#9B59B6','#FF6B9D','#00BCD4','#8BC34A','#FF5722','#607D8B','#E91E63','#3F51B5','#009688','#CDDC39','#795548'];
 
 // ========== AUTH ==========
 function doLogin() {
@@ -1227,10 +1247,13 @@ function renderGrid() {
       } else {
         content = escHtml(String(val));
       }
-      html += '<td class="'+cls+(highlightRowCol?' highlight-row':'')+'" data-abs-row="'+absRow+'" data-col="'+colIdx+'" data-key="'+col.key+'" data-id="'+(p.id||'')+'" onclick="selectCell(this)" ondblclick="startEdit(this)">'
-        + '<div class="cell-content'+(col.type==='number'?' num':'')+'">'+content+'</div>'
-        + '<input class="cell-edit" onblur="finishEdit(this)" onkeydown="if(event.key===\'Enter\')this.blur();if(event.key===\'Escape\'){this.value=this.dataset.old;this.blur()}">'
-        + '</td>';
+      const dd = columnDropdowns[col.key];
+      const hasDD = dd && dd.options && dd.options.length > 0;
+      const ddCls = hasDD ? ' cell-dropping' : '';
+      html += '<td class="'+cls+ddCls+(highlightRowCol?' highlight-row':'')+'" data-abs-row="'+absRow+'" data-col="'+colIdx+'" data-key="'+col.key+'" data-id="'+(p.id||'')+'" onclick="selectCell(this)" ondblclick="startEdit(this)">'
+	        + '<div class="cell-content'+(col.type==='number'?' num':'')+'">'+content+(hasDD?'<span class="cell-dd-indicator">\u25BC</span>':'')+'</div>'
+	        + '<input class="cell-edit" onblur="finishEdit(this)" onkeydown="if(event.key===\'Enter\')this.blur();if(event.key===\'Escape\'){this.value=this.dataset.old;this.blur()}">'
+	        + '</td>';
     });
     html += '</tr>';
     return html;
@@ -1275,51 +1298,26 @@ function selectCell(el) {
   document.getElementById('cellRef').textContent = col + row;
   const content = el.querySelector('.cell-content');
   document.getElementById('formulaInput').value = content ? content.textContent.trim() : '';
+
+  // Show dropdown panel on single click for dropdown columns
+  const key = el.dataset.key;
+  const dd = columnDropdowns[key];
+  if (dd && dd.options && dd.options.length > 0) {
+    showDropdownPanel(el);
+  }
 }
 
 function startEdit(el) {
-  if (editingCell) finishEdit(editingCell.querySelector('.cell-edit, .cell-select-edit'));
+  if (editingCell) finishEdit(editingCell.querySelector('.cell-edit'));
   const editInput = el.querySelector('.cell-edit');
   const content = el.querySelector('.cell-content');
   const key = el.dataset.key;
   if (!editInput || !key || !COLUMNS.find(c=>c.key===key)?.editable) return;
 
-  // Check if this column has dropdown options
+  // Check if this column has dropdown options - show panel on single click instead
   const dd = columnDropdowns[key];
   if (dd && dd.options && dd.options.length > 0) {
-    const select = el.querySelector('.cell-select-edit');
-    if (select) {
-      select.classList.add('active');
-      select.focus();
-      editingCell = el;
-      document.getElementById('formulaInput').value = select.value;
-      return;
-    }
-    // Create select dropdown
-    const currentVal = content.textContent.trim();
-    let selectHtml = '<select class="cell-select-edit" onchange="onDropdownSelectChange(this)" onblur="onDropdownSelectBlur(this)" onkeydown="if(event.key===\'Escape\'){this.dataset.cancel=\'1\';this.blur()}">';
-    // Add empty option
-    selectHtml += '<option value=""></option>';
-    dd.options.forEach(opt => {
-      const selected = opt === currentVal ? ' selected' : '';
-      selectHtml += '<option value="'+escHtml(opt)+'"'+selected+'>'+escHtml(opt)+'</option>';
-    });
-    // If allowCustom, add a custom input option
-    if (dd.allowCustom) {
-      selectHtml += '<option value="__CUSTOM__" '+(currentVal && !dd.options.includes(currentVal)?'selected':'')+'>✏️ 输入自定义值...</option>';
-    }
-    selectHtml += '</select>';
-    content.insertAdjacentHTML('afterend', selectHtml);
-    const newSelect = el.querySelector('.cell-select-edit');
-    newSelect.classList.add('active');
-    newSelect.focus();
-    if (currentVal && !dd.options.includes(currentVal) && dd.allowCustom) {
-      // Replace select with input for custom value
-      newSelect.value = '__CUSTOM__';
-      onDropdownSelectChange(newSelect);
-    }
-    editingCell = el;
-    document.getElementById('formulaInput').value = currentVal;
+    showDropdownPanel(el);
     return;
   }
 
@@ -1333,49 +1331,93 @@ function startEdit(el) {
   document.getElementById('formulaInput').value = editInput.value;
 }
 
-function onDropdownSelectChange(select) {
-  if (select.value === '__CUSTOM__') {
-    // Replace select with text input for custom value
-    const td = select.closest('td');
-    const currentVal = td.querySelector('.cell-content').textContent.trim();
-    select.style.display = 'none';
-    const editInput = td.querySelector('.cell-edit');
-    editInput.value = currentVal;
-    editInput.dataset.old = currentVal;
-    editInput.style.display = 'block';
-    editInput.classList.add('active');
-    editInput.focus();
-    editInput.select();
+// ========== DROPDOWN PANEL ==========
+let _ddCell = null; // The cell currently showing the dropdown panel
+
+function showDropdownPanel(el) {
+  if (_ddCell === el) { hideDropdownPanel(); return; }
+  hideDropdownPanel();
+  const dd = columnDropdowns[el.dataset.key];
+  if (!dd || !dd.options || !dd.options.length) return;
+
+  _ddCell = el;
+  const currentVal = el.querySelector('.cell-content').textContent.trim();
+  const rect = el.getBoundingClientRect();
+  const panel = document.getElementById('ddPanel');
+  const overlay = document.getElementById('ddOverlay');
+
+  let html = '';
+  dd.options.forEach((opt, i) => {
+    const color = DROPDOWN_COLORS[i % DROPDOWN_COLORS.length];
+    const checked = opt === currentVal ? ' checked' : '';
+    const val = escHtml(opt);
+    const dataVal = opt.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    html += '<div class="dd-option" data-val="'+dataVal+'" onclick="event.stopPropagation();selectDropdownOption(this.dataset.val)">'
+      + '<span class="dd-color-dot" style="background:'+color+'"></span>'
+      + '<span class="dd-check'+checked+'">\u2713</span>'
+      + '<span class="dd-label">'+val+'</span>'
+      + '</div>';
+  });
+
+  // Add custom option if allowed and current value is not in options
+  if (dd.allowCustom) {
+    html += '<div class="dd-option dd-option-custom" onclick="event.stopPropagation();showCustomInput()">'
+      + '<span class="dd-color-dot" style="background:var(--gray-300)"></span>'
+      + '<span class="dd-check"></span>'
+      + '<span class="dd-label">'+escHtml(currentVal || '输入自定义值...')+'</span>'
+      + '</div>';
   }
+
+  panel.innerHTML = html;
+  panel.classList.add('active');
+  overlay.classList.add('active');
+
+  // Position the panel below the cell
+  let top = rect.bottom + 2;
+  let left = rect.left;
+  if (top + 280 > window.innerHeight) top = rect.top - 282;
+  if (left + 300 > window.innerWidth) left = window.innerWidth - 310;
+  if (left < 0) left = 0;
+  panel.style.top = top + 'px';
+  panel.style.left = left + 'px';
+  panel.style.width = Math.max(180, Math.min(300, rect.width + 40)) + 'px';
 }
 
-function onDropdownSelectBlur(select) {
-  if (select.dataset.cancel === '1') {
-    delete select.dataset.cancel;
-    select.classList.remove('active');
-    select.remove();
-    editingCell = null;
-    return;
-  }
-  // If custom input is active, handle from finishEdit
-  if (select.value === '__CUSTOM__') return;
-  finishDropdownEdit(select);
+function hideDropdownPanel() {
+  document.getElementById('ddPanel').classList.remove('active');
+  document.getElementById('ddOverlay').classList.remove('active');
+  _ddCell = null;
 }
 
-function finishDropdownEdit(select) {
-  const td = select.closest('td');
-  const content = td.querySelector('.cell-content');
-  const newVal = select.value;
-  select.classList.remove('active');
-  const cell = editingCell;
-  editingCell = null;
-  if (newVal !== content.textContent.trim()) {
-    const id = parseInt(cell.dataset.id);
-    const key = cell.dataset.key;
-    if (id) quickEdit(id, key, newVal);
-    content.textContent = newVal;
+function selectDropdownOption(value) {
+  if (!_ddCell) return;
+  const content = _ddCell.querySelector('.cell-content');
+  const oldVal = content.textContent.trim();
+  if (value !== oldVal) {
+    const id = parseInt(_ddCell.dataset.id);
+    const key = _ddCell.dataset.key;
+    content.textContent = value;
+    if (id) quickEdit(id, key, value);
+    document.getElementById('formulaInput').value = value;
   }
-  select.remove();
+  hideDropdownPanel();
+}
+
+function showCustomInput() {
+  if (!_ddCell) return;
+  hideDropdownPanel();
+  const editInput = _ddCell.querySelector('.cell-edit');
+  const content = _ddCell.querySelector('.cell-content');
+  editInput.value = content.textContent.trim();
+  editInput.dataset.old = editInput.value;
+  content.classList.add('editing');
+  editInput.classList.add('active');
+  editInput.style.display = 'block';
+  editInput.focus();
+  editInput.select();
+  editingCell = _ddCell;
+  _ddCell = null;
+  document.getElementById('formulaInput').value = editInput.value;
 }
 
 document.addEventListener('keydown', e => {
