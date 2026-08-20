@@ -434,6 +434,7 @@ def upload_excel(
 
             imported = 0
             updated = 0
+            seen_skus = set()  # Track SKUs within this file to handle duplicates
 
             for row in rows[1:]:
                 cells = row.findall('s:c', ns2)
@@ -468,10 +469,20 @@ def upload_excel(
                 if not item.get('product_name'):
                     item['product_name'] = item['sku']
 
-                existing = db.query(Product).filter(Product.sku == item['sku']).first()
+                # Normalize SKU: trim and lowercase for comparison
+                item['sku'] = str(item['sku']).strip()
+
+                # Skip if this SKU was already seen in this file (internal duplicate)
+                if item['sku'] in seen_skus:
+                    continue
+                seen_skus.add(item['sku'])
+
+                # Case-insensitive lookup using lower()
+                from sqlalchemy import func
+                existing = db.query(Product).filter(func.lower(Product.sku) == item['sku'].lower()).first()
                 if existing:
                     for field, value in item.items():
-                        if value:
+                        if value or value == 0:
                             setattr(existing, field, value)
                     existing.updated_by = user.id
                     updated += 1
@@ -510,10 +521,92 @@ def upload_excel(
                     db.add(product)
                     imported += 1
 
-            db.commit()
+            try:
+                db.commit()
+            except Exception as commit_err:
+                db.rollback()
+                # Fallback: try inserting one by one, update on conflict
+                imported = 0
+                updated = 0
+                for row in rows[1:]:
+                    cells = row.findall('s:c', ns2)
+                    item = {}
+                    for i, c in enumerate(cells):
+                        v = c.find('s:v', ns2)
+                        val = v.text if v is not None else ''
+                        t = c.get('t')
+                        if t == 's' and val:
+                            idx = int(val)
+                            if idx < len(strs):
+                                val = strs[idx]
+                        if i < len(headers):
+                            field = field_map.get(headers[i])
+                            if field:
+                                if field in ('purchase_quantity', 'stock_quantity'):
+                                    try: val = int(float(val))
+                                    except: val = 0
+                                elif field in ('purchase_price', 'new_purchase_price', 'length', 'width', 'height'):
+                                    try: val = float(val)
+                                    except: val = 0.0
+                                item[field] = val
+                    if not item.get('sku') and not item.get('product_name'):
+                        continue
+                    if not item.get('sku'):
+                        item['sku'] = f"AUTO-{item.get('product_name', 'unknown')[:20]}"
+                    if not item.get('product_name'):
+                        item['product_name'] = item['sku']
+                    item['sku'] = str(item['sku']).strip()
+
+                    try:
+                        existing = db.query(Product).filter(func.lower(Product.sku) == item['sku'].lower()).first()
+                        if existing:
+                            for field, value in item.items():
+                                if value or value == 0:
+                                    setattr(existing, field, value)
+                            existing.updated_by = user.id
+                            updated += 1
+                        else:
+                            db.execute(
+                                Product.__table__.insert().prefix_with('OR IGNORE').values(
+                                    date=item.get('date', ''),
+                                    attribute=item.get('attribute', ''),
+                                    category=item.get('category', ''),
+                                    store=item.get('store', ''),
+                                    mercadolibre_link=item.get('mercadolibre_link', ''),
+                                    purchase_link=item.get('purchase_link', ''),
+                                    sku=item['sku'],
+                                    product_name=item['product_name'],
+                                    product_attributes=item.get('product_attributes', ''),
+                                    purchase_remarks=item.get('purchase_remarks', ''),
+                                    purchase_quantity=item.get('purchase_quantity', 0),
+                                    warehouse_remarks=item.get('warehouse_remarks', ''),
+                                    order_number=item.get('order_number', ''),
+                                    purchase_price=item.get('purchase_price', 0.0),
+                                    new_purchase_price=item.get('new_purchase_price', 0.0),
+                                    new_purchase_link=item.get('new_purchase_link', ''),
+                                    supplier=item.get('supplier', ''),
+                                    image_url=item.get('image_url', ''),
+                                    stock_quantity=item.get('stock_quantity', 0),
+                                    remark1=item.get('remark1', ''),
+                                    remark2=item.get('remark2', ''),
+                                    remark3=item.get('remark3', ''),
+                                    remark4=item.get('remark4', ''),
+                                    length=item.get('length', 0.0),
+                                    width=item.get('width', 0.0),
+                                    height=item.get('height', 0.0),
+                                    status="待采购",
+                                    created_by=user.id,
+                                    updated_by=user.id,
+                                )
+                            )
+                            imported += 1
+                    except Exception:
+                        pass
+                db.commit()
+
             return {"message": f"导入完成: 新增{imported}, 更新{updated}", "imported": imported, "updated": updated}
 
     except zipfile.BadZipFile:
         raise HTTPException(status_code=400, detail="文件格式错误，请上传有效的 .xlsx 文件")
     except Exception as e:
-        raise HTTPException(status_code=400, detail=f"解析失败: {str(e)}")
+        raise HTTPException(status_code=400, detail=f"导入失败: {str(e)}")
