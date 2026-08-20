@@ -55,13 +55,13 @@ class Product(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     # 日期
-    date = Column(String(50), default="")
+    date = Column(String(50), default="", index=True)
     # 属性
     attribute = Column(String(100), default="")
     # 组别
-    category = Column(String(200), default="")
+    category = Column(String(200), default="", index=True)
     # 店铺
-    store = Column(String(200), default="")
+    store = Column(String(200), default="", index=True)
     # 美客多产品链接
     mercadolibre_link = Column(Text, default="")
     # 原采购链接
@@ -69,7 +69,7 @@ class Product(Base):
     # SKU
     sku = Column(String(100), unique=True, index=True, nullable=False)
     # 标题
-    product_name = Column(String(500), nullable=False)
+    product_name = Column(String(500), nullable=False, index=True)
     # 产品属性
     product_attributes = Column(String(500), default="")
     # 采购备注
@@ -87,7 +87,7 @@ class Product(Base):
     # 新采购链接
     new_purchase_link = Column(Text, default="")
     # 供应商
-    supplier = Column(String(200), default="")
+    supplier = Column(String(200), default="", index=True)
     # 图片
     image_url = Column(Text, default="")
     # 库存
@@ -102,7 +102,7 @@ class Product(Base):
     width = Column(Float, default=0.0)
     height = Column(Float, default=0.0)
     # 状态
-    status = Column(String(20), default=ProductStatus.PENDING.value)
+    status = Column(String(20), default=ProductStatus.PENDING.value, index=True)
     # 旧字段保留兼容
     price_1688 = Column(Float, default=0.0)
     price_amazon = Column(Float, default=0.0)
