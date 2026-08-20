@@ -316,6 +316,11 @@ a { color: var(--primary); text-decoration: none; }
 .dropdown-item .item-icon { width: 20px; text-align: center; font-size: 14px; }
 .dropdown-sep { height: 1px; background: var(--gray-200); margin: 4px 0; }
 
+/* ===== CELL DROPDOWN (edit mode) ===== */
+.cell-select-edit { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 2px solid var(--primary); border-radius: 0; background: #fff; font-size: 13px; padding: 0 4px; outline: none; z-index: 5; cursor: default; }
+.cell-select-edit.active { display: block; }
+.cell-select-edit option { padding: 4px; }
+
 /* ===== COLUMN FILTER POPUP ===== */
 .col-filter-popup { position: fixed; background: #fff; border: 1px solid var(--gray-200); border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); z-index: 1000; min-width: 220px; max-width: 320px; max-height: 360px; display: flex; flex-direction: column; }
 .col-filter-popup .popup-header { padding: 8px 12px; border-bottom: 1px solid var(--gray-200); font-size: 12px; font-weight: 600; color: var(--gray-700); display: flex; justify-content: space-between; align-items: center; }
@@ -918,6 +923,20 @@ const COLUMNS = [
   { key: 'height', label: '高', width: 70, editable: true, type: 'number' },
 ];
 
+// ========== DROPDOWN OPTIONS STORAGE ==========
+// columnKey -> { options: string[], allowCustom: boolean }
+const columnDropdowns = {};
+function loadDropdownOptions() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('columnDropdowns') || '{}');
+    Object.assign(columnDropdowns, saved);
+  } catch(e) { /* ignore */ }
+}
+function persistDropdownOptions() {
+  localStorage.setItem('columnDropdowns', JSON.stringify(columnDropdowns));
+}
+loadDropdownOptions();
+
 // ========== AUTH ==========
 function doLogin() {
   const u = document.getElementById('loginUsername').value;
@@ -1259,11 +1278,51 @@ function selectCell(el) {
 }
 
 function startEdit(el) {
-  if (editingCell) finishEdit(editingCell.querySelector('.cell-edit'));
+  if (editingCell) finishEdit(editingCell.querySelector('.cell-edit, .cell-select-edit'));
   const editInput = el.querySelector('.cell-edit');
   const content = el.querySelector('.cell-content');
   const key = el.dataset.key;
   if (!editInput || !key || !COLUMNS.find(c=>c.key===key)?.editable) return;
+
+  // Check if this column has dropdown options
+  const dd = columnDropdowns[key];
+  if (dd && dd.options && dd.options.length > 0) {
+    const select = el.querySelector('.cell-select-edit');
+    if (select) {
+      select.classList.add('active');
+      select.focus();
+      editingCell = el;
+      document.getElementById('formulaInput').value = select.value;
+      return;
+    }
+    // Create select dropdown
+    const currentVal = content.textContent.trim();
+    let selectHtml = '<select class="cell-select-edit" onchange="onDropdownSelectChange(this)" onblur="onDropdownSelectBlur(this)" onkeydown="if(event.key===\'Escape\'){this.dataset.cancel=\'1\';this.blur()}">';
+    // Add empty option
+    selectHtml += '<option value=""></option>';
+    dd.options.forEach(opt => {
+      const selected = opt === currentVal ? ' selected' : '';
+      selectHtml += '<option value="'+escHtml(opt)+'"'+selected+'>'+escHtml(opt)+'</option>';
+    });
+    // If allowCustom, add a custom input option
+    if (dd.allowCustom) {
+      selectHtml += '<option value="__CUSTOM__" '+(currentVal && !dd.options.includes(currentVal)?'selected':'')+'>✏️ 输入自定义值...</option>';
+    }
+    selectHtml += '</select>';
+    content.insertAdjacentHTML('afterend', selectHtml);
+    const newSelect = el.querySelector('.cell-select-edit');
+    newSelect.classList.add('active');
+    newSelect.focus();
+    if (currentVal && !dd.options.includes(currentVal) && dd.allowCustom) {
+      // Replace select with input for custom value
+      newSelect.value = '__CUSTOM__';
+      onDropdownSelectChange(newSelect);
+    }
+    editingCell = el;
+    document.getElementById('formulaInput').value = currentVal;
+    return;
+  }
+
   editInput.value = content.textContent.trim();
   editInput.dataset.old = editInput.value;
   content.classList.add('editing');
@@ -1272,6 +1331,51 @@ function startEdit(el) {
   editInput.select();
   editingCell = el;
   document.getElementById('formulaInput').value = editInput.value;
+}
+
+function onDropdownSelectChange(select) {
+  if (select.value === '__CUSTOM__') {
+    // Replace select with text input for custom value
+    const td = select.closest('td');
+    const currentVal = td.querySelector('.cell-content').textContent.trim();
+    select.style.display = 'none';
+    const editInput = td.querySelector('.cell-edit');
+    editInput.value = currentVal;
+    editInput.dataset.old = currentVal;
+    editInput.style.display = 'block';
+    editInput.classList.add('active');
+    editInput.focus();
+    editInput.select();
+  }
+}
+
+function onDropdownSelectBlur(select) {
+  if (select.dataset.cancel === '1') {
+    delete select.dataset.cancel;
+    select.classList.remove('active');
+    select.remove();
+    editingCell = null;
+    return;
+  }
+  // If custom input is active, handle from finishEdit
+  if (select.value === '__CUSTOM__') return;
+  finishDropdownEdit(select);
+}
+
+function finishDropdownEdit(select) {
+  const td = select.closest('td');
+  const content = td.querySelector('.cell-content');
+  const newVal = select.value;
+  select.classList.remove('active');
+  const cell = editingCell;
+  editingCell = null;
+  if (newVal !== content.textContent.trim()) {
+    const id = parseInt(cell.dataset.id);
+    const key = cell.dataset.key;
+    if (id) quickEdit(id, key, newVal);
+    content.textContent = newVal;
+  }
+  select.remove();
 }
 
 document.addEventListener('keydown', e => {
@@ -1312,6 +1416,7 @@ function finishEdit(input) {
   const content = editingCell.querySelector('.cell-content');
   const newVal = input.value;
   input.classList.remove('active');
+  input.style.display = ''; // Reset display for custom input mode
   content.classList.remove('editing');
   const cell = editingCell;
   editingCell = null;
@@ -1819,7 +1924,7 @@ function openDialog(type) {
     conditionalFormat: { title: '条件格式', body: '<div class="form-group"><label>规则类型</label><select id="cfRuleType" onchange="updateCFPreview()"><option value="greater">大于</option><option value="less">小于</option><option value="between">介于</option><option value="equal">等于</option><option value="text">文本包含</option></select></div><div class="form-group"><label>值</label><input id="cfValue" placeholder="输入阈值" oninput="updateCFPreview()"></div><div class="form-group"><label>样式</label><div style="display:flex;gap:8px;"><input type="color" id="cfColor" value="#ff0000" onchange="updateCFPreview()"> <input type="color" id="cfBgColor" value="#ffebee" onchange="updateCFPreview()"></div></div><div class="cf-preview" id="cfPreview">预览效果</div>', footer: 'okClose' },
     textToColumns: { title: '分列', body: '<div class="form-group"><label>分隔符</label><select><option>逗号</option><option>制表符</option><option>空格</option><option>分号</option><option>自定义</option></select></div><div class="form-group"><label>目标列</label><input placeholder="选择要分列的数据列"></div><div style="font-size:12px;color:var(--gray-400);">将一列数据按分隔符拆分为多列</div>', footer: 'okClose' },
     dataValidation: { title: '数据验证', body: '<div class="form-group"><label>验证条件</label><select><option>任何值</option><option>整数</option><option>小数</option><option>列表</option><option>日期</option><option>文本长度</option></select></div><div class="form-group"><label>最小值</label><input type="number" value="0"></div><div class="form-group"><label>最大值</label><input type="number" value="100"></div><div class="form-group"><label>错误提示</label><input placeholder="输入无效时的提示信息"></div>', footer: 'okClose' },
-    dropdownOptions: { title: '下拉选项', body: '<div class="form-group"><label>选项（每行一个）</label><textarea rows="5" style="width:100%;font-family:monospace;" placeholder="选项1\n选项2\n选项3"></textarea></div><div class="form-group"><label style="display:flex;align-items:center;gap:6px;font-size:12px;"><input type="checkbox" checked> 允许下拉以外值</label></div>', footer: 'okClose' },
+    dropdownOptions: { title: '下拉选项', body: '', footer: 'custom', handler: 'showDropdownOptionsDialog' },
     checkbox: { title: '插入复选框', body: '<div class="form-group"><label>复选框文本</label><input placeholder="复选框标签"></div><div class="form-group"><label style="display:flex;align-items:center;gap:6px;font-size:12px;"><input type="checkbox"> 默认选中</label></div>', footer: 'okClose' },
     versionHistory: { title: '版本历史记录', body: '<div class="vh-item"><span class="vh-time">2026-08-19 10:00</span><span class="vh-user">管理员</span><span class="vh-action">编辑了 5 个单元格</span></div><div class="vh-item"><span class="vh-time">2026-08-18 16:30</span><span class="vh-user">管理员</span><span class="vh-action">导入了 3361 条数据</span></div><div class="vh-item"><span class="vh-time">2026-08-18 14:00</span><span class="vh-user">管理员</span><span class="vh-action">创建了 3 行数据</span></div><div class="vh-item"><span class="vh-time">2026-08-17 09:00</span><span class="vh-user">系统</span><span class="vh-action">初始版本</span></div>', footer: 'close' },
     cellHistory: { title: '单元格历史记录', body: '<div style="font-size:12px;color:var(--gray-500);margin-bottom:12px;">当前选中: '+(selectedCell?document.getElementById('cellRef').textContent:'未选中')+'</div><div class="vh-item"><span class="vh-time">10:00</span><span class="vh-user">管理员</span><span class="vh-action">更新为 "新款产品"</span></div><div class="vh-item"><span class="vh-time">09:30</span><span class="vh-user">管理员</span><span class="vh-action">更新为 "旧款产品"</span></div>', footer: 'close' },
@@ -1859,6 +1964,11 @@ function openDialog(type) {
   if (!dlg) { toast('功能开发中...', 'info'); return; }
   document.getElementById('modalTitle').textContent = dlg.title;
   document.getElementById('modalWindow').className = 'modal';
+  // If the dialog has a custom handler function, call it instead
+  if (dlg.handler && typeof window[dlg.handler] === 'function') {
+    window[dlg.handler]();
+    return;
+  }
   document.getElementById('modalBody').innerHTML = dlg.body;
   if (dlg.footer === 'okClose') {
     document.getElementById('modalFooter').innerHTML = '<button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="toast(\'操作完成\',\'success\');closeModal()">确定</button>';
@@ -1874,6 +1984,96 @@ function updateCFPreview() {
   const bg = document.getElementById('cfBgColor')?.value || '#ffebee';
   const preview = document.getElementById('cfPreview');
   if (preview) preview.style.cssText = 'color:'+color+';background:'+bg+';padding:6px;border-radius:4px;';
+}
+
+// ========== DROPDOWN OPTIONS DIALOG ==========
+function showDropdownOptionsDialog() {
+  // Build column selector (only editable text columns, not numbers/links/images)
+  const editableCols = COLUMNS.filter(c => c.editable && c.type !== 'number' && c.type !== 'link' && c.type !== 'image' && c.key !== 'row_num');
+  const colOptions = editableCols.map(c => '<option value="'+c.key+'">'+escHtml(c.label)+'</option>').join('');
+
+  // Find which column is currently selected
+  const selectedColKey = selectedCell ? selectedCell.dataset.key : '';
+
+  const bodyHtml = '<div class="form-group"><label>应用到列</label><select id="ddColumnSelect" onchange="onDropdownColumnChange()">'+colOptions+'</select></div>'
+    + '<div class="form-group"><label>选项（每行一个）</label><textarea id="ddOptionsText" rows="6" style="width:100%;font-family:monospace;resize:vertical;" placeholder="每行输入一个选项值"></textarea></div>'
+    + '<div class="form-group"><label style="display:flex;align-items:center;gap:6px;font-size:12px;"><input type="checkbox" id="ddAllowCustom" checked> 允许下拉以外值</label></div>'
+    + '<div style="font-size:12px;color:var(--gray-500);padding:4px 0;"><span id="ddStatus">提示：从已有数据中提取选项，或手动输入</span></div>';
+
+  document.getElementById('modalBody').innerHTML = bodyHtml;
+  document.getElementById('modalFooter').innerHTML = '<button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-outline" onclick="extractColumnOptions()" style="margin-right:auto;">从数据提取</button><button class="btn btn-outline" onclick="clearDropdownOptions()" style="color:var(--danger);">清除</button><button class="btn btn-primary" onclick="saveDropdownOptions()">确定</button>';
+  document.getElementById('modalOverlay').classList.add('active');
+
+  // If a column was selected, load its existing options
+  if (selectedColKey) {
+    setTimeout(() => {
+      document.getElementById('ddColumnSelect').value = selectedColKey;
+      onDropdownColumnChange();
+    }, 50);
+  }
+}
+
+function onDropdownColumnChange() {
+  const colKey = document.getElementById('ddColumnSelect').value;
+  const dd = columnDropdowns[colKey];
+  if (dd && dd.options && dd.options.length) {
+    document.getElementById('ddOptionsText').value = dd.options.join('\n');
+    document.getElementById('ddAllowCustom').checked = dd.allowCustom !== false;
+    document.getElementById('ddStatus').textContent = '已配置 ' + dd.options.length + ' 个选项' + (dd.allowCustom !== false ? '（允许自定义）' : '（仅限下拉值）');
+  } else {
+    document.getElementById('ddOptionsText').value = '';
+    document.getElementById('ddAllowCustom').checked = true;
+    document.getElementById('ddStatus').textContent = '该列暂无下拉选项配置';
+  }
+}
+
+function extractColumnOptions() {
+  const colKey = document.getElementById('ddColumnSelect').value;
+  if (!products.length) { toast('没有数据可提取', 'info'); return; }
+  const values = new Set();
+  products.forEach(p => {
+    const v = p[colKey];
+    if (v !== null && v !== undefined && String(v).trim()) {
+      values.add(String(v).trim());
+    }
+  });
+  const sorted = Array.from(values).sort();
+  if (sorted.length === 0) { toast('该列没有数据', 'info'); return; }
+  document.getElementById('ddOptionsText').value = sorted.join('\n');
+  document.getElementById('ddStatus').textContent = '已从现有数据中提取 ' + sorted.length + ' 个唯一值';
+  toast('已提取 ' + sorted.length + ' 个选项', 'success');
+}
+
+function saveDropdownOptions() {
+  const colKey = document.getElementById('ddColumnSelect').value;
+  const text = document.getElementById('ddOptionsText').value;
+  const allowCustom = document.getElementById('ddAllowCustom').checked;
+  const options = text.split('\n').map(s => s.trim()).filter(s => s.length > 0);
+  if (options.length === 0) {
+    delete columnDropdowns[colKey];
+    persistDropdownOptions();
+    toast('已清除该列的下拉选项', 'info');
+  } else {
+    columnDropdowns[colKey] = { options, allowCustom };
+    persistDropdownOptions();
+    toast('下拉选项已保存：' + options.length + ' 个选项', 'success');
+  }
+  closeModal();
+  // Re-render to apply the dropdown to visible cells
+  renderGrid();
+}
+
+function clearDropdownOptions() {
+  const colKey = document.getElementById('ddColumnSelect').value;
+  if (columnDropdowns[colKey]) {
+    delete columnDropdowns[colKey];
+    persistDropdownOptions();
+    toast('已清除下拉选项', 'info');
+  } else {
+    toast('该列没有下拉选项', 'info');
+  }
+  closeModal();
+  renderGrid();
 }
 
 // ========== MODAL HELPERS ==========
